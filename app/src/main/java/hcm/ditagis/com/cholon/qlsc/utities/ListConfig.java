@@ -113,22 +113,22 @@ public class ListConfig {
         configs.add(new Config(mContext.getResources().getString(R.string.URL_DIEM_XA_CAN),
                 mContext.getResources().getStringArray(R.array.queryFields_diemXaCan),
                 mContext.getResources().getStringArray(R.array.outFields_diemXaCan),
-                mContext.getResources().getString(R.string.ALIAS_DONG_HO_KHACH_HANG),
+                mContext.getResources().getString(R.string.ALIAS_DIEM_XA_CAN),
                 mContext.getResources().getInteger(R.integer.minScale_diemXaCan), new String[]{}));
         configs.add(new Config(mContext.getResources().getString(R.string.URL_DIEM_BE_CHUA),
                 mContext.getResources().getStringArray(R.array.queryFields_beChua),
                 mContext.getResources().getStringArray(R.array.outFields_beChua),
-                mContext.getResources().getString(R.string.ALIAS_DONG_HO_KHACH_HANG),
+                mContext.getResources().getString(R.string.ALIAS_BE_CHUA),
                 mContext.getResources().getInteger(R.integer.minScale_beChua), new String[]{}));
         configs.add(new Config(mContext.getResources().getString(R.string.URL_THAP_CAT_AP),
                 mContext.getResources().getStringArray(R.array.queryFields_thapCatAp),
                 mContext.getResources().getStringArray(R.array.outFields_thapCatAp),
-                mContext.getResources().getString(R.string.ALIAS_DONG_HO_KHACH_HANG),
+                mContext.getResources().getString(R.string.ALIAS_THAP_CAT_AP),
                 mContext.getResources().getInteger(R.integer.minScale_thapCatAp), new String[]{}));
         configs.add(new Config(mContext.getResources().getString(R.string.URL_THUY_DAI),
                 mContext.getResources().getStringArray(R.array.queryFields_thuyDai),
                 mContext.getResources().getStringArray(R.array.outFields_thuyDai),
-                mContext.getResources().getString(R.string.ALIAS_DONG_HO_KHACH_HANG),
+                mContext.getResources().getString(R.string.ALIAS_THUY_DAI),
                 mContext.getResources().getInteger(R.integer.minScale_thuyDai), new String[]{}));
 
         configs.add(new Config(mContext.getResources().getString(R.string.URL_DIEM_SU_CO),

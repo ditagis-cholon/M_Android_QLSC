@@ -34,11 +34,11 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.QuanLySuCo;
+import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapAddFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
 import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
-import hcm.ditagis.com.cholon.qlsc.R;
 
 /**
  * Created by ThanLe on 2/2/2018.
@@ -132,7 +132,8 @@ public class MapViewHandler extends Activity {
         final QueryParameters queryParameters = new QueryParameters();
         final String query = "OBJECTID = " + objectID;
         queryParameters.setWhereClause(query);
-        final ListenableFuture<FeatureQueryResult> feature = mServiceFeatureTable.queryFeaturesAsync(queryParameters);
+        final ListenableFuture<FeatureQueryResult> feature =
+                mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
         feature.addDoneListener(new Runnable() {
             @Override
             public void run() {
@@ -217,7 +218,7 @@ public class MapViewHandler extends Activity {
                         }
                         String viTri = "";
                         try {
-                            viTri = attributes.get(mContext.getString(R.string.Field_SuCo_ViTri)).toString();
+                            viTri = attributes.get(mContext.getString(R.string.Field_SuCo_DiaChi)).toString();
                         } catch (Exception ignored) {
 
                         }

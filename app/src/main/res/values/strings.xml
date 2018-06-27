@@ -48,6 +48,10 @@
     <string name="ALIAS_SONG_HO">Sông hồ</string>
     <string name="ALIAS_GIAO_THONG">Giao thông</string>
     <string name="ALIAS_HANH_CHINH">Hành chính</string>
+    <string name="ALIAS_DIEM_XA_CAN">Điểm xả cặn</string>
+    <string name="ALIAS_THUY_DAI">Thủy đài</string>
+    <string name="ALIAS_THAP_CAT_AP">Tháp cắt áp</string>
+    <string name="ALIAS_BE_CHUA">Bể chứa</string>
     <!--ALIAS END-->
     <string name="URL_DIEM_SU_CO">http://sawagis.vn/arcgis/rest/services/ChoLon/SuCo/FeatureServer/0</string>
     <string name="URL_DONG_HO_KHACH_HANG">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonGIS/MapServer/0</string>
@@ -271,7 +275,7 @@
     <string name="Quan8Name">Quận 8</string>
     <string name="QuanBinhTanName">Bình Tân</string>
     <string name="format_date_month_year">%02d_%02d_%d</string>
-    <string name="SoNha">SoNha</string>
+    <string name="Field_SuCo_DiaChi">SoNha</string>
     <string name="LoaiSuCo_OngNganh">Ống ngánh</string>
     <string name="LoaiSuCo_OngChinh">Ống chính</string>
 
