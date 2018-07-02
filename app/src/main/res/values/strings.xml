@@ -74,7 +74,7 @@
     <string name="URL_GIAO_THONG">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonBaseMap/MapServer/2</string>
     <string name="URL_SONG_HO">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonBaseMap/MapServer/3</string>
     <string name="URL_THUA_DAT">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonBaseMap/MapServer/4</string>
-    <string name="URL_HANH_CHINH">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonBaseMap/MapServer/6</string>
+    <string name="URL_HANH_CHINH">http://sawagis.vn/arcgis/rest/services/ChoLon/ChoLonBaseMap/MapServer/5</string>
     <!--URL START-->
     <string name="url_image_symbol_chuasuachua">http://sawagis.vn/tanhoa/Content/images/map/0.png</string>
     <string name="url_image_symbol_dangsuachua">http://sawagis.vn/tanhoa/Content/images/map/1.png</string>
