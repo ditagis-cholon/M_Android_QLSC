@@ -213,7 +213,7 @@
     <string name="sql_changepassword">update users set pass = ?, c_pass = ? where username = ?</string>
     <string name="sql_get_docso">select top 1 * from &table_docso; where docsoid = ? </string>
 
-    <string name="sql_select_ma_dma">  select madma from dma  order by madma asc</string>
+    <string name="sql_select_ma_dma">select madma from sde.dma where madma is not null order by madma asc</string>
     <string name="sql_select_nguyennhan_ongchinh">  SELECT *  FROM NguyenNhanOngChinh</string>
     <string name="sql_select_nguyennhan_ongnganh">  SELECT *  FROM NguyenNhanOngNganh</string>
     <string name="sql_select_vatlieu_ongchinh">  SELECT *  FROM VatLieuOngChinh</string>
@@ -319,5 +319,7 @@
     <string name="message_ChupAnh_HoanThanh">Cần chụp ảnh để hoàn thành sự cố</string>
     <string name="message_soluong_themvattu">Số lượng không được để trống</string>
     <string name="message_number_format_exception">Số liệu nhập vào không đúng định dạng</string>
+    <string name="btnRight_editItemViewMoreInfo">Cập nhật</string>
+    <string name="btnLeft_editItemViewMoreInfo">Hủy</string>
     <!--field sự cố end-->
 </resources>
