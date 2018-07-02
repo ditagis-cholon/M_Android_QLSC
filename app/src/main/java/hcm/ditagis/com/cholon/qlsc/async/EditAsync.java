@@ -124,7 +124,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                             || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
 
                         List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort-1).getDomains().get(mContext.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
+                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
                         if (codedValues != null) {
                             for (CodedValue codedValue : codedValues) {
                                 if (codedValue.getName().equals(item.getValue())) {
@@ -140,7 +140,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                     if (finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngNganh))
                             || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
                         List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort-1).getDomains().get(mContext.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
+                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
                         if (codedValues != null) {
                             for (CodedValue codedValue : codedValues) {
                                 if (codedValue.getName().equals(item.getValue())) {
@@ -154,7 +154,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                     if (finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngNganh))
                             || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
                         List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort-1).getDomains().get(mContext.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
+                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
                         if (codedValues != null) {
                             for (CodedValue codedValue : codedValues) {
                                 if (codedValue.getName().equals(item.getValue())) {
@@ -204,8 +204,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                     if (hasDomain)
                         if (codeDomain != null)
                             mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), codeDomain.toString());
-                        else
-                            mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), null);
+                        else mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), null);
                     else
                         mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), item.getValue());
                     break;
