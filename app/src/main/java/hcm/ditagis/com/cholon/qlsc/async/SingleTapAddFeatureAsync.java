@@ -106,6 +106,8 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                             feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan8Code));
                         else if (subAdminArea.equals(mContext.getString(R.string.Quan6Name)))
                             feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan6Code));
+                        else if (subAdminArea.equals(mContext.getString(R.string.QuanBinhTanName)))
+                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
                         Short intObj = (short) 0;
                         feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
 
