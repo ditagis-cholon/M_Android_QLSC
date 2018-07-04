@@ -132,7 +132,7 @@
 
     <string name="format_day_yearfirst">yyyy-MM-dd HH:mm:ss</string>
     <string name="format_time_day_month_year">dd/MM/yyyy</string>
-
+    <string name="format_definitionExp_DiemSuCo">trangthai = 0 or trangthai = 1 or (trangthai = 3 and (ngayxayra >= date\'%s\'))</string>
     <!--Route begin-->
     <string name="title_activity_find_route">Tìm đường đi</string>
     <string name="find_route_xem_ban_do">Xem bản đồ</string>
