@@ -5,11 +5,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.connectDB.ConnectionDB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.LoginDB;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 
 public class LoginAsycn extends AsyncTask<String, Void, KhachHang> {
     private ProgressDialog mDialog;
@@ -44,7 +44,7 @@ public class LoginAsycn extends AsyncTask<String, Void, KhachHang> {
             publishProgress();
             LoginDB loginDB = new LoginDB(mContext);
             KhachHang khachHang = loginDB.find(danhBo, pin);
-            KhachHang.khachHangDangNhap = khachHang;
+            KhachHangDangNhap.getInstance().setKhachHang(khachHang);
             return khachHang;
         } catch (Exception e) {
             Log.e("Lỗi đăng nhập", e.toString());

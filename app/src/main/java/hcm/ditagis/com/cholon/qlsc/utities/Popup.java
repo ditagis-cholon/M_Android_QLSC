@@ -70,8 +70,8 @@ import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoDB;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
@@ -204,7 +204,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                                     .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
 
                         }
-                    }  else {
+                    } else {
                         codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
 
                     }
@@ -272,7 +272,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 @Override
                 public void onClick(View view) {
                     EditAsync editAsync = new EditAsync(mMainActivity,
-                            (ServiceFeatureTable) mFeatureLayerDTG.getFeatureLayer().getFeatureTable(),
+                            (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
                             mSelectedArcGISFeature, true, null, mListHoSoVatTuSuCo, isAddFeature, new EditAsync.AsyncResponse() {
                         @Override
                         public void processFinish(ArcGISFeature arcGISFeature) {
@@ -317,7 +317,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                                         MySnackBar.make(mBtnLeft, R.string.message_ChupAnh_HoanThanh, true);
                                     } else {
                                         EditAsync editAsync = new EditAsync(mMainActivity,
-                                                (ServiceFeatureTable) mFeatureLayerDTG.getFeatureLayer().getFeatureTable(),
+                                                (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
                                                 mSelectedArcGISFeature, true, null, mListHoSoVatTuSuCo, isAddFeature, new EditAsync.AsyncResponse() {
                                             @Override
                                             public void processFinish(ArcGISFeature arcGISFeature) {
@@ -335,7 +335,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
                     } else {
                         EditAsync editAsync = new EditAsync(mMainActivity,
-                                (ServiceFeatureTable) mFeatureLayerDTG.getFeatureLayer().getFeatureTable(),
+                                (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
                                 mSelectedArcGISFeature, true, null, mListHoSoVatTuSuCo, isAddFeature, new EditAsync.AsyncResponse() {
                             @Override
                             public void processFinish(ArcGISFeature arcGISFeature) {
@@ -373,7 +373,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private void loadDataViewMoreInfo(boolean isAddFeature, View layout) {
         Map<String, Object> attr = mSelectedArcGISFeature.getAttributes();
 
-        String[] updateFields = mFeatureLayerDTG.getUpdateFields();
+        String[] updateFields = mMainActivity.getResources().getStringArray(R.array.update_fields_arrays);
         String[] addFields = mMainActivity.getResources().getStringArray(R.array.add_fields_arrays);
         String[] no_displayFields = mMainActivity.getResources().getStringArray(R.array.no_display_fields_arrays);
         String typeIdField = mSelectedArcGISFeature.getFeatureTable().getTypeIdField();
@@ -685,7 +685,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         if (item.getValue() != null)
             spin.setSelection(codes.indexOf(item.getValue()));
     }
-
 
 
     private void loadDataEdit_VatTu(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
@@ -1071,7 +1070,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     private void clearSelection() {
         if (mFeatureLayerDTG != null) {
-            FeatureLayer featureLayer = mFeatureLayerDTG.getFeatureLayer();
+            FeatureLayer featureLayer = mFeatureLayerDTG.getLayer();
             featureLayer.clearSelection();
         }
     }
@@ -1089,7 +1088,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         dimissCallout();
         this.mSelectedArcGISFeature = selectedArcGISFeature;
 
-        FeatureLayer featureLayer = mFeatureLayerDTG.getFeatureLayer();
+        FeatureLayer featureLayer = mFeatureLayerDTG.getLayer();
         featureLayer.selectFeature(mSelectedArcGISFeature);
         lstFeatureType = new ArrayList<>();
         for (int i = 0; i < mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().size(); i++) {
@@ -1102,7 +1101,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         linearLayout.findViewById(R.id.imgBtn_layout_thongtinsuco).setOnClickListener(this);
         if (featureLayer.getName().equals(mMainActivity.getString(R.string.ALIAS_DIEM_SU_CO))) {
             //user admin mới có quyền xóa
-            if (KhachHang.khachHangDangNhap.getUserName().equals("admin")) {
+            if (KhachHangDangNhap.getInstance().getKhachHang().getUserName().equals("admin")) {
                 linearLayout.findViewById(R.id.imgBtn_delete).setOnClickListener(this);
             } else {
                 linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.GONE);

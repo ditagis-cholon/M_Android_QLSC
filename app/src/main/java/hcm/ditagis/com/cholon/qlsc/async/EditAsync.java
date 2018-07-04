@@ -27,6 +27,7 @@ import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoDB;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 /**
@@ -246,7 +247,8 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
             c[0] = Calendar.getInstance();
             mSelectedArcGISFeature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayKhacPhuc), c[0]);
         }
-        mSelectedArcGISFeature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NhanVienGiamSat), KhachHang.khachHangDangNhap.getUserName());
+        mSelectedArcGISFeature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NhanVienGiamSat),
+                KhachHangDangNhap.getInstance().getKhachHang().getUserName());
 
         mServiceFeatureTable.loadAsync();
         mServiceFeatureTable.addDoneLoadingListener(new Runnable() {

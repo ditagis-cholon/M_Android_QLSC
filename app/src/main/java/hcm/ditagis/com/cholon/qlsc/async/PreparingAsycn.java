@@ -10,8 +10,11 @@ import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.connectDB.DMADB;
+import hcm.ditagis.com.cholon.qlsc.connectDB.ListFeatureLayerDTGDB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngChinhDB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngNganhDB;
+import hcm.ditagis.com.cholon.qlsc.entities.ListLayerInfoDTG;
+import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class PreparingAsycn extends AsyncTask<Void, Void, List<Object>> {
     private ProgressDialog mDialog;
@@ -48,6 +51,11 @@ public class PreparingAsycn extends AsyncTask<Void, Void, List<Object>> {
 
             VatTuOngNganhDB getListVatTuOngNganhDB = new VatTuOngNganhDB(mContext);
             lst.add(getListVatTuOngNganhDB.find());
+
+            ListFeatureLayerDTGDB listFeatureLayerDTGDB = new ListFeatureLayerDTGDB(mContext);
+            ListLayerInfoDTG.getInstance().setLstFeatureLayerDTG(listFeatureLayerDTGDB.find(Preference.getInstance().loadPreference(
+                    mContext.getString(R.string.preference_username)
+            )));
         } catch (Exception e) {
             Log.e("Lỗi lấy danh sách DMA", e.toString());
         }

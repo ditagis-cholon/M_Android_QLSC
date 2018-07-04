@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import hcm.ditagis.com.cholon.qlsc.async.LoginAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
@@ -75,22 +76,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 //        handleLoginSuccess(userName,passWord);
 //        final String finalUserName = userName;
-//        LoginAsycn loginAsycn = new LoginAsycn(this, new LoginAsycn.AsyncResponse() {
-//
-//            @Override
-//            public void processFinish(KhachHang output) {
-//                if (output != null)
-//                    handleLoginSuccess(output);
-//                else
-//                    handleLoginFail();
-//            }
-//        });
-//        loginAsycn.execute(userName, passWord);
-        if (userName.equals("cholon") && passWord.equals("123456")) {
-            KhachHang.khachHangDangNhap = new KhachHang(userName,passWord,"Cấp nước Chợ Lớn",true,true,true,true);
-            handleLoginSuccess(KhachHang.khachHangDangNhap);
-        } else
-            handleLoginFail();
+        LoginAsycn loginAsycn = new LoginAsycn(this, new LoginAsycn.AsyncResponse() {
+
+            @Override
+            public void processFinish(KhachHang output) {
+                if (output != null)
+                    handleLoginSuccess(output);
+                else
+                    handleLoginFail();
+            }
+        });
+        loginAsycn.execute(userName, passWord);
+//        if (userName.equals("cholon") && passWord.equals("123456")) {
+//            KhachHang.khachHangDangNhap = new KhachHang(userName,passWord,"Cấp nước Chợ Lớn",true,true,true,true);
+//            handleLoginSuccess(KhachHang.khachHangDangNhap);
+//        } else
+//            handleLoginFail();
     }
 
     private void handleInfoLoginEmpty() {

@@ -52,9 +52,7 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
             String query = mContext.getString(R.string.sql_login);
             PreparedStatement mStatement = cnn.prepareStatement(query);
 
-            String passEncoded1 = (new EncodeMD5()).encode(passWord);
-            String passEncoded2 = (new EncodeMD5()).encode(passEncoded1 + mContext.getString(R.string.encode_string));
-            String passEncoded = (passEncoded1 + ":" + passEncoded2).replace("-", "");
+            String passEncoded = (new EncodeMD5()).encode(passWord + "_DITAGIS");
 
 
             mStatement.setString(1, userName);
@@ -66,6 +64,11 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
                 khachHang = new KhachHang();
                 khachHang.setUserName(userName);
                 khachHang.setDisplayName(rs.getString(mContext.getString(R.string.sql_coloumn_login_displayname)));
+                khachHang.setQuan5(true);
+                khachHang.setQuan6(true);
+                khachHang.setQuan8(true);
+                khachHang.setQuanBinhTan(true);
+                khachHang.setValid(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_status)));
 //                khachHang.setTanBinh(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanbinh)));
 //                khachHang.setTanPhu(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanphu)));
 //                khachHang.setPhuNhuan(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_phunhuan)));

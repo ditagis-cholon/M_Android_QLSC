@@ -1,4 +1,4 @@
-<!DOCTYPE resources [<!ENTITY table_temp_docso "#docsotemp"><!ENTITY table_docso "Docso"><!ENTITY table_lichsuds "LichSuDS"><!ENTITY table_khachhang "KhachHang1"><!ENTITY table_hinhdhn "Docsoth_hinh..HinhDHN">]>
+<!DOCTYPE resources [<!ENTITY table_sys_layer "ChoLonSystem..SYS_Layer"><!ENTITY table_sys_layer_account "ChoLonSystem..SYS_Layer_Account"><!ENTITY table_sys_account "ChoLonSystem..SYS_Account">]>
 <resources>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -83,8 +83,6 @@
     <!--URL END-->
     <string name="path_saveImage">.qlsc</string>
     <string name="attachment">attachment</string>
-    <!--<string name="world_elevation_service">https://ditagis.com:6443/arcgis/rest/services/HoChiMinh/SuCo_TanHoa/MapServer</string>-->
-    <!--<string name="service_feature_table">https://113.161.88.180:800/arcgis/rest/services/TanHoa/TanHoaSuCo/FeatureServer/0</string>-->
     <string name="world_elevation_service">http://113.161.88.180:800/arcgis/rest/services/TanHoa/TanHoaSuCo/MapServer</string>
     <string name="service_feature_table">http://113.161.88.180:800/arcgis/rest/services/TanHoa/TanHoaSuCo/FeatureServer/0</string>
 
@@ -172,49 +170,38 @@
     <!--preference end-->
 
     <!--sql begin-->
-    <string name="sql_table_name_docso">&table_docso;</string>
-    <string name="sql_table_name_khachhang">&table_khachhang;</string>
-    <string name="sql_table_name_hinhdhn">&table_hinhdhn;</string>
-    <string name="sql_table_name_lichsuds">&table_lichsuds;</string>
 
     <!--sql column login begin-->
-    <string name="sql_coloumn_login_displayname">namedisplay</string>
+    <string name="sql_coloumn_login_displayname">displayname</string>
     <string name="sql_coloumn_login_tanbinh">tanbinh</string>
     <string name="sql_coloumn_login_tanphu">tanphu</string>
     <string name="sql_coloumn_login_phunhuan">phunhuan</string>
+    <string name="sql_coloumn_login_status">status</string>
     <!--sql column login end-->
 
-    <!--sql column docso start-->
-    <string name="sql_coloumn_docso_cscu">cscu</string>
-    <string name="sql_coloumn_docso_csmoi">csmoi</string>
-    <string name="sql_coloumn_docso_tieuthucu">tieuthucu</string>
-    <string name="sql_coloumn_docso_tieuthumoi">tieuthumoi</string>
-    <string name="sql_coloumn_docso_tiennuoc">tiennuoc</string>
-    <string name="sql_coloumn_docso_thuevat">thue</string>
-    <string name="sql_coloumn_docso_phibvmt">bvmt</string>
-    <string name="sql_coloumn_docso_tongtien">tongtien</string>
-    <!--sql column docso end-->
+    <!--sql column login begin-->
+    <string name="sql_coloumn_sys_id">id</string>
+    <string name="sql_coloumn_sys_title">title</string>
+    <string name="sql_coloumn_sys_url">url</string>
+    <string name="sql_coloumn_sys_number_order">NumericalOder</string>
+    <string name="sql_coloumn_sys_iscreate">iscreate</string>
+    <string name="sql_coloumn_sys_isdelete">isdelete</string>
+    <string name="sql_coloumn_sys_isedit">isedit</string>
+    <string name="sql_coloumn_sys_isview">isview</string>
+    <string name="sql_coloumn_sys_outfield">outfields</string>
+    <string name="sql_coloumn_sys_definition">definition</string>
 
-    <!--sql column lichsuds begin-->
-    <string name="sql_coloumn_lichsuds_nam">nam</string>
-    <string name="sql_coloumn_lichsuds_ky">ky</string>
-    <string name="sql_coloumn_lichsuds_nhanviends">nhanviends</string>
-    <!--sql column lichsuds end-->
-    <string name="sql_get_lichsuds">select top 1 * from &table_lichsuds; where dot = ? and may = ? order by nam desc, ky desc</string>
-    <string name="sql_get_khachhang">select * from &table_khachhang;
-        where danhba = ? and pin = ?</string>
+    <!--sql column login end-->
+
     <string name="sql_login">select *
-					 from Users u
-					 left join UserInGroup ug
-					 on ug.UserID = u.id
-					 left join GroupRole gr
-					 on ug.GroupID = gr.GroupID
-					 where u.username = ? and u.pass = ?</string>
+					 from &table_sys_account;
+					 where username = ? and password = ?</string>
     <string name="sql_changepassword">update users set pass = ?, c_pass = ? where username = ?</string>
-    <string name="sql_get_docso">select top 1 * from &table_docso; where docsoid = ? </string>
 
     <string name="sql_select_ma_dma">select madma from sde.dma where madma is not null order by madma asc</string>
     <string name="sql_select_nguyennhan_ongchinh">  SELECT *  FROM NguyenNhanOngChinh</string>
+    <string name="sql_select_sys_layer">SELECT *  FROM &table_sys_layer;
+        l  inner join &table_sys_layer_account; la  on l.id = la.Layer  where account = ?</string>
     <string name="sql_select_nguyennhan_ongnganh">  SELECT *  FROM NguyenNhanOngNganh</string>
     <string name="sql_select_vatlieu_ongchinh">  SELECT *  FROM VatLieuOngChinh</string>
     <string name="sql_select_vatlieu_ongnganh">  SELECT *  FROM VatLieuOngNganh</string>
@@ -267,7 +254,7 @@
     <string name="Quan6Code">775</string>
     <string name="Quan8Code">776</string>
     <string name="QuanBinhTanCode">777</string>
-    <string name="Name_DiemSuCo">DIEMSUCO</string>
+    <string name="Name_DiemSuCo">diemsucoLYR</string>
     <string name="message_not_area_management">Vị trí không thuộc địa bàn quản lý</string>
     <string name="message_no_geocoder_available">Cần cập nhật phiên bản Google+ mới nhất để dùng tính năng này</string>
     <string name="Quan5Name">Quận 5</string>

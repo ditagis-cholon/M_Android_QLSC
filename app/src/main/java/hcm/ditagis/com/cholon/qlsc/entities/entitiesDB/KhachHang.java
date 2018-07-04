@@ -8,13 +8,15 @@ public class KhachHang {
     private boolean isQuan6;
     private boolean isQuan8;
     private boolean isQuanBinhTan;
-    public static KhachHang khachHangDangNhap;
+
+    private boolean isCreate;
+    private boolean isValid;
 
     public KhachHang() {
 
     }
 
-    public KhachHang(String userName, String passWord, String displayName, boolean isQuan5, boolean isQuan6, boolean isQuan8, boolean isQuanBinhTan) {
+    public KhachHang(String userName, String passWord, String displayName, boolean isQuan5, boolean isQuan6, boolean isQuan8, boolean isQuanBinhTan, boolean isCreate, boolean isValid) {
         this.userName = userName;
         this.passWord = passWord;
         this.displayName = displayName;
@@ -22,6 +24,8 @@ public class KhachHang {
         this.isQuan6 = isQuan6;
         this.isQuan8 = isQuan8;
         this.isQuanBinhTan = isQuanBinhTan;
+        this.isCreate = isCreate;
+        this.isValid = isValid;
     }
 
     public String getUserName() {
@@ -80,11 +84,20 @@ public class KhachHang {
         isQuanBinhTan = quanBinhTan;
     }
 
-    public static KhachHang getKhachHangDangNhap() {
-        return khachHangDangNhap;
+
+    public boolean isCreate() {
+        return isCreate;
     }
 
-    public static void setKhachHangDangNhap(KhachHang khachHangDangNhap) {
-        KhachHang.khachHangDangNhap = khachHangDangNhap;
+    public void setCreate(boolean create) {
+        isCreate = create;
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    public void setValid(boolean valid) {
+        isValid = valid;
     }
 }

@@ -38,7 +38,7 @@ import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapAddFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 
 /**
  * Created by ThanLe on 2/2/2018.
@@ -68,10 +68,10 @@ public class MapViewHandler extends Activity {
                           Popup popupInfos, Context mContext, Geocoder geocoder) {
         this.mCallout = mCallout;
         this.mMapView = mapView;
-        this.mServiceFeatureTable = (ServiceFeatureTable) featureLayerDTG.getFeatureLayer().getFeatureTable();
+        this.mServiceFeatureTable = (ServiceFeatureTable) featureLayerDTG.getLayer().getFeatureTable();
         this.mPopUp = popupInfos;
         this.mContext = mContext;
-        this.suCoTanHoaLayer = featureLayerDTG.getFeatureLayer();
+        this.suCoTanHoaLayer = featureLayerDTG.getLayer();
         this.mGeocoder = geocoder;
     }
 

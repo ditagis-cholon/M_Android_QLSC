@@ -17,7 +17,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 
 /**
@@ -100,7 +100,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
 
     public FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
         for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
-            long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getFeatureLayer().getFeatureTable()).getServiceLayerId();
+            long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
             if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
         }
         return null;

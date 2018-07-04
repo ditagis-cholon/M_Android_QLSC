@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.MyServiceFeatureTable;
 
 public class FindLocationAsycn extends AsyncTask<String, List<MyAddress>, Void> {

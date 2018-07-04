@@ -55,6 +55,7 @@ import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReferences;
+import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
@@ -85,9 +86,12 @@ import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
+import hcm.ditagis.com.cholon.qlsc.entities.ListLayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Config;
 import hcm.ditagis.com.cholon.qlsc.utities.ListConfig;
@@ -299,36 +303,37 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         // config feature layer service
         List<Config> configs = ListConfig.getInstance(this).getConfigs();
         mFeatureLayerDTGS = new ArrayList<>();
-        for (Config config : configs) {
-            ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(config.getUrl());
+        List<FeatureLayerDTG> tmpLstFeatureLayerDTG = new ArrayList<>();
+        for (LayerInfoDTG layerInfoDTG : ListLayerInfoDTG.getInstance().getLstFeatureLayerDTG()) {
+            ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable("http:" + layerInfoDTG.getUrl());
+            Layer layer = null;
+            if (layerInfoDTG.getId().equals("BASEMAP")) {
+                ArcGISMapImageLayer arcGISMapImageLayer = new ArcGISMapImageLayer(layerInfoDTG.getUrl());
+                layer = arcGISMapImageLayer;
+            } else {
+                FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
+                featureLayer.setName(layerInfoDTG.getTitleLayer());
+                featureLayer.setMaxScale(0);
 
-            FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
-            featureLayer.setName(config.getAlias());
-            featureLayer.setMaxScale(0);
+                featureLayer.setMinScale(1000000);
+                FeatureLayerDTG tmpFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
+                mFeatureLayerDTG = tmpFeatureLayerDTG;
+                if (layerInfoDTG.getId() != null && layerInfoDTG.getId().equals(getString(R.string.Name_DiemSuCo))) {
+                    TimePeriodReport timePeriodReport = new TimePeriodReport(this);
+                    featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
+                    featureLayer.setId(layerInfoDTG.getId());
+                    Callout callout = mMapView.getCallout();
+                    mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mLocationDisplay, mListObjectDB, mGeocoder, mFeatureLayerDTGS);
+                    featureLayer.setPopupEnabled(true);
+                    setRendererSuCoFeatureLayer(featureLayer);
+                    FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
 
-            featureLayer.setMinScale(1000000);
-            FeatureLayerDTG featureLayerDTG = new FeatureLayerDTG(featureLayer);
-            featureLayerDTG.setOutFields(config.getOutField());
-            featureLayerDTG.setQueryFields(config.getQueryField());
-            featureLayerDTG.setTitleLayer(featureLayer.getName());
-            featureLayerDTG.setUpdateFields(config.getUpdateField());
-            mFeatureLayerDTG = featureLayerDTG;
-            if (config.getName() != null && config.getName().equals(getString(R.string.Name_DiemSuCo))) {
-                TimePeriodReport timePeriodReport = new TimePeriodReport(this);
-                featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
-                featureLayer.setId(config.getName());
-                Callout callout = mMapView.getCallout();
-                mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mLocationDisplay, mListObjectDB, mGeocoder, mFeatureLayerDTGS);
-                featureLayer.setPopupEnabled(true);
-                setRendererSuCoFeatureLayer(featureLayer);
-                FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
-
-                mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
-                mFeatureLayerDTG.getFeatureLayer().getFeatureTable().loadAsync();
+                    mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
+                }
+                layer = featureLayer;
+                mFeatureLayerDTGS.add(mFeatureLayerDTG);
             }
-
-            mFeatureLayerDTGS.add(mFeatureLayerDTG);
-            mMap.getOperationalLayers().add(featureLayer);
+            mMap.getOperationalLayers().add(layer);
 
         }
         mMapView.setMap(mMap);
@@ -388,7 +393,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
                     if (buttonView.isChecked()) {
                         for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
-                            if (featureLayerDTG.getTitleLayer().contentEquals(textView.getText())
+                            if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
                                     && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
                                 tmpFeatureLayerDTGs.add(featureLayerDTG);
                                 layer.setVisible(true);
@@ -397,7 +402,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
                     } else {
                         for (FeatureLayerDTG featureLayerDTG : tmpFeatureLayerDTGs)
-                            if (featureLayerDTG.getTitleLayer().contentEquals(textView.getText())
+                            if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
                                     && tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
                                 tmpFeatureLayerDTGs.remove(featureLayerDTG);
                                 layer.setVisible(false);
@@ -414,7 +419,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
             if (layer.getName().equals(getString(R.string.ALIAS_DIEM_SU_CO))) {
                 checkBox.setChecked(true);
                 for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
-                    if (featureLayerDTG.getTitleLayer().contentEquals(checkBox.getText())
+                    if (featureLayerDTG.getLayer().getName().contentEquals(checkBox.getText())
                             && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
                         tmpFeatureLayerDTGs.add(featureLayerDTG);
                         layer.setVisible(true);
@@ -610,7 +615,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void processFinish(List<MyAddress> output) {
                 if (output != null) {
-                    KhachHang khachHangDangNhap = KhachHang.khachHangDangNhap;
+                    KhachHang khachHangDangNhap = KhachHangDangNhap.getInstance().getKhachHang();
                     String subAdminArea = output.get(0).getSubAdminArea();
                     //nếu tài khoản có quyền truy cập vào
                     if ((khachHangDangNhap.isQuan5() && subAdminArea.equals(getString(R.string.Quan5Name))) ||
@@ -812,6 +817,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 break;
         }
     }
+
     public void onClickCheckBox(View v) {
         if (v instanceof CheckBox) {
             CheckBox checkBox = (CheckBox) v;
@@ -1050,7 +1056,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 //                            mMapViewHandler.addFeature(image);
 
                             EditAsync editAsync = new EditAsync(this, (ServiceFeatureTable)
-                                    mFeatureLayerDTG.getFeatureLayer().getFeatureTable(), mSelectedArcGISFeature,
+                                    mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
                                     true, image, mPopUp.getListHoSoVatTuSuCo(), true, new EditAsync.AsyncResponse() {
                                 @Override
                                 public void processFinish(ArcGISFeature arcGISFeature) {
@@ -1089,7 +1095,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 //                            mMapViewHandler.addFeature(image);
 //                            mPopUp.getDialog().dismiss();
                             EditAsync editAsync = new EditAsync(this, (ServiceFeatureTable)
-                                    mFeatureLayerDTG.getFeatureLayer().getFeatureTable(), mSelectedArcGISFeature,
+                                    ((FeatureLayer)mFeatureLayerDTG.getLayer()).getFeatureTable(), mSelectedArcGISFeature,
                                     true, image, mPopUp.getListHoSoVatTuSuCo(), false, new EditAsync.AsyncResponse() {
                                 @Override
                                 public void processFinish(ArcGISFeature arcGISFeature) {

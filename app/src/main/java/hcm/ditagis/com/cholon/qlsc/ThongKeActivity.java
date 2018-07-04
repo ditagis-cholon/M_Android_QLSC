@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.ThongKeAdapter;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class ThongKeActivity extends AppCompatActivity {
@@ -190,7 +191,7 @@ public class ThongKeActivity extends AppCompatActivity {
     }
 
     private void query(ThongKeAdapter.Item item) {
-        mChuaSuaChua = mDangSuaChua  = mHoanThanh = 0;
+        mChuaSuaChua = mDangSuaChua = mHoanThanh = 0;
         ((TextView) ThongKeActivity.this.findViewById(R.id.txt_thongke_mota)).setText(item.getMota());
         TextView txtThoiGian = ThongKeActivity.this.findViewById(R.id.txt_thongke_thoigian);
         if (item.getThoigianhienthi() == null) txtThoiGian.setVisibility(View.GONE);
@@ -198,7 +199,7 @@ public class ThongKeActivity extends AppCompatActivity {
             txtThoiGian.setText(item.getThoigianhienthi());
             txtThoiGian.setVisibility(View.VISIBLE);
         }
-        KhachHang khachHang = KhachHang.khachHangDangNhap;
+        KhachHang khachHang = KhachHangDangNhap.getInstance().getKhachHang();
         String whereClause = "";
         if (item.getThoigianbatdau() == null || item.getThoigianketthuc() == null) {
             if (khachHang.isQuan5())

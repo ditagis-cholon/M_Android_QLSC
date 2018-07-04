@@ -7,7 +7,7 @@ import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.libs.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 
 public class MyServiceFeatureTable {
     private ServiceFeatureTable layerThuaDat;
@@ -16,13 +16,13 @@ public class MyServiceFeatureTable {
 
     private MyServiceFeatureTable(Context context, List<FeatureLayerDTG> mFeatureLayerDTGS) {
         for (FeatureLayerDTG feature : mFeatureLayerDTGS) {
-            if (feature.getTitleLayer().equals(context.getString(R.string.ALIAS_THUA_DAT))) {
-                layerThuaDat = (ServiceFeatureTable) feature.getFeatureLayer().getFeatureTable();
-            } else if (feature.getTitleLayer().equals(context.getString(R.string.ALIAS_DMA))) {
-                layerDMA = (ServiceFeatureTable) feature.getFeatureLayer().getFeatureTable();
+            if (feature.getLayer().getName().equals(context.getString(R.string.ALIAS_THUA_DAT))) {
+                layerThuaDat = (ServiceFeatureTable) feature.getLayer().getFeatureTable();
+            } else if (feature.getLayer().getName().equals(context.getString(R.string.ALIAS_DMA))) {
+                layerDMA = (ServiceFeatureTable) feature.getLayer().getFeatureTable();
 
-            } else if (feature.getTitleLayer().equals(context.getString(R.string.ALIAS_HANH_CHINH))) {
-                layerHanhChinh = (ServiceFeatureTable) feature.getFeatureLayer().getFeatureTable();
+            } else if (feature.getLayer().getName().equals(context.getString(R.string.ALIAS_HANH_CHINH))) {
+                layerHanhChinh = (ServiceFeatureTable) feature.getLayer().getFeatureTable();
             }
         }
 
