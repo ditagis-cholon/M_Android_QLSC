@@ -56,8 +56,11 @@ import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
+import com.esri.arcgisruntime.layers.ArcGISMapImageSublayer;
+import com.esri.arcgisruntime.layers.ArcGISSublayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.LayerList;
@@ -71,6 +74,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.symbology.UniqueValueRenderer;
+import com.esri.arcgisruntime.util.ListenableList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -86,15 +90,13 @@ import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
-import hcm.ditagis.com.cholon.qlsc.entities.ListLayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
-import hcm.ditagis.com.cholon.qlsc.utities.Config;
-import hcm.ditagis.com.cholon.qlsc.utities.ListConfig;
 import hcm.ditagis.com.cholon.qlsc.utities.MapViewHandler;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
@@ -102,11 +104,9 @@ import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
-    private List<Object> mListObjectDB;
     private Uri mUri;
     private Popup mPopUp;
     private MapView mMapView;
-    private ArcGISMap mMap;
     private FeatureLayerDTG mFeatureLayerDTG;
     private MapViewHandler mMapViewHandler;
     private TraCuuAdapter mSearchAdapter;
@@ -129,6 +129,10 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     private ImageView mImageOpenStreetMap, mImageStreetMap, mImageImageWithLabel;
     private TextView mTxtOpenStreetMap, mTxtStreetMap, mTxtImageWithLabel;
     private SearchView mTxtSearchView;
+    private int states[][];
+    private int colors[];
+    private ArcGISMapImageLayer mArcGISMapImageLayer;
+    private SeekBar mSeekBarAdministrator;
 
     public void setUri(Uri uri) {
         this.mUri = uri;
@@ -153,17 +157,17 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_su_co);
+
+        states = new int[][]{{android.R.attr.state_checked}, {}};
+        colors = new int[]{R.color.colorTextColor_1, R.color.colorTextColor_1};
         findViewById(R.id.layout_layer).setVisibility(View.INVISIBLE);
         requestPermisson();
 
 //        prepare();
         final PreparingAsycn preparingAsycn = new PreparingAsycn(this, new PreparingAsycn.AsyncResponse() {
             @Override
-            public void processFinish(List<Object> output) {
-                if (output != null) {
-                    mListObjectDB = output;
-                    prepare();
-                }
+            public void processFinish(Void output) {
+                prepare();
             }
         });
 
@@ -177,7 +181,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         // create an empty map instance
         setLicense();
         mGeocoder = new Geocoder(this.getApplicationContext(), Locale.getDefault());
-        mMap = new ArcGISMap(Basemap.Type.OPEN_STREET_MAP, 10.7554041, 106.6546293, 12);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -201,9 +205,9 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(QuanLySuCo.this);
         mMapView = findViewById(R.id.mapView);
-
+        mMapView.setMap(new ArcGISMap(Basemap.Type.OPEN_STREET_MAP, 10.7554041, 106.6546293, 12));
         setService();
-        mMap.addDoneLoadingListener(new Runnable() {
+        mMapView.getMap().addDoneLoadingListener(new Runnable() {
             @Override
             public void run() {
                 handleArcgisMapDoneLoading();
@@ -229,7 +233,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 if (mIsAddFeature && mMapViewHandler != null) {
                     //center is x, y
-                    Point center = ((MapView) mMapView).getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
+                    Point center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
 
                     //project is long, lat
                     Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
@@ -268,9 +272,27 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         mGraphicsOverlay = new GraphicsOverlay();
         mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
 
+        mSeekBarAdministrator = findViewById(R.id.skbr_hanhchinh_app_bar_quan_ly_su_co);
+        mSeekBarAdministrator.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mArcGISMapImageLayer.setOpacity((float) i / 100);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         findViewById(R.id.layout_layer_open_street_map).setOnClickListener(this);
         findViewById(R.id.layout_layer_street_map).setOnClickListener(this);
         findViewById(R.id.layout_layer_image).setOnClickListener(this);
+
 
         mTxtOpenStreetMap = findViewById(R.id.txt_layer_open_street_map);
         mTxtStreetMap = findViewById(R.id.txt_layer_street_map);
@@ -300,43 +322,64 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void setService() {
-        // config feature layer service
-        List<Config> configs = ListConfig.getInstance(this).getConfigs();
-        mFeatureLayerDTGS = new ArrayList<>();
-        List<FeatureLayerDTG> tmpLstFeatureLayerDTG = new ArrayList<>();
-        for (LayerInfoDTG layerInfoDTG : ListLayerInfoDTG.getInstance().getLstFeatureLayerDTG()) {
-            ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable("http:" + layerInfoDTG.getUrl());
-            Layer layer = null;
-            if (layerInfoDTG.getId().equals("BASEMAP")) {
-                ArcGISMapImageLayer arcGISMapImageLayer = new ArcGISMapImageLayer(layerInfoDTG.getUrl());
-                layer = arcGISMapImageLayer;
-            } else {
-                FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
-                featureLayer.setName(layerInfoDTG.getTitleLayer());
-                featureLayer.setMaxScale(0);
+        try {
+            // config feature layer service
+            mFeatureLayerDTGS = new ArrayList<>();
+            for (LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
+                if (layerInfoDTG.getId().substring(layerInfoDTG.getId().length() - 3,
+                        layerInfoDTG.getId().length() - 1).equals("TBL") || !layerInfoDTG.isView())
+                    continue;
+                String url = layerInfoDTG.getUrl();
+                if (!layerInfoDTG.getUrl().startsWith("http"))
+                    url = "http:" + layerInfoDTG.getUrl();
+                if (layerInfoDTG.getId().equals("BASEMAP")) {
+                    mArcGISMapImageLayer = new ArcGISMapImageLayer(url);
+                    mMapView.getMap().getOperationalLayers().add(mArcGISMapImageLayer);
+                    mArcGISMapImageLayer.addDoneLoadingListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mArcGISMapImageLayer.getLoadStatus() == LoadStatus.LOADED) {
+                                ListenableList<ArcGISSublayer> sublayerList = mArcGISMapImageLayer.getSublayers();
+                                for (ArcGISSublayer sublayer : sublayerList) {
+                                    addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors);
+                                }
 
-                featureLayer.setMinScale(1000000);
-                FeatureLayerDTG tmpFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
-                mFeatureLayerDTG = tmpFeatureLayerDTG;
-                if (layerInfoDTG.getId() != null && layerInfoDTG.getId().equals(getString(R.string.Name_DiemSuCo))) {
+                            }
+                        }
+                    });
+                    mArcGISMapImageLayer.loadAsync();
+
+                } else if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+                    ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
+                    FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
+                    featureLayer.setName(layerInfoDTG.getTitleLayer());
+                    featureLayer.setMaxScale(0);
+
+                    featureLayer.setMinScale(1000000);
+                    FeatureLayerDTG tmpFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
+
+
+                    mFeatureLayerDTG = tmpFeatureLayerDTG;
                     TimePeriodReport timePeriodReport = new TimePeriodReport(this);
                     featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
                     featureLayer.setId(layerInfoDTG.getId());
                     Callout callout = mMapView.getCallout();
-                    mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mLocationDisplay, mListObjectDB, mGeocoder, mFeatureLayerDTGS);
+                    mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mLocationDisplay, mGeocoder, mFeatureLayerDTGS);
                     featureLayer.setPopupEnabled(true);
                     setRendererSuCoFeatureLayer(featureLayer);
                     FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
 
                     mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
-                }
-                layer = featureLayer;
-                mFeatureLayerDTGS.add(mFeatureLayerDTG);
-            }
-            mMap.getOperationalLayers().add(layer);
 
+                    mFeatureLayerDTGS.add(tmpFeatureLayerDTG);
+                    mMapView.getMap().getOperationalLayers().add(featureLayer);
+                }
+
+
+            }
+        } catch (Exception e) {
+            Log.e("error", e.toString());
         }
-        mMapView.setMap(mMap);
 //        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
     }
 
@@ -347,94 +390,122 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         mLayoutDisplayLayerAdministration = findViewById(R.id.linnearDisplayLayerAdministration);
         mLayoutDisplayLayerAdministration.removeAllViews();
 
-        LayerList layers = mMap.getOperationalLayers();
-        int states[][] = {{android.R.attr.state_checked}, {}};
-        int colors[] = {R.color.colorTextColor_1, R.color.colorTextColor_1};
+        LayerList layers = mMapView.getMap().getOperationalLayers();
+
         for (final Layer layer : layers) {
+            if (layer instanceof FeatureLayer)
+                addCheckBox((FeatureLayer) layer, tmpFeatureLayerDTGs, states, colors);
+        }
+    }
 
-            LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
-            final SeekBar seekBar = layoutFeature.findViewById(R.id.skbr_layout_feature);
-            final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
-            final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
-            textView.setTextColor(getResources().getColor(android.R.color.black));
-            textView.setText(layer.getName());
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (seekBar.getVisibility() == View.VISIBLE)
-                        seekBar.setVisibility(View.GONE);
-                    else seekBar.setVisibility(View.VISIBLE);
+    private void addCheckBox(final FeatureLayer layer,
+                             final List<FeatureLayerDTG> tmpFeatureLayerDTGs, int[][] states, int[] colors) {
+        LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
+        final SeekBar seekBar = layoutFeature.findViewById(R.id.skbr_layout_feature);
+        final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
+        final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
+        textView.setTextColor(getResources().getColor(android.R.color.black));
+        textView.setText(layer.getName());
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (seekBar.getVisibility() == View.VISIBLE)
+                    seekBar.setVisibility(View.GONE);
+                else seekBar.setVisibility(View.VISIBLE);
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                layer.setOpacity((float) i / 100);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        checkBox.setChecked(false);
+        layer.setVisible(false);
+        CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (buttonView.isChecked()) {
+                    for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
+                        if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
+                                && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
+                            tmpFeatureLayerDTGs.add(featureLayerDTG);
+                            layer.setVisible(true);
+                            break;
+                        }
+
+                } else {
+                    for (FeatureLayerDTG featureLayerDTG : tmpFeatureLayerDTGs)
+                        if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
+                                && tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
+                            tmpFeatureLayerDTGs.remove(featureLayerDTG);
+                            layer.setVisible(false);
+                            break;
+                        }
+
                 }
-            });
-
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    layer.setOpacity((float) i / 100);
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-            checkBox.setChecked(false);
-            layer.setVisible(false);
-            CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                    if (buttonView.isChecked()) {
-                        for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
-                            if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
-                                    && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
-                                tmpFeatureLayerDTGs.add(featureLayerDTG);
-                                layer.setVisible(true);
-                                break;
-                            }
-
-                    } else {
-                        for (FeatureLayerDTG featureLayerDTG : tmpFeatureLayerDTGs)
-                            if (featureLayerDTG.getLayer().getName().contentEquals(textView.getText())
-                                    && tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
-                                tmpFeatureLayerDTGs.remove(featureLayerDTG);
-                                layer.setVisible(false);
-                                break;
-                            }
-
-                    }
-                    if (mMapViewHandler != null)
-                        mMapViewHandler.setFeatureLayerDTGs(tmpFeatureLayerDTGs);
-
-                }
-            });
-
-            if (layer.getName().equals(getString(R.string.ALIAS_DIEM_SU_CO))) {
-                checkBox.setChecked(true);
-                for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
-                    if (featureLayerDTG.getLayer().getName().contentEquals(checkBox.getText())
-                            && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
-                        tmpFeatureLayerDTGs.add(featureLayerDTG);
-                        layer.setVisible(true);
-                        break;
-                    }
                 if (mMapViewHandler != null)
                     mMapViewHandler.setFeatureLayerDTGs(tmpFeatureLayerDTGs);
-            } else if (layer.getName().equals(getString(R.string.ALIAS_THUA_DAT))
-                    || layer.getName().equals(getString(R.string.ALIAS_SONG_HO))
-                    || layer.getName().equals(getString(R.string.ALIAS_GIAO_THONG))
-                    || layer.getName().equals(getString(R.string.ALIAS_HANH_CHINH)))
-                mLayoutDisplayLayerAdministration.addView(layoutFeature);
-            else
-                mLayoutDisplayLayerFeature.addView(layoutFeature);
-        }
+
+            }
+        });
+
+        if (layer.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+            checkBox.setChecked(true);
+            for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
+                if (featureLayerDTG.getLayer().getName().contentEquals(checkBox.getText())
+                        && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
+                    tmpFeatureLayerDTGs.add(featureLayerDTG);
+                    layer.setVisible(true);
+                    break;
+                }
+            if (mMapViewHandler != null)
+                mMapViewHandler.setFeatureLayerDTGs(tmpFeatureLayerDTGs);
+        } else
+            mLayoutDisplayLayerFeature.addView(layoutFeature);
+    }
+
+    private void addCheckBox(final ArcGISMapImageSublayer layer, int[][] states, int[] colors) {
+        LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
+        final SeekBar seekBar = layoutFeature.findViewById(R.id.skbr_layout_feature);
+        final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
+        final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
+        textView.setTextColor(getResources().getColor(android.R.color.black));
+        textView.setText(layer.getName());
+        checkBox.setChecked(false);
+        layer.setVisible(false);
+        CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (buttonView.isChecked()) {
+                    if (textView.getText().equals(layer.getName()))
+                        layer.setVisible(true);
+
+
+                } else {
+                    if (textView.getText().equals(layer.getName()))
+                        layer.setVisible(false);
+                }
+            }
+        });
+        mLayoutDisplayLayerAdministration.addView(layoutFeature);
     }
 
     private void setLicense() {
@@ -804,10 +875,14 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     public void onClickTextView(View v) {
         switch (v.getId()) {
             case R.id.txt_quanlysuco_hanhchinh:
-                if (mLayoutDisplayLayerAdministration.getVisibility() == View.VISIBLE)
+
+                if (mLayoutDisplayLayerAdministration.getVisibility() == View.VISIBLE) {
+                    mSeekBarAdministrator.setVisibility(View.GONE);
                     mLayoutDisplayLayerAdministration.setVisibility(View.GONE);
-                else
+                } else {
+                    mSeekBarAdministrator.setVisibility(View.VISIBLE);
                     mLayoutDisplayLayerAdministration.setVisibility(View.VISIBLE);
+                }
                 break;
             case R.id.txt_quanlysuco_dulieu:
                 if (mLayoutDisplayLayerFeature.getVisibility() == View.VISIBLE)
@@ -1095,7 +1170,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 //                            mMapViewHandler.addFeature(image);
 //                            mPopUp.getDialog().dismiss();
                             EditAsync editAsync = new EditAsync(this, (ServiceFeatureTable)
-                                    ((FeatureLayer)mFeatureLayerDTG.getLayer()).getFeatureTable(), mSelectedArcGISFeature,
+                                    mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
                                     true, image, mPopUp.getListHoSoVatTuSuCo(), false, new EditAsync.AsyncResponse() {
                                 @Override
                                 public void processFinish(ArcGISFeature arcGISFeature) {

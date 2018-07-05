@@ -254,7 +254,7 @@
     <string name="Quan6Code">775</string>
     <string name="Quan8Code">776</string>
     <string name="QuanBinhTanCode">777</string>
-    <string name="Name_DiemSuCo">diemsucoLYR</string>
+    <string name="IDLayer_DiemSuCo">diemsucoLYR</string>
     <string name="message_not_area_management">Vị trí không thuộc địa bàn quản lý</string>
     <string name="message_no_geocoder_available">Cần cập nhật phiên bản Google+ mới nhất để dùng tính năng này</string>
     <string name="Quan5Name">Quận 5</string>

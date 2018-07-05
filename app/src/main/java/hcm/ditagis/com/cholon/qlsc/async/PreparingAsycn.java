@@ -13,16 +13,16 @@ import hcm.ditagis.com.cholon.qlsc.connectDB.DMADB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.ListFeatureLayerDTGDB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngChinhDB;
 import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngNganhDB;
-import hcm.ditagis.com.cholon.qlsc.entities.ListLayerInfoDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
-public class PreparingAsycn extends AsyncTask<Void, Void, List<Object>> {
+public class PreparingAsycn extends AsyncTask<Void, Void, Void> {
     private ProgressDialog mDialog;
     private Context mContext;
     private AsyncResponse mDelegate;
 
     public interface AsyncResponse {
-        void processFinish(List<Object> output);
+        void processFinish(Void output);
     }
 
     public PreparingAsycn(Context context, AsyncResponse delegate) {
@@ -40,26 +40,26 @@ public class PreparingAsycn extends AsyncTask<Void, Void, List<Object>> {
     }
 
     @Override
-    protected List<Object> doInBackground(Void... params) {
-        List<Object> lst = new ArrayList<>();
+    protected Void doInBackground(Void... params) {
         try {
             DMADB getListDMADB = new DMADB(mContext);
-            lst.add(getListDMADB.find());
+            ListObjectDB.getInstance().setDmas(getListDMADB.find());
 
             VatTuOngChinhDB getListVatTuOngChinhDB = new VatTuOngChinhDB(mContext);
-            lst.add(getListVatTuOngChinhDB.find());
+            ListObjectDB.getInstance().setVatTuOngChinhs(getListVatTuOngChinhDB.find());
 
             VatTuOngNganhDB getListVatTuOngNganhDB = new VatTuOngNganhDB(mContext);
-            lst.add(getListVatTuOngNganhDB.find());
+            ListObjectDB.getInstance().setVatTuOngNganhs(getListVatTuOngNganhDB.find());
+
 
             ListFeatureLayerDTGDB listFeatureLayerDTGDB = new ListFeatureLayerDTGDB(mContext);
-            ListLayerInfoDTG.getInstance().setLstFeatureLayerDTG(listFeatureLayerDTGDB.find(Preference.getInstance().loadPreference(
+            ListObjectDB.getInstance().setLstFeatureLayerDTG(listFeatureLayerDTGDB.find(Preference.getInstance().loadPreference(
                     mContext.getString(R.string.preference_username)
             )));
         } catch (Exception e) {
             Log.e("Lỗi lấy danh sách DMA", e.toString());
         }
-        return lst;
+        return null;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class PreparingAsycn extends AsyncTask<Void, Void, List<Object>> {
     }
 
     @Override
-    protected void onPostExecute(List<Object> value) {
+    protected void onPostExecute(Void value) {
 //        if (khachHang != null) {
         mDialog.dismiss();
         this.mDelegate.processFinish(value);

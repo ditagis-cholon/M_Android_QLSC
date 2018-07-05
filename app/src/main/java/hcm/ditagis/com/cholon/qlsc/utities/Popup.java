@@ -72,13 +72,12 @@ import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_ID_IMAGE_CAPTURE = 44;
     private List<String> mListDMA, mListTenVatTuOngChinh, mListTenVatTuOngNganh;
-    private List<VatTu> mListVatTuOngChinh, mListVatTuOngNganh;
-    private List<Object> mListObjectDB;
     private QuanLySuCo mMainActivity;
     private ArcGISFeature mSelectedArcGISFeature = null;
     private ServiceFeatureTable mServiceFeatureTable;
@@ -99,22 +98,18 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private Button mBtnLeft;
 
     public Popup(QuanLySuCo mainActivity, MapView mapView, ServiceFeatureTable serviceFeatureTable,
-                 Callout callout, LocationDisplay locationDisplay, List<Object> listObjectDB, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS) {
+                 Callout callout, LocationDisplay locationDisplay, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS) {
         this.mMainActivity = mainActivity;
         this.mMapView = mapView;
         this.mServiceFeatureTable = serviceFeatureTable;
         this.mCallout = callout;
         this.mLocationDisplay = locationDisplay;
-        this.mListObjectDB = listObjectDB;
         this.mGeocoder = geocoder;
-        mListDMA = (List<String>) mListObjectDB.get(0);
-        mListVatTuOngChinh = (List<VatTu>) mListObjectDB.get(1);
-        mListVatTuOngNganh = (List<VatTu>) mListObjectDB.get(2);
         mListTenVatTuOngChinh = new ArrayList<>();
         mListTenVatTuOngNganh = new ArrayList<>();
-        for (VatTu vatTu : mListVatTuOngChinh)
+        for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs())
             mListTenVatTuOngChinh.add(vatTu.getTenVatTu());
-        for (VatTu vatTu : mListVatTuOngNganh)
+        for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs())
             mListTenVatTuOngNganh.add(vatTu.getTenVatTu());
 
         this.mFeatureLayerDTGS = featureLayerDTGS;
@@ -601,7 +596,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListDMA);
         spin.setAdapter(adapter);
         if (item.getValue() != null)
-            spin.setSelection(mListObjectDB.indexOf(item.getValue()));
+            spin.setSelection(ListObjectDB.getInstance().getDmas().indexOf(item.getValue()));
     }
 
     private void loadDataEdit_ViTri(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
@@ -617,8 +612,8 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mMainActivity.getResources().getStringArray(R.array.vitri_ongchinh1_arrays));
             spin.setAdapter(adapter);
         }
-        if (item.getValue() != null)
-            spin.setSelection(mListObjectDB.indexOf(item.getValue()));
+//        if (item.getValue() != null)
+//            spin.setSelection(mListObjectDB.indexOf(item.getValue()));
     }
 
     private void loadDataEdit_NguyenNhan(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
@@ -750,7 +745,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             public void afterTextChanged(Editable editable) {
                 String tenVatTu = editable.toString();
                 if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))) {
-                    for (VatTu vatTu : mListVatTuOngNganh) {
+                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs()) {
                         if (vatTu.getTenVatTu().equals(tenVatTu)) {
                             txtDonViTinh.setText(vatTu.getDonViTinh());
                             maVatTu[0] = vatTu.getMaVatTu();
@@ -758,7 +753,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                         }
                     }
                 } else if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh))) {
-                    for (VatTu vatTu : mListVatTuOngChinh) {
+                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs()) {
                         if (vatTu.getTenVatTu().equals(tenVatTu)) {
                             txtDonViTinh.setText(vatTu.getDonViTinh());
                             maVatTu[0] = vatTu.getMaVatTu();
