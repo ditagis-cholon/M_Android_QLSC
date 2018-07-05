@@ -244,6 +244,14 @@
                         android:textColor="@color/colorTextColor_1" />
                 </LinearLayout>
 
+                <SeekBar
+                    android:id="@+id/skbr_chuyende_app_bar_quan_ly_su_co"
+                    style="@style/MySeekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:progress="100"
+                    android:visibility="visible" />
 
                 <LinearLayout
                     android:id="@+id/linnearDisplayLayerFeature"

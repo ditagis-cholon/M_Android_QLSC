@@ -61,13 +61,25 @@ public class ListFeatureLayerDTGDB implements IDB<HashMap<String, String>, Boole
             mStatement.setString(1, account);
             rs = mStatement.executeQuery();
 
+            boolean isAddLayerThematic = false;
             while (rs.next()) {
-                layerDTGS.add(new LayerInfoDTG(rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
-                        rs.getString(mContext.getString(R.string.sql_coloumn_sys_title)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
-                        rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
-                        rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
-                        rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition)),
-                        rs.getInt(mContext.getString(R.string.sql_coloumn_sys_number_order))));
+                if (rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)).equals(mContext.getString(R.string.IDLayer_DiemSuCo)) ||
+                        rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)).equals(mContext.getString(R.string.IDLayer_Basemap)))
+                    layerDTGS.add(new LayerInfoDTG(rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_title)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
+                            rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
+                            rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition)),
+                            rs.getInt(mContext.getString(R.string.sql_coloumn_sys_number_order))));
+                else if (!isAddLayerThematic) {
+                    layerDTGS.add(new LayerInfoDTG(rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_title)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
+                            rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
+                            rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition)),
+                            rs.getInt(mContext.getString(R.string.sql_coloumn_sys_number_order))));
+                    isAddLayerThematic = true;
+                }
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
