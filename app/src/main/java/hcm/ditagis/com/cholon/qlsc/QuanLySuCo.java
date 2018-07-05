@@ -360,7 +360,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             if (mArcGISMapImageLayerAdministrator.getLoadStatus() == LoadStatus.LOADED) {
                                 ListenableList<ArcGISSublayer> sublayerList = mArcGISMapImageLayerAdministrator.getSublayers();
                                 for (ArcGISSublayer sublayer : sublayerList) {
-                                    addCheckBoxAdministrator((ArcGISMapImageSublayer) sublayer, states, colors);
+                                    addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, true);
                                 }
 
                             }
@@ -403,7 +403,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             if (mArcGISMapImageLayerThematic.getLoadStatus() == LoadStatus.LOADED) {
                                 ListenableList<ArcGISSublayer> sublayerList = mArcGISMapImageLayerThematic.getSublayers();
                                 for (ArcGISSublayer sublayer : sublayerList) {
-                                    addCheckBoxThematic((ArcGISMapImageSublayer) sublayer, states, colors);
+                                    addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, false);
                                 }
 
                             }
@@ -501,22 +501,19 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
             }
         });
 
-        if (layer.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
-            checkBox.setChecked(true);
-            for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
-                if (featureLayerDTG.getLayer().getName().contentEquals(checkBox.getText())
-                        && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
-                    tmpFeatureLayerDTGs.add(featureLayerDTG);
-                    layer.setVisible(true);
-                    break;
-                }
-            if (mMapViewHandler != null)
-                mMapViewHandler.setFeatureLayerDTGs(tmpFeatureLayerDTGs);
-        } else
-            mLayoutDisplayLayerThematic.addView(layoutFeature);
+        checkBox.setChecked(true);
+        for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGS)
+            if (featureLayerDTG.getLayer().getName().contentEquals(checkBox.getText())
+                    && !tmpFeatureLayerDTGs.contains(featureLayerDTG)) {
+                tmpFeatureLayerDTGs.add(featureLayerDTG);
+                layer.setVisible(true);
+                break;
+            }
+        if (mMapViewHandler != null)
+            mMapViewHandler.setFeatureLayerDTGs(tmpFeatureLayerDTGs);
     }
 
-    private void addCheckBoxAdministrator(final ArcGISMapImageSublayer layer, int[][] states, int[] colors) {
+    private void addCheckBox(final ArcGISMapImageSublayer layer, int[][] states, int[] colors, boolean isAdministrator) {
         LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
         final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
         final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
@@ -541,37 +538,10 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
         });
-        mLayoutDisplayLayerAdministration.addView(layoutFeature);
+        if (isAdministrator) mLayoutDisplayLayerAdministration.addView(layoutFeature);
+        else mLayoutDisplayLayerThematic.addView(layoutFeature);
     }
 
-
-    private void addCheckBoxThematic(final ArcGISMapImageSublayer layer, int[][] states, int[] colors) {
-        LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
-        final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
-        final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
-        textView.setTextColor(getResources().getColor(android.R.color.black));
-        textView.setText(layer.getName());
-        checkBox.setChecked(false);
-        layer.setVisible(false);
-        CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (buttonView.isChecked()) {
-                    if (textView.getText().equals(layer.getName()))
-                        layer.setVisible(true);
-
-
-                } else {
-                    if (textView.getText().equals(layer.getName()))
-                        layer.setVisible(false);
-                }
-            }
-        });
-        mLayoutDisplayLayerThematic.addView(layoutFeature);
-    }
 
     private void setLicense() {
         //way 1

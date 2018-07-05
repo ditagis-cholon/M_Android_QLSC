@@ -9,6 +9,7 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.data.ArcGISFeatureTable;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
@@ -61,7 +62,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
 
     @Override
     protected Void doInBackground(Point... points) {
-        final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false, 1);
+        final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false);
         listListenableFuture.addDoneListener(new Runnable() {
             @Override
             public void run() {
@@ -71,7 +72,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
                     for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
                         {
                             List<GeoElement> elements = identifyLayerResult.getElements();
-                            if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
+                             if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
                                 isFound = true;
                                 mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
                                 long serviceLayerId = mSelectedArcGISFeature.getFeatureTable().
@@ -99,10 +100,11 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     }
 
     public FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
-        for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
-            long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
-            if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
-        }
+        for (Layer layer : mMapView.getMap().getOperationalLayers())
+            for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
+                long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
+                if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
+            }
         return null;
     }
 
