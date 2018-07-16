@@ -69,15 +69,13 @@ public class ListFeatureLayerDTGDB implements IDB<HashMap<String, String>, Boole
                             rs.getString(mContext.getString(R.string.sql_coloumn_sys_title)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                             rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
                             rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
-                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition)),
-                            rs.getInt(mContext.getString(R.string.sql_coloumn_sys_number_order))));
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition))));
                 else if (!isAddLayerThematic) {
                     layerDTGS.add(new LayerInfoDTG(rs.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
                             rs.getString(mContext.getString(R.string.sql_coloumn_sys_title)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                             rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
                             rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), rs.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
-                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition)),
-                            rs.getInt(mContext.getString(R.string.sql_coloumn_sys_number_order))));
+                            rs.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), rs.getString(mContext.getString(R.string.sql_coloumn_sys_definition))));
                     isAddLayerThematic = true;
                 }
             }

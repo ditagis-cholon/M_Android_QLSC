@@ -1,8 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.entities.entitiesDB;
 
 
-import com.esri.arcgisruntime.layers.Layer;
-
 /**
  * Created by NGUYEN HONG on 3/14/2018.
  */
@@ -19,9 +17,8 @@ public class LayerInfoDTG {
     private boolean isView;
     private String outField;
     private String definition;
-    private int order;
 
-    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete, boolean isEdit, boolean isView, String outField, String definition, int order) {
+    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete, boolean isEdit, boolean isView, String outField, String definition) {
         this.id = id;
         this.titleLayer = titleLayer;
         this.url = url;
@@ -31,8 +28,8 @@ public class LayerInfoDTG {
         this.isView = isView;
         this.outField = outField;
         this.definition = definition;
-        this.order = order;
     }
+
 
     public String getId() {
         return id;
@@ -106,12 +103,5 @@ public class LayerInfoDTG {
         this.definition = definition;
     }
 
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 
 }

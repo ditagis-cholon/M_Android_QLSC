@@ -61,7 +61,7 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
                     stringBuilder.append(line);
                     break;
                 }
-                Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString());
+                Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"",""));
                 bufferedReader.close();
 
                 KhachHangDangNhap.getInstance().setKhachHang(new KhachHang());
