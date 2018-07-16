@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import hcm.ditagis.com.cholon.qlsc.async.LoginAsycn;
+import hcm.ditagis.com.cholon.qlsc.async.NewLoginAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mTxtUsername = findViewById(R.id.txtUsername);
         mTxtPassword = findViewById(R.id.txtPassword);
-
+        mTxtPassword.setText("ditagis@123");
         mTxtValidation = findViewById(R.id.txt_login_validation);
         create();
     }
@@ -51,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         else {
             isLastLogin = true;
             findViewById(R.id.layout_login_tool).setVisibility(View.VISIBLE);
-            findViewById(R.id.layout_login_username).setVisibility(View.GONE);
+            mTxtUsername.setVisibility(View.GONE);
         }
 
     }
@@ -76,7 +77,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 //        handleLoginSuccess(userName,passWord);
 //        final String finalUserName = userName;
-        LoginAsycn loginAsycn = new LoginAsycn(this, new LoginAsycn.AsyncResponse() {
+
+//        LoginAsycn loginAsycn = new LoginAsycn(this, new LoginAsycn.AsyncResponse() {
+//
+//            @Override
+//            public void processFinish(KhachHang output) {
+//                if (output != null)
+//                    handleLoginSuccess(output);
+//                else
+//                    handleLoginFail();
+//            }
+//        });
+//        loginAsycn.execute(userName, passWord);
+        NewLoginAsycn loginAsycn = new NewLoginAsycn(this, new LoginAsycn.AsyncResponse() {
 
             @Override
             public void processFinish(KhachHang output) {

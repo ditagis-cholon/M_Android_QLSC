@@ -889,6 +889,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     prepare();
                 break;
             case R.id.nav_logOut:
+                Preference.getInstance().deletePreferences(getString(R.string.preference_login_api));
                 this.finish();
                 break;
             case R.id.nav_delete_searching:
