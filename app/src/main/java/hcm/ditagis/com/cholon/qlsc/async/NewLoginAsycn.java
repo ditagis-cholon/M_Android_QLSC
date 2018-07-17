@@ -5,15 +5,23 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
+import hcm.ditagis.com.cholon.qlsc.utities.Route;
 
 public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
     private Exception exception;
@@ -61,10 +69,11 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
                     stringBuilder.append(line);
                     break;
                 }
-                Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"",""));
+                Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"", ""));
                 bufferedReader.close();
 
                 KhachHangDangNhap.getInstance().setKhachHang(new KhachHang());
+                KhachHangDangNhap.getInstance().getKhachHang().setDisplayName(getDisplayName());
                 return KhachHangDangNhap.getInstance().getKhachHang();
             } finally {
                 conn.disconnect();
@@ -81,5 +90,53 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
         mDialog.dismiss();
         this.mDelegate.processFinish(khachHang);
 //        }
+    }
+
+    private String getDisplayName() {
+        String API_URL = "http://sawagis.vn/cholon/api/Account/Profile";
+        String displayName = "";
+        try {
+            URL url = new URL(API_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            try {
+                conn.setDoOutput(false);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.connect();
+
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    displayName = pajsonRouteeJSon(line);
+
+                    break;
+                }
+
+            } catch (Exception e) {
+                Log.e("error", e.toString());
+            } finally {
+                conn.disconnect();
+            }
+        } catch (Exception e) {
+            Log.e("error", e.toString());
+        } finally {
+            return displayName;
+        }
+    }
+
+    private String pajsonRouteeJSon(String data) throws JSONException {
+        if (data == null)
+            return "";
+        String displayName = "";
+        String myData = "{ \"account\": [".concat(data).concat("]}");
+        JSONObject jsonData = new JSONObject(myData);
+        JSONArray jsonRoutes = jsonData.getJSONArray("account");
+//        jsonData.getJSONArray("account");
+        for (int i = 0; i < jsonRoutes.length(); i++) {
+            JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
+            displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));
+        }
+        return displayName;
+
     }
 }

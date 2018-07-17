@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //nhập username và password bình thường
         if (preference_userName == null || preference_userName.isEmpty()) {
             findViewById(R.id.layout_login_tool).setVisibility(View.GONE);
-            mTxtUsername.setVisibility(View.VISIBLE);
+            findViewById(R.id.layout_login_username).setVisibility(View.VISIBLE);
             isLastLogin = false;
         }
         //ngược lại
@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         else {
             isLastLogin = true;
             findViewById(R.id.layout_login_tool).setVisibility(View.VISIBLE);
-            mTxtUsername.setVisibility(View.GONE);
+            findViewById(R.id.layout_login_username).setVisibility(View.GONE);
         }
 
     }
@@ -118,13 +118,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void handleLoginSuccess(KhachHang khachHang) {
+
+
+        Preference.getInstance().savePreferences(getString(R.string.preference_username), mTxtUsername.getText().toString());
+//        Preference.getInstance().savePreferences(getString(R.string.preference_password), khachHang.getPassWord());
+        Preference.getInstance().savePreferences(getString(R.string.preference_displayname), khachHang.getDisplayName());
         mTxtUsername.setText("");
         mTxtPassword.setText("");
-
-        Preference.getInstance().savePreferences(getString(R.string.preference_username), khachHang.getUserName());
-        Preference.getInstance().savePreferences(getString(R.string.preference_password), khachHang.getPassWord());
-        Preference.getInstance().savePreferences(getString(R.string.preference_displayname), khachHang.getDisplayName());
-
         Intent intent = new Intent(this, QuanLySuCo.class);
 
         startActivity(intent);
