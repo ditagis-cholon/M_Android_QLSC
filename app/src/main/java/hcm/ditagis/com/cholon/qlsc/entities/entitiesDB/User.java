@@ -1,6 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.entities.entitiesDB;
 
-public class KhachHang {
+public class User {
     private String userName;
     private String passWord;
     private String displayName;
@@ -11,12 +11,13 @@ public class KhachHang {
 
     private boolean isCreate;
     private boolean isValid;
+    public static User userDangNhap;
 
-    public KhachHang() {
+    public User() {
 
     }
 
-    public KhachHang(String userName, String passWord, String displayName, boolean isQuan5, boolean isQuan6, boolean isQuan8, boolean isQuanBinhTan, boolean isCreate, boolean isValid) {
+    public User(String userName, String passWord, String displayName, boolean isQuan5, boolean isQuan6, boolean isQuan8, boolean isQuanBinhTan, boolean isCreate, boolean isValid) {
         this.userName = userName;
         this.passWord = passWord;
         this.displayName = displayName;

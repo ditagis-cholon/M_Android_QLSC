@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.connectDB.DMADB;
+import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngChinhDB;
+import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngNganhDB;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
@@ -48,14 +51,14 @@ public class PreparingAsycn extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-//            DMADB getListDMADB = new DMADB(mContext);
-//            ListObjectDB.getInstance().setDmas(getListDMADB.find());
-//
-//            VatTuOngChinhDB getListVatTuOngChinhDB = new VatTuOngChinhDB(mContext);
-//            ListObjectDB.getInstance().setVatTuOngChinhs(getListVatTuOngChinhDB.find());
-//
-//            VatTuOngNganhDB getListVatTuOngNganhDB = new VatTuOngNganhDB(mContext);
-//            ListObjectDB.getInstance().setVatTuOngNganhs(getListVatTuOngNganhDB.find());
+            DMADB getListDMADB = new DMADB(mContext);
+            ListObjectDB.getInstance().setDmas(getListDMADB.find());
+
+            VatTuOngChinhDB getListVatTuOngChinhDB = new VatTuOngChinhDB(mContext);
+            ListObjectDB.getInstance().setVatTuOngChinhs(getListVatTuOngChinhDB.find());
+
+            VatTuOngNganhDB getListVatTuOngNganhDB = new VatTuOngNganhDB(mContext);
+            ListObjectDB.getInstance().setVatTuOngNganhs(getListVatTuOngNganhDB.find());
 
             String API_URL = "http://sawagis.vn/cholon/api/layerinfo";
             URL url = new URL(API_URL);

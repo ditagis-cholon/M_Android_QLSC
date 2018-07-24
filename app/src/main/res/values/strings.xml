@@ -175,6 +175,7 @@
 
     <!--sql column login begin-->
     <string name="sql_coloumn_login_displayname">DisplayName</string>
+    <string name="sql_coloumn_login_username">Username</string>
     <string name="sql_coloumn_login_tanbinh">tanbinh</string>
     <string name="sql_coloumn_login_tanphu">tanphu</string>
     <string name="sql_coloumn_login_phunhuan">phunhuan</string>

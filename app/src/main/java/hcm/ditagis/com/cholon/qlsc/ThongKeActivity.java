@@ -36,8 +36,10 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.ThongKeAdapter;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class ThongKeActivity extends AppCompatActivity {
@@ -51,8 +53,15 @@ public class ThongKeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thong_ke);
+        for (final LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
+            String url = layerInfoDTG.getUrl();
+            if (!layerInfoDTG.getUrl().startsWith("http"))
+                url = "http:" + layerInfoDTG.getUrl();
+            if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+                mServiceFeatureTable = new ServiceFeatureTable(url);
+            }
+        }
 
-        mServiceFeatureTable = new ServiceFeatureTable(getResources().getString(R.string.URL_DIEM_SU_CO));
         TimePeriodReport timePeriodReport = new TimePeriodReport(this);
         List<ThongKeAdapter.Item> items = timePeriodReport.getItems();
         mThongKeAdapter = new ThongKeAdapter(this, items);
@@ -199,16 +208,16 @@ public class ThongKeActivity extends AppCompatActivity {
             txtThoiGian.setText(item.getThoigianhienthi());
             txtThoiGian.setVisibility(View.VISIBLE);
         }
-        KhachHang khachHang = KhachHangDangNhap.getInstance().getKhachHang();
+        User user = UserDangNhap.getInstance().getUser();
         String whereClause = "";
         if (item.getThoigianbatdau() == null || item.getThoigianketthuc() == null) {
-            if (khachHang.isQuan5())
+            if (user.isQuan5())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan5Code));
-            if (khachHang.isQuan6())
+            if (user.isQuan6())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan6Code));
-            if (khachHang.isQuan8())
+            if (user.isQuan8())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan8Code));
-            if (khachHang.isQuanBinhTan())
+            if (user.isQuanBinhTan())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.QuanBinhTanCode));
             whereClause += " 1 = 1";
         } else {
@@ -216,13 +225,13 @@ public class ThongKeActivity extends AppCompatActivity {
             whereClause = String.format("(%s >= date '%s' and %s <= date '%s') and (",
                     getString(R.string.Field_SuCo_NgayThongBao), item.getThoigianbatdau(),
                     getString(R.string.Field_SuCo_NgayThongBao), item.getThoigianketthuc());
-            if (khachHang.isQuan5())
+            if (user.isQuan5())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan5Code));
-            if (khachHang.isQuan6())
+            if (user.isQuan6())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan6Code));
-            if (khachHang.isQuan8())
+            if (user.isQuan8())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan8Code));
-            if (khachHang.isQuanBinhTan())
+            if (user.isQuanBinhTan())
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.QuanBinhTanCode));
             whereClause += " 1 = 1)";
         }

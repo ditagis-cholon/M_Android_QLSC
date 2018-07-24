@@ -207,7 +207,7 @@
 
 
                 <LinearLayout
-                    android:id="@+id/linnearDisplayLayerAdministration"
+                    android:id="@+id/mLinnearDisplayLayerBaseMap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"
@@ -254,7 +254,7 @@
                     android:visibility="visible" />
 
                 <LinearLayout
-                    android:id="@+id/linnearDisplayLayerFeature"
+                    android:id="@+id/mLinnearDisplayLayerTaiSan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"

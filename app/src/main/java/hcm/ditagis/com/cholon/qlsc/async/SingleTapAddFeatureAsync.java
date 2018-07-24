@@ -37,8 +37,8 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 
@@ -184,7 +184,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                 feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayXayRa), c);
                 feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayThongBao), c);
             }
-            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), KhachHangDangNhap.getInstance().getKhachHang().getUserName());
+            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), UserDangNhap.getInstance().getUser().getUserName());
             feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_LoaiSuCo), (short) 0);
             //---get DMA begin
             final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false, 1);

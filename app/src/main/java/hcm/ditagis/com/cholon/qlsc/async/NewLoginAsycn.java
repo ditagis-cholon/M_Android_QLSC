@@ -13,28 +13,24 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
-import hcm.ditagis.com.cholon.qlsc.utities.Route;
 
-public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
+public class NewLoginAsycn extends AsyncTask<String, Void, User> {
     private Exception exception;
     private ProgressDialog mDialog;
     private Context mContext;
-    private LoginAsycn.AsyncResponse mDelegate;
+    private NewLoginAsycn.AsyncResponse mDelegate;
     String API_URL = "http://sawagis.vn/cholon/api/Login";
 
     public interface AsyncResponse {
-        void processFinish(KhachHang output);
+        void processFinish(User output);
     }
 
-    public NewLoginAsycn(Context context, LoginAsycn.AsyncResponse delegate) {
+    public NewLoginAsycn(Context context, NewLoginAsycn.AsyncResponse delegate) {
         this.mContext = context;
         this.mDelegate = delegate;
     }
@@ -48,7 +44,7 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
     }
 
     @Override
-    protected KhachHang doInBackground(String... params) {
+    protected User doInBackground(String... params) {
         String userName = params[0];
         String pin = params[1];
 //        String passEncoded = (new EncodeMD5()).encode(pin + "_DITAGIS");
@@ -72,9 +68,9 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
                 Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"", ""));
                 bufferedReader.close();
 
-                KhachHangDangNhap.getInstance().setKhachHang(new KhachHang());
-                KhachHangDangNhap.getInstance().getKhachHang().setDisplayName(getDisplayName());
-                return KhachHangDangNhap.getInstance().getKhachHang();
+                UserDangNhap.getInstance().setUser(new User());
+                UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
+                return UserDangNhap.getInstance().getUser();
             } finally {
                 conn.disconnect();
             }
@@ -85,10 +81,10 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
     }
 
     @Override
-    protected void onPostExecute(KhachHang khachHang) {
+    protected void onPostExecute(User user) {
 //        if (khachHang != null) {
         mDialog.dismiss();
-        this.mDelegate.processFinish(khachHang);
+        this.mDelegate.processFinish(user);
 //        }
     }
 
@@ -107,7 +103,7 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    displayName = pajsonRouteeJSon(line);
+                    pajsonRouteeJSon(line);
 
                     break;
                 }
@@ -124,19 +120,20 @@ public class NewLoginAsycn extends AsyncTask<String, Void, KhachHang> {
         }
     }
 
-    private String pajsonRouteeJSon(String data) throws JSONException {
-        if (data == null)
-            return "";
-        String displayName = "";
-        String myData = "{ \"account\": [".concat(data).concat("]}");
-        JSONObject jsonData = new JSONObject(myData);
-        JSONArray jsonRoutes = jsonData.getJSONArray("account");
+    private void pajsonRouteeJSon(String data) throws JSONException {
+        if (data != null) {
+            String myData = "{ \"account\": [".concat(data).concat("]}");
+            JSONObject jsonData = new JSONObject(myData);
+            JSONArray jsonRoutes = jsonData.getJSONArray("account");
 //        jsonData.getJSONArray("account");
-        for (int i = 0; i < jsonRoutes.length(); i++) {
-            JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
-            displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));
+            for (int i = 0; i < jsonRoutes.length(); i++) {
+                JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
+                String displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));
+                String username = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_username));
+                UserDangNhap.getInstance().setUser(new User());
+                UserDangNhap.getInstance().getUser().setDisplayName(displayName);
+                UserDangNhap.getInstance().getUser().setUserName(username);
+            }
         }
-        return displayName;
-
     }
 }

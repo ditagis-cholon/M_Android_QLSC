@@ -11,9 +11,9 @@ import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.EncodeMD5;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 
-public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
+public class ChangePasswordDB implements IDB<User, Boolean, String> {
     private Context mContext;
 
     public ChangePasswordDB(Context mContext) {
@@ -21,7 +21,7 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
     }
 
     @Override
-    public Boolean add(KhachHang khachHang) {
+    public Boolean add(User user) {
         return null;
     }
 
@@ -31,15 +31,15 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
     }
 
     @Override
-    public Boolean update(KhachHang khachHang) {
+    public Boolean update(User user) {
         return null;
     }
 
 
     @Override
-    public KhachHang find(String userName, String oldPassword) {
+    public User find(String userName, String oldPassword) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
-        KhachHang khachHang = null;
+        User user = null;
         ResultSet rs = null;
         try {
             if (cnn == null)
@@ -59,8 +59,8 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
 
             while (rs.next()) {
 
-                khachHang = new KhachHang();
-                khachHang.setUserName(userName);
+                user = new User();
+                user.setUserName(userName);
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -72,16 +72,16 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
                 e.printStackTrace();
             }
         }
-        return khachHang;
+        return user;
     }
     @Override
-    public KhachHang find(String danhBo, String oldPassword, String newPassword) {
+    public User find(String danhBo, String oldPassword, String newPassword) {
      return null;
     }
 
-    public KhachHang change(String userName, String newPassword) {
+    public User change(String userName, String newPassword) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
-        KhachHang khachHang = null;
+        User user = null;
         ResultSet rs = null;
         try {
             if (cnn == null)
@@ -102,8 +102,8 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
 
             if (update > 0) {
 
-                khachHang = new KhachHang();
-                khachHang.setUserName(userName);
+                user = new User();
+                user.setUserName(userName);
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -115,10 +115,10 @@ public class ChangePasswordDB implements IDB<KhachHang, Boolean, String> {
                 e.printStackTrace();
             }
         }
-        return khachHang;
+        return user;
     }
     @Override
-    public List<KhachHang> getAll() {
+    public List<User> getAll() {
         return null;
     }
 

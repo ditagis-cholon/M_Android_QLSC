@@ -8,9 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import hcm.ditagis.com.cholon.qlsc.async.LoginAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.NewLoginAsycn;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
@@ -31,6 +30,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mTxtUsername = findViewById(R.id.txtUsername);
         mTxtPassword = findViewById(R.id.txtPassword);
+        mTxtUsername.setText("ditagis");
         mTxtPassword.setText("ditagis@123");
         mTxtValidation = findViewById(R.id.txt_login_validation);
         create();
@@ -75,24 +75,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             handleInfoLoginEmpty();
             return;
         }
-//        handleLoginSuccess(userName,passWord);
-//        final String finalUserName = userName;
-
-//        LoginAsycn loginAsycn = new LoginAsycn(this, new LoginAsycn.AsyncResponse() {
-//
-//            @Override
-//            public void processFinish(KhachHang output) {
-//                if (output != null)
-//                    handleLoginSuccess(output);
-//                else
-//                    handleLoginFail();
-//            }
-//        });
-//        loginAsycn.execute(userName, passWord);
-        NewLoginAsycn loginAsycn = new NewLoginAsycn(this, new LoginAsycn.AsyncResponse() {
+        NewLoginAsycn loginAsycn = new NewLoginAsycn(this, new NewLoginAsycn.AsyncResponse() {
 
             @Override
-            public void processFinish(KhachHang output) {
+            public void processFinish(User output) {
                 if (output != null)
                     handleLoginSuccess(output);
                 else
@@ -100,11 +86,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         });
         loginAsycn.execute(userName, passWord);
-//        if (userName.equals("cholon") && passWord.equals("123456")) {
-//            KhachHang.khachHangDangNhap = new KhachHang(userName,passWord,"Cấp nước Chợ Lớn",true,true,true,true);
-//            handleLoginSuccess(KhachHang.khachHangDangNhap);
-//        } else
-//            handleLoginFail();
     }
 
     private void handleInfoLoginEmpty() {
@@ -117,12 +98,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mTxtValidation.setVisibility(View.VISIBLE);
     }
 
-    private void handleLoginSuccess(KhachHang khachHang) {
+    private void handleLoginSuccess(User user) {
 
 
         Preference.getInstance().savePreferences(getString(R.string.preference_username), mTxtUsername.getText().toString());
-//        Preference.getInstance().savePreferences(getString(R.string.preference_password), khachHang.getPassWord());
-        Preference.getInstance().savePreferences(getString(R.string.preference_displayname), khachHang.getDisplayName());
+//        Preference.getInstance().savePreferences(getString(R.string.preference_password), user.getPassWord());
+        Preference.getInstance().savePreferences(getString(R.string.preference_displayname), user.getDisplayName());
         mTxtUsername.setText("");
         mTxtPassword.setText("");
         Intent intent = new Intent(this, QuanLySuCo.class);

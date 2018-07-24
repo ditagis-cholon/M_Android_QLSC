@@ -13,9 +13,9 @@ import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.EncodeMD5;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 
-public class LoginDB implements IDB<KhachHang, Boolean, String> {
+public class LoginDB implements IDB<User, Boolean, String> {
     DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
     private Context mContext;
 
@@ -24,7 +24,7 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
     }
 
     @Override
-    public Boolean add(KhachHang khachHang) {
+    public Boolean add(User user) {
         return null;
     }
 
@@ -34,15 +34,15 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
     }
 
     @Override
-    public Boolean update(KhachHang khachHang) {
+    public Boolean update(User user) {
         return null;
     }
 
 
     @Override
-    public KhachHang find(String userName, String passWord) {
+    public User find(String userName, String passWord) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
-        KhachHang khachHang = null;
+        User user = null;
         ResultSet rs = null;
         try {
             if (cnn == null)
@@ -61,17 +61,17 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
 
             while (rs.next()) {
 
-                khachHang = new KhachHang();
-                khachHang.setUserName(userName);
-                khachHang.setDisplayName(rs.getString(mContext.getString(R.string.sql_coloumn_login_displayname)));
-                khachHang.setQuan5(true);
-                khachHang.setQuan6(true);
-                khachHang.setQuan8(true);
-                khachHang.setQuanBinhTan(true);
-                khachHang.setValid(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_status)));
-//                khachHang.setTanBinh(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanbinh)));
-//                khachHang.setTanPhu(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanphu)));
-//                khachHang.setPhuNhuan(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_phunhuan)));
+                user = new User();
+                user.setUserName(userName);
+                user.setDisplayName(rs.getString(mContext.getString(R.string.sql_coloumn_login_displayname)));
+                user.setQuan5(true);
+                user.setQuan6(true);
+                user.setQuan8(true);
+                user.setQuanBinhTan(true);
+                user.setValid(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_status)));
+//                user.setTanBinh(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanbinh)));
+//                user.setTanPhu(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_tanphu)));
+//                user.setPhuNhuan(rs.getBoolean(mContext.getString(R.string.sql_coloumn_login_phunhuan)));
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -83,16 +83,16 @@ public class LoginDB implements IDB<KhachHang, Boolean, String> {
                 e.printStackTrace();
             }
         }
-        return khachHang;
+        return user;
     }
 
     @Override
-    public KhachHang find(String s, String k1, String k2) {
+    public User find(String s, String k1, String k2) {
         return null;
     }
 
     @Override
-    public List<KhachHang> getAll() {
+    public List<User> getAll() {
         return null;
     }
 

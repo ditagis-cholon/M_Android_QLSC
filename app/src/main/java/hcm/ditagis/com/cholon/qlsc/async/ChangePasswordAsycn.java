@@ -8,7 +8,7 @@ import android.util.Log;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.connectDB.ChangePasswordDB;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHang;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 import hcm.ditagis.com.cholon.qlsc.utities.Utils;
 
 public class ChangePasswordAsycn extends AsyncTask<String, Void, Integer> {
@@ -42,11 +42,11 @@ public class ChangePasswordAsycn extends AsyncTask<String, Void, Integer> {
         String newPin = params[2];
         try {
             ChangePasswordDB changePasswordDB = new ChangePasswordDB(mContext);
-            KhachHang khachHang = changePasswordDB.find(danhBo, pin);
-            if (khachHang != null) {
+            User user = changePasswordDB.find(danhBo, pin);
+            if (user != null) {
                 publishProgress();
-                KhachHang khachHang1 = changePasswordDB.change(danhBo, newPin);
-                if (khachHang1 != null) {
+                User user1 = changePasswordDB.change(danhBo, newPin);
+                if (user1 != null) {
                     return Utils.getInstance().CHANGE_PASSWORD_SUCCESS;
                 } else return Utils.getInstance().CHANGE_PASSWORD_FAILURE;
             } else {

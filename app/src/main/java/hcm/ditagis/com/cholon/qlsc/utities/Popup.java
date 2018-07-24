@@ -47,7 +47,6 @@ import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.view.Callout;
-import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
 import java.io.File;
@@ -71,8 +70,8 @@ import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
 import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.KhachHangDangNhap;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
@@ -88,7 +87,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private DialogInterface mDialog;
     private LinearLayout linearLayout;
     private MapView mMapView;
-    private LocationDisplay mLocationDisplay;
     private String mLoaiSuCo;
     private short mLoaiSuCoShort;
     private Geocoder mGeocoder;
@@ -98,12 +96,11 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private Button mBtnLeft;
 
     public Popup(QuanLySuCo mainActivity, MapView mapView, ServiceFeatureTable serviceFeatureTable,
-                 Callout callout, LocationDisplay locationDisplay, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS) {
+                 Callout callout, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS) {
         this.mMainActivity = mainActivity;
         this.mMapView = mapView;
         this.mServiceFeatureTable = serviceFeatureTable;
         this.mCallout = callout;
-        this.mLocationDisplay = locationDisplay;
         this.mGeocoder = geocoder;
         mListTenVatTuOngChinh = new ArrayList<>();
         mListTenVatTuOngNganh = new ArrayList<>();
@@ -1096,7 +1093,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         linearLayout.findViewById(R.id.imgBtn_layout_thongtinsuco).setOnClickListener(this);
         if (featureLayer.getName().equals(mMainActivity.getString(R.string.ALIAS_DIEM_SU_CO))) {
             //user admin mới có quyền xóa
-            if (KhachHangDangNhap.getInstance().getKhachHang().getUserName().equals("admin")) {
+            if (UserDangNhap.getInstance().getUser().getUserName() != null && UserDangNhap.getInstance().getUser().getUserName().equals("ditagis")) {
                 linearLayout.findViewById(R.id.imgBtn_delete).setOnClickListener(this);
             } else {
                 linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.GONE);
