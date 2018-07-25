@@ -318,5 +318,6 @@
     <string name="field_VatTu_tenVatTu">TenVatTu</string>
     <string name="field_VatTu_donViTinh">DonViTinh</string>
     <string name="API_URL">&API_URL;/api/layerinfo</string>
+    <string name="message_unloaded_map">Chưa khởi tạo xong bản đồ Vui lòng làm mới lại dữ liệu</string>
     <!--field sự cố end-->
 </resources>

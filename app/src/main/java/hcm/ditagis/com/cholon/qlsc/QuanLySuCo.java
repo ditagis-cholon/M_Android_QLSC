@@ -356,7 +356,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 String url = layerInfoDTG.getUrl();
                 if (!layerInfoDTG.getUrl().startsWith("http"))
                     url = "http:" + layerInfoDTG.getUrl();
-                if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_Basemap))) {
+                if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_Basemap)) && hanhChinhImageLayers == null) {
                     hanhChinhImageLayers = new ArcGISMapImageLayer(url);
                     hanhChinhImageLayers.setId(layerInfoDTG.getId());
                     mMapView.getMap().getOperationalLayers().add(hanhChinhImageLayers);
@@ -613,6 +613,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
                 "Chưa xử lý", "Chưa xử lý", hoanThanh, hoanThanhValue));
         mSuCoTanHoaLayer.setRenderer(uniqueValueRenderer);
+        mSuCoTanHoaLayer.loadAsync();
     }
 
     private void changeStatusOfLocationDataSource() {
@@ -666,7 +667,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
     private void setViewPointCenterLongLat(Point position, String location) {
         if (mMapView == null || mPopUp == null) {
-            MySnackBar.make(mTxtSearchView, "Chưa khởi tạo xong bản đồ", true);
+            MySnackBar.make(mTxtSearchView, getString(R.string.message_unloaded_map), true);
         } else {
             Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWgs84());
             Geometry geometry1 = GeometryEngine.project(geometry, SpatialReferences.getWebMercator());
