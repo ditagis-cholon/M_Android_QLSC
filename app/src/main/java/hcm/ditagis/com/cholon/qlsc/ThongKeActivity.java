@@ -54,10 +54,11 @@ public class ThongKeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thong_ke);
         for (final LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
-            String url = layerInfoDTG.getUrl();
-            if (!layerInfoDTG.getUrl().startsWith("http"))
-                url = "http:" + layerInfoDTG.getUrl();
+
             if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+                String url = layerInfoDTG.getUrl();
+                if (!layerInfoDTG.getUrl().startsWith("http"))
+                    url = "http:" + layerInfoDTG.getUrl();
                 mServiceFeatureTable = new ServiceFeatureTable(url);
             }
         }
@@ -211,13 +212,13 @@ public class ThongKeActivity extends AppCompatActivity {
         User user = UserDangNhap.getInstance().getUser();
         String whereClause = "";
         if (item.getThoigianbatdau() == null || item.getThoigianketthuc() == null) {
-            if (user.isQuan5())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan5Code));
-            if (user.isQuan6())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan6Code));
-            if (user.isQuan8())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan8Code));
-            if (user.isQuanBinhTan())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.QuanBinhTanCode));
             whereClause += " 1 = 1";
         } else {
@@ -225,13 +226,13 @@ public class ThongKeActivity extends AppCompatActivity {
             whereClause = String.format("(%s >= date '%s' and %s <= date '%s') and (",
                     getString(R.string.Field_SuCo_NgayThongBao), item.getThoigianbatdau(),
                     getString(R.string.Field_SuCo_NgayThongBao), item.getThoigianketthuc());
-            if (user.isQuan5())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan5Code));
-            if (user.isQuan6())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan6Code));
-            if (user.isQuan8())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.Quan8Code));
-            if (user.isQuanBinhTan())
+
                 whereClause += String.format("%s = '%s' or ", getString(R.string.Field_SuCo_MaQuan), getString(R.string.QuanBinhTanCode));
             whereClause += " 1 = 1)";
         }

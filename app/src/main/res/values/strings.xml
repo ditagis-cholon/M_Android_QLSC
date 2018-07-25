@@ -1,4 +1,4 @@
-<!DOCTYPE resources [<!ENTITY table_sys_layer "ChoLonSystem..SYS_Layer"><!ENTITY table_sys_layer_account "ChoLonSystem..SYS_Layer_Account"><!ENTITY table_sys_account "ChoLonSystem..SYS_Account">]>
+<!DOCTYPE resources [<!ENTITY API_URL "http://gis.capnuoccholon.com.vn/cholon"><!ENTITY table_sys_layer "ChoLonSystem..SYS_Layer"><!ENTITY table_sys_layer_account "ChoLonSystem..SYS_Layer_Account"><!ENTITY table_sys_account "ChoLonSystem..SYS_Account">]>
 <resources>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -196,8 +196,7 @@
     <!--sql column login end-->
 
     <string name="sql_login">select *
-					 from &table_sys_account;
-					 where username = ? and password = ?</string>
+					 from &table_sys_account; where username = ? and password = ?</string>
     <string name="sql_changepassword">update users set pass = ?, c_pass = ? where username = ?</string>
 
     <string name="sql_select_ma_dma">select madma from sde.dma where madma is not null order by madma asc</string>
@@ -311,5 +310,13 @@
     <string name="btnRight_editItemViewMoreInfo">Cập nhật</string>
     <string name="btnLeft_editItemViewMoreInfo">Hủy</string>
     <string name="IDLayer_Basemap">BASEMAP</string>
+    <string name="LayerInfo_vatTuOngChinh">vattuongchinhTBL</string>
+    <string name="LayerInfo_DMA">dmaLYR</string>
+    <string name="LayerInfo_vatTuOngNganh">vattuongnganhTBL</string>
+    <string name="field_DMA_maDMA">MADMA</string>
+    <string name="field_VatTu_maVatTu">MaVatTu</string>
+    <string name="field_VatTu_tenVatTu">TenVatTu</string>
+    <string name="field_VatTu_donViTinh">DonViTinh</string>
+    <string name="API_URL">&API_URL;/api/layerinfo</string>
     <!--field sự cố end-->
 </resources>

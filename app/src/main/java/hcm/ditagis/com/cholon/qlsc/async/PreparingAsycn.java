@@ -5,6 +5,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.FeatureQueryResult;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,15 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.connectDB.DMADB;
-import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngChinhDB;
-import hcm.ditagis.com.cholon.qlsc.connectDB.VatTuOngNganhDB;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
+import hcm.ditagis.com.cholon.qlsc.services.GetDMA;
+import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngChinh;
+import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngNganh;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 import hcm.ditagis.com.cholon.qlsc.utities.Route;
 
-public class PreparingAsycn extends AsyncTask<Void, Void, Void> {
+public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQueryResult>, Void> {
     private ProgressDialog mDialog;
     private Context mContext;
     private AsyncResponse mDelegate;
@@ -51,16 +54,37 @@ public class PreparingAsycn extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-            DMADB getListDMADB = new DMADB(mContext);
-            ListObjectDB.getInstance().setDmas(getListDMADB.find());
 
-            VatTuOngChinhDB getListVatTuOngChinhDB = new VatTuOngChinhDB(mContext);
-            ListObjectDB.getInstance().setVatTuOngChinhs(getListVatTuOngChinhDB.find());
+            getLayerInfoAPI();
+            new GetVatTuOngChinh(mContext).getVatTuFromService();
+            new GetVatTuOngNganh(mContext).getVatTuFromService();
+            new GetDMA(mContext).getMaDMAFromService();
+        } catch (Exception e) {
+            Log.e("Lỗi lấy danh sách DMA", e.toString());
+        }
+        return null;
+    }
 
-            VatTuOngNganhDB getListVatTuOngNganhDB = new VatTuOngNganhDB(mContext);
-            ListObjectDB.getInstance().setVatTuOngNganhs(getListVatTuOngNganhDB.find());
+    @Override
+    protected void onProgressUpdate(ListenableFuture<FeatureQueryResult>... values) {
+        super.onProgressUpdate(values);
 
-            String API_URL = "http://sawagis.vn/cholon/api/layerinfo";
+
+    }
+
+    @Override
+    protected void onPostExecute(Void value) {
+//        if (khachHang != null) {
+        mDialog.dismiss();
+        this.mDelegate.processFinish(value);
+//        }
+    }
+
+
+    private void getLayerInfoAPI() {
+        try {
+            String API_URL = mContext.getString(R.string.API_URL);
+
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
@@ -81,29 +105,9 @@ public class PreparingAsycn extends AsyncTask<Void, Void, Void> {
             } finally {
                 conn.disconnect();
             }
-//            ListFeatureLayerDTGDB listFeatureLayerDTGDB = new ListFeatureLayerDTGDB(mContext);
-//            ListObjectDB.getInstance().setLstFeatureLayerDTG(listFeatureLayerDTGDB.find(Preference.getInstance().loadPreference(
-//                    mContext.getString(R.string.preference_username)
-//            )));
         } catch (Exception e) {
-            Log.e("Lỗi lấy danh sách DMA", e.toString());
+            Log.e("Lỗi lấy LayerInfo", e.toString());
         }
-        return null;
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
-
-
-    }
-
-    @Override
-    protected void onPostExecute(Void value) {
-//        if (khachHang != null) {
-        mDialog.dismiss();
-        this.mDelegate.processFinish(value);
-//        }
     }
 
     private void pajsonRouteeJSon(String data) throws JSONException {

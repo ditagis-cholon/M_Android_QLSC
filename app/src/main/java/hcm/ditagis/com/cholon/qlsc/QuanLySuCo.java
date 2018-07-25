@@ -159,16 +159,20 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_su_co);
 
+        prepare1();
+    }
+
+    private void prepare1() {
         states = new int[][]{{android.R.attr.state_checked}, {}};
         colors = new int[]{R.color.colorTextColor_1, R.color.colorTextColor_1};
         findViewById(R.id.layout_layer).setVisibility(View.INVISIBLE);
         requestPermisson();
 
-//        prepare();
+//        prepare1();
         final PreparingAsycn preparingAsycn = new PreparingAsycn(this, new PreparingAsycn.AsyncResponse() {
             @Override
             public void processFinish(Void output) {
-                prepare();
+                prepare2();
             }
         });
 
@@ -178,7 +182,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void prepare() {
+    private void prepare2() {
         // create an empty map instance
         setLicense();
         mGeocoder = new Geocoder(this.getApplicationContext(), Locale.getDefault());
@@ -661,17 +665,22 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void setViewPointCenterLongLat(Point position, String location) {
-        Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWgs84());
-        Geometry geometry1 = GeometryEngine.project(geometry, SpatialReferences.getWebMercator());
-        Point point = geometry1.getExtent().getCenter();
+        if (mMapView == null || mPopUp == null) {
+            MySnackBar.make(mTxtSearchView, "Chưa khởi tạo xong bản đồ", true);
+        } else {
+            Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWgs84());
+            Geometry geometry1 = GeometryEngine.project(geometry, SpatialReferences.getWebMercator());
+            Point point = geometry1.getExtent().getCenter();
 
-        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS, Color.RED, 20);
-        Graphic graphic = new Graphic(point, symbol);
-        mGraphicsOverlay.getGraphics().add(graphic);
+            SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS, Color.RED, 20);
+            Graphic graphic = new Graphic(point, symbol);
+            mGraphicsOverlay.getGraphics().add(graphic);
 
-        mMapView.setViewpointCenterAsync(point, getResources().getInteger(R.integer.SCALE_IMAGE_WITH_LABLES));
-        mPopUp.showPopupFindLocation(point, location);
-        this.mPointFindLocation = point;
+            mMapView.setViewpointCenterAsync(point, getResources().getInteger(R.integer.SCALE_IMAGE_WITH_LABLES));
+            mPopUp.showPopupFindLocation(point, location);
+            this.mPointFindLocation = point;
+        }
+
     }
 
 
@@ -732,10 +741,10 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     User user = UserDangNhap.getInstance().getUser();
                     String subAdminArea = output.get(0).getSubAdminArea();
                     //nếu tài khoản có quyền truy cập vào
-                    if ((user.isQuan5() && subAdminArea.equals(getString(R.string.Quan5Name))) ||
-                            (user.isQuan6() && subAdminArea.equals(getString(R.string.Quan6Name))) ||
-                            (user.isQuan8() && subAdminArea.equals(getString(R.string.Quan8Name))) ||
-                            (user.isQuanBinhTan() && subAdminArea.equals(getString(R.string.QuanBinhTanName)))) {
+                    if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
+                            subAdminArea.equals(getString(R.string.Quan6Name)) ||
+                            subAdminArea.equals(getString(R.string.Quan8Name)) ||
+                            subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
                         mTxtSearchView.setQuery("", true);
                         mMapViewHandler.addFeature(null, mPointFindLocation);
                         deleteSearching();
@@ -894,7 +903,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 break;
             case R.id.nav_reload:
                 if (CheckConnectInternet.isOnline(this))
-                    prepare();
+                    prepare1();
                 break;
             case R.id.nav_logOut:
                 Preference.getInstance().deletePreferences(getString(R.string.preference_login_api));
