@@ -3,6 +3,7 @@ package hcm.ditagis.com.cholon.qlsc;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.location.Geocoder;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -104,6 +106,8 @@ import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
+    public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
+    String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private Uri mUri;
     private Popup mPopUp;
     private MapView mMapView;
@@ -120,7 +124,6 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     private FloatingActionButton mFloatButtonLayer;
     private FloatingActionButton mFloatButtonLocation;
     private List<FeatureLayerDTG> mFeatureLayerDTGS;
-    public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
     private LinearLayout mLayoutDisplayLayerThematic;
     private LinearLayout mLayoutDisplayLayerAdministration;
     private Point mPointFindLocation;
@@ -134,6 +137,8 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     private ArcGISMapImageLayer hanhChinhImageLayers, taiSanImageLayers;
     private LinearLayout mLinnearDisplayLayerTaiSan, mLinnearDisplayLayerBaseMap;
     private SeekBar mSeekBarAdministrator, mSeekBarThematic;
+    private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
+    private ArcGISFeature mSelectedArcGISFeature;
 
     public void setUri(Uri uri) {
         this.mUri = uri;
@@ -143,14 +148,9 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         this.mFeatureViewMoreInfoAdapter = featureViewMoreInfoAdapter;
     }
 
-    private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
-
     public void setSelectedArcGISFeature(ArcGISFeature selectedArcGISFeature) {
         this.mSelectedArcGISFeature = selectedArcGISFeature;
     }
-
-    private ArcGISFeature mSelectedArcGISFeature;
-    String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -646,28 +646,32 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void setViewPointCenter(final Point position) {
-        final Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWebMercator());
-        final ListenableFuture<Boolean> booleanListenableFuture = mMapView.setViewpointCenterAsync(geometry.getExtent().getCenter());
-        booleanListenableFuture.addDoneListener(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (booleanListenableFuture.get()) {
-                        QuanLySuCo.this.mPointFindLocation = position;
+        if (mPopUp == null) {
+            MySnackBar.make(mMapView, getString(R.string.message_unloaded_map), true);
+        } else {
+            final Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWebMercator());
+            final ListenableFuture<Boolean> booleanListenableFuture = mMapView.setViewpointCenterAsync(geometry.getExtent().getCenter());
+            booleanListenableFuture.addDoneListener(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (booleanListenableFuture.get()) {
+                            QuanLySuCo.this.mPointFindLocation = position;
+                        }
+                        mPopUp.showPopupFindLocation(position);
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
-                    mPopUp.showPopupFindLocation(position);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
 
-            }
-        });
+                }
+            });
+        }
 
     }
 
     private void setViewPointCenterLongLat(Point position, String location) {
-        if (mMapView == null || mPopUp == null) {
-            MySnackBar.make(mTxtSearchView, getString(R.string.message_unloaded_map), true);
+        if ( mPopUp == null) {
+            MySnackBar.make(mMapView, getString(R.string.message_unloaded_map), true);
         } else {
             Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWgs84());
             Geometry geometry1 = GeometryEngine.project(geometry, SpatialReferences.getWebMercator());
@@ -706,12 +710,21 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mLocationDisplay.startAsync();
 
         } else {
             Toast.makeText(QuanLySuCo.this, getResources().getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean checkGPSStatus() {
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        boolean GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return GpsStatus;
     }
 
     private void optionSearchFeature() {
@@ -1028,7 +1041,9 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 }
                 break;
             case R.id.floatBtnLocation:
-                if (!mLocationDisplay.isStarted()) {
+                if (!checkGPSStatus())
+                    MySnackBar.make(mMapView, "Chưa bật GPS!!!", true);
+                else if (!mLocationDisplay.isStarted()) {
                     mLocationDisplay.startAsync();
                     setViewPointCenter(mLocationDisplay.getMapLocation());
 
