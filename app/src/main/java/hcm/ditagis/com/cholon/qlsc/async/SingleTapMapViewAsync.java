@@ -72,7 +72,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
                     for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
                         {
                             List<GeoElement> elements = identifyLayerResult.getElements();
-                             if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
+                            if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
                                 isFound = true;
                                 mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
                                 long serviceLayerId = mSelectedArcGISFeature.getFeatureTable().
@@ -125,7 +125,8 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     @Override
     protected void onProgressUpdate(FeatureLayerDTG... values) {
         super.onProgressUpdate(values);
-        if (values != null && mSelectedArcGISFeature != null) {
+        if (values != null && values.length > 0 && mSelectedArcGISFeature != null) {
+
             FeatureLayerDTG featureLayerDTG = values[0];
             mPopUp.setFeatureLayerDTG(featureLayerDTG);
             mPopUp.showPopup(mSelectedArcGISFeature, false);
