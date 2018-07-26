@@ -386,27 +386,28 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     featureLayer.setName(layerInfoDTG.getTitleLayer());
                     featureLayer.setMaxScale(0);
                     featureLayer.setMinScale(1000000);
-                    featureLayer.setId(layerInfoDTG.getId()); featureLayer.setPopupEnabled(true);
-                    mMapView.getMap().getOperationalLayers().add(featureLayer);
+                    featureLayer.setId(layerInfoDTG.getId());
+                    featureLayer.setPopupEnabled(true);
 
-                    mMapView.getMap().addDoneLoadingListener(new Runnable() {
+
+                    featureLayer.addDoneLoadingListener(new Runnable() {
                         @Override
                         public void run() {
+                            setRendererSuCoFeatureLayer(featureLayer);
                             mFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
-
-
                             Callout callout = mMapView.getCallout();
                             mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mGeocoder, mFeatureLayerDTGS);
 
-                            setRendererSuCoFeatureLayer(featureLayer);
+
                             FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
 
                             mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
 
                             mFeatureLayerDTGS.add(mFeatureLayerDTG);
                         }
-                    });
 
+                    });
+                    mMapView.getMap().getOperationalLayers().add(featureLayer);
 
                 } else if (taiSanImageLayers == null) {
 
@@ -436,7 +437,10 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 }
 
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             Log.e("error", e.toString());
         }
 //        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
@@ -472,31 +476,6 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
             else mLayoutDisplayLayerThematic.addView(layoutFeature);
             mListLayerID.add(layer.getName());
         }
-    }
-
-    private CheckBox addCheckBox_SubLayer(final ArcGISMapImageSublayer layer) {
-        final CheckBox checkBox = new CheckBox(this);
-        checkBox.setText(layer.getName());
-        checkBox.setChecked(false);
-        layer.setVisible(false);
-        CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (checkBox.isChecked()) {
-                    if (buttonView.getText().equals(layer.getName()))
-                        layer.setVisible(true);
-
-
-                } else {
-                    if (checkBox.getText().equals(layer.getName()))
-                        layer.setVisible(false);
-                }
-            }
-        });
-        return checkBox;
     }
 
 

@@ -102,14 +102,21 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         this.mServiceFeatureTable = serviceFeatureTable;
         this.mCallout = callout;
         this.mGeocoder = geocoder;
-        mListTenVatTuOngChinh = new ArrayList<>();
-        mListTenVatTuOngNganh = new ArrayList<>();
-        for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs())
-            mListTenVatTuOngChinh.add(vatTu.getTenVatTu());
-        for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs())
-            mListTenVatTuOngNganh.add(vatTu.getTenVatTu());
+
 
         this.mFeatureLayerDTGS = featureLayerDTGS;
+    }
+
+    private void initializeVatTu() {
+        if (mListTenVatTuOngChinh == null || mListTenVatTuOngNganh == null) {
+            mListTenVatTuOngChinh = new ArrayList<>();
+            mListTenVatTuOngNganh = new ArrayList<>();
+            for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs())
+                mListTenVatTuOngChinh.add(vatTu.getTenVatTu());
+            for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs())
+                mListTenVatTuOngNganh.add(vatTu.getTenVatTu());
+        }
+
     }
 
     public DialogInterface getDialog() {
@@ -1076,6 +1083,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     @SuppressLint("InflateParams")
     public void showPopup(final ArcGISFeature selectedArcGISFeature,
                           final boolean isAddFeature) {
+        initializeVatTu();
         clearSelection();
         dimissCallout();
         this.mSelectedArcGISFeature = selectedArcGISFeature;
