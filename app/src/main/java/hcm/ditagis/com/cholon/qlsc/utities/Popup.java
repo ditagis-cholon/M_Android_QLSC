@@ -71,7 +71,6 @@ import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
@@ -1101,16 +1100,15 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         linearLayout.findViewById(R.id.imgBtn_layout_thongtinsuco).setOnClickListener(this);
         if (featureLayer.getName().equals(mMainActivity.getString(R.string.ALIAS_DIEM_SU_CO))) {
             //user admin mới có quyền xóa
-            if (UserDangNhap.getInstance().getUser().getUserName() != null && UserDangNhap.getInstance().getUser().getUserName().equals("ditagis")) {
+            if (mFeatureLayerDTG.getLayerInfoDTG().isDelete()) {
                 linearLayout.findViewById(R.id.imgBtn_delete).setOnClickListener(this);
             } else {
                 linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.GONE);
             }
-
             //khi hoàn thành rồi thì không chỉnh sửa được
             Object o = mSelectedArcGISFeature.getAttributes().get(mMainActivity.getString(R.string.Field_SuCo_TrangThai));
             if (o != null && Integer.parseInt(o.toString())
-                    != mMainActivity.getResources().getInteger(R.integer.trang_thai_hoan_thanh))
+                    != mMainActivity.getResources().getInteger(R.integer.trang_thai_hoan_thanh) && mFeatureLayerDTG.getLayerInfoDTG().isEdit())
                 linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setOnClickListener(this);
             else
                 linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setVisibility(View.GONE);

@@ -100,7 +100,6 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     }
 
     public FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
-        for (Layer layer : mMapView.getMap().getOperationalLayers())
             for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
                 long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
                 if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;

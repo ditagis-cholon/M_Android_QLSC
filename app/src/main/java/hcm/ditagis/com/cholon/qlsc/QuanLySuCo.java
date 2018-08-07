@@ -395,6 +395,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                         public void run() {
                             setRendererSuCoFeatureLayer(featureLayer);
                             mFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
+                            mFeatureLayerDTGS.add(mFeatureLayerDTG);
                             Callout callout = mMapView.getCallout();
                             mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mGeocoder, mFeatureLayerDTGS);
 
@@ -402,8 +403,8 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
 
                             mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
+                            mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
 
-                            mFeatureLayerDTGS.add(mFeatureLayerDTG);
                         }
 
                     });
