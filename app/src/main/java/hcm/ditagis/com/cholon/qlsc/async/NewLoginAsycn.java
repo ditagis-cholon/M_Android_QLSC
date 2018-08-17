@@ -47,6 +47,7 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
     protected User doInBackground(String... params) {
         String userName = params[0];
         String pin = params[1];
+        UserDangNhap.getInstance().setUser(null);
 //        String passEncoded = (new EncodeMD5()).encode(pin + "_DITAGIS");
         // Do some validation here
         String urlParameters = String.format("Username=%s&Password=%s", userName, pin);
@@ -68,15 +69,18 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
                 Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"", ""));
                 bufferedReader.close();
 
-                UserDangNhap.getInstance().setUser(new User());
-                UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
-                return UserDangNhap.getInstance().getUser();
+                if (checkAccess()) {
+                    UserDangNhap.getInstance().setUser(new User());
+                    UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
+
+                }
             } finally {
                 conn.disconnect();
             }
         } catch (Exception e) {
             Log.e("ERROR", e.getMessage(), e);
-            return null;
+        } finally {
+            return UserDangNhap.getInstance().getUser();
         }
     }
 
@@ -86,6 +90,34 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
         mDialog.dismiss();
         this.mDelegate.processFinish(user);
 //        }
+    }
+
+    private Boolean checkAccess() {
+        boolean isAccess = false;
+        try {
+            URL url = new URL(Constant.getInstance().IS_ACCESS);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            try {
+                conn.setDoOutput(false);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.connect();
+
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String line = bufferedReader.readLine();
+                if (line.equals("true"))
+                    isAccess = true;
+
+            } catch (Exception e) {
+                Log.e("error", e.toString());
+            } finally {
+                conn.disconnect();
+            }
+        } catch (Exception e) {
+            Log.e("error", e.toString());
+        } finally {
+            return isAccess;
+        }
     }
 
     private String getDisplayName() {

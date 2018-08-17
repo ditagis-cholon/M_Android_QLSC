@@ -124,8 +124,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
             layerDTGS.add(new LayerInfoDTG(jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_title)),
-                    jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)).replace("//sawagis.vn/arcgis/rest/services/",
-                            "//gis.capnuoccholon.com.vn/server/rest/services/"),
+                    jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_definition))));

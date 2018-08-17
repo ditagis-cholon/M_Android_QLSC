@@ -30,8 +30,17 @@ public class Constant {
     {
         LAYER_INFO = SERVER_API + "/layerinfo";
     }
-    public String GENERATE_ID_SUCO;{
+
+    public String GENERATE_ID_SUCO;
+
+    {
         GENERATE_ID_SUCO = SERVER_API + "/quanlysuco/generateidsuco";
+    }
+
+    public String IS_ACCESS;
+
+    {
+        IS_ACCESS = SERVER_API + "/Account/IsAccess/m_qlsc";
     }
 
     private SettingsAdapter.Item[] mSettingsItems;
