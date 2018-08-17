@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -25,11 +26,12 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.services.GetDMA;
 import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngChinh;
 import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngNganh;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
-import hcm.ditagis.com.cholon.qlsc.utities.Route;
 
 public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQueryResult>, Void> {
     private ProgressDialog mDialog;
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private AsyncResponse mDelegate;
 
@@ -54,19 +56,20 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
     @Override
     protected Void doInBackground(Void... params) {
         try {
-
             getLayerInfoAPI();
             new GetVatTuOngChinh(mContext).getVatTuFromService();
             new GetVatTuOngNganh(mContext).getVatTuFromService();
             new GetDMA(mContext).getMaDMAFromService();
+
         } catch (Exception e) {
             Log.e("Lỗi lấy danh sách DMA", e.toString());
         }
         return null;
     }
 
+    @SafeVarargs
     @Override
-    protected void onProgressUpdate(ListenableFuture<FeatureQueryResult>... values) {
+    protected final void onProgressUpdate(ListenableFuture<FeatureQueryResult>... values) {
         super.onProgressUpdate(values);
 
 
@@ -83,7 +86,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
 
     private void getLayerInfoAPI() {
         try {
-            String API_URL = mContext.getString(R.string.API_URL);
+            String API_URL = Constant.getInstance().LAYER_INFO;
 
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -94,12 +97,12 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder builder = new StringBuilder();
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    buffer.append(line);
+                    builder.append(line);
                 }
-                pajsonRouteeJSon(buffer.toString());
+                pajsonRouteeJSon(builder.toString());
             } catch (Exception e) {
                 Log.e("error", e.toString());
             } finally {
@@ -114,15 +117,11 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
         if (data == null)
             return;
         String myData = "{ \"layerInfo\": ".concat(data).concat("}");
-        List<Route> routes = new ArrayList<Route>();
         JSONObject jsonData = new JSONObject(myData);
         JSONArray jsonRoutes = jsonData.getJSONArray("layerInfo");
         List<LayerInfoDTG> layerDTGS = new ArrayList<>();
         for (int i = 0; i < jsonRoutes.length(); i++) {
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
-
-
-//           LayerInfoDTG layerInfoDTG = new LayerInfoDTG();
             layerDTGS.add(new LayerInfoDTG(jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_title)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)).replace("//sawagis.vn/arcgis/rest/services/",

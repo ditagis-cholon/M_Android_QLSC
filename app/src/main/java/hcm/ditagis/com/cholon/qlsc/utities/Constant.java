@@ -11,6 +11,29 @@ import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
 public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+    //    public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+    private final String SERVER_API = "http://sawagis.vn/cholon/api";
+    public String API_LOGIN;
+
+    {
+        API_LOGIN = SERVER_API + "/Login";
+    }
+
+    public String DISPLAY_NAME;
+
+    {
+        DISPLAY_NAME = SERVER_API + "/Account/Profile";
+    }
+
+    public String LAYER_INFO;
+
+    {
+        LAYER_INFO = SERVER_API + "/layerinfo";
+    }
+    public String GENERATE_ID_SUCO;{
+        GENERATE_ID_SUCO = SERVER_API + "/quanlysuco/generateidsuco";
+    }
+
     private SettingsAdapter.Item[] mSettingsItems;
 
     private static Constant mInstance = null;

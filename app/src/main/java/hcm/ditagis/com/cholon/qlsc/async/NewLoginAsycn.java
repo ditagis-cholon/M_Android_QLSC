@@ -17,6 +17,7 @@ import java.net.URL;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class NewLoginAsycn extends AsyncTask<String, Void, User> {
@@ -24,7 +25,6 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
     private ProgressDialog mDialog;
     private Context mContext;
     private NewLoginAsycn.AsyncResponse mDelegate;
-    String API_URL = "http://sawagis.vn/cholon/api/Login";
 
     public interface AsyncResponse {
         void processFinish(User output);
@@ -50,7 +50,7 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
 //        String passEncoded = (new EncodeMD5()).encode(pin + "_DITAGIS");
         // Do some validation here
         String urlParameters = String.format("Username=%s&Password=%s", userName, pin);
-        String urlWithParam = String.format("%s?%s", API_URL, urlParameters);
+        String urlWithParam = String.format("%s?%s", Constant.getInstance().API_LOGIN, urlParameters);
         try {
 //            + "&apiKey=" + API_KEY
             URL url = new URL(urlWithParam);
@@ -89,10 +89,9 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
     }
 
     private String getDisplayName() {
-        String API_URL = "http://sawagis.vn/cholon/api/Account/Profile";
         String displayName = "";
         try {
-            URL url = new URL(API_URL);
+            URL url = new URL(Constant.getInstance().DISPLAY_NAME);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);

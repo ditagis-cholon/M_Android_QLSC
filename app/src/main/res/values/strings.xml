@@ -1,4 +1,3 @@
-<!DOCTYPE resources [<!ENTITY API_URL "http://gis.capnuoccholon.com.vn/cholon"><!ENTITY table_sys_layer "ChoLonSystem..SYS_Layer"><!ENTITY table_sys_layer_account "ChoLonSystem..SYS_Layer_Account"><!ENTITY table_sys_account "ChoLonSystem..SYS_Account">]>
 <resources>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -195,24 +194,24 @@
 
     <!--sql column login end-->
 
-    <string name="sql_login">select *
-					 from &table_sys_account; where username = ? and password = ?</string>
-    <string name="sql_changepassword">update users set pass = ?, c_pass = ? where username = ?</string>
+    <!--<string name="sql_login">select *-->
+					 <!--from &table_sys_account; where username = ? and password = ?</string>-->
+    <!--<string name="sql_changepassword">update users set pass = ?, c_pass = ? where username = ?</string>-->
 
-    <string name="sql_select_ma_dma">select madma from sde.dma where madma is not null order by madma asc</string>
-    <string name="sql_select_nguyennhan_ongchinh">  SELECT *  FROM NguyenNhanOngChinh</string>
-    <string name="sql_select_sys_layer">SELECT *  FROM &table_sys_layer;
-        l  inner join &table_sys_layer_account; la  on l.id = la.Layer  where account = ?</string>
-    <string name="sql_select_nguyennhan_ongnganh">  SELECT *  FROM NguyenNhanOngNganh</string>
-    <string name="sql_select_vatlieu_ongchinh">  SELECT *  FROM VatLieuOngChinh</string>
-    <string name="sql_select_vatlieu_ongnganh">  SELECT *  FROM VatLieuOngNganh</string>
-    <string name="sql_select_vattu_ongchinh">select * from vattuongchinh</string>
-    <string name="sql_select_vattu_ongnganh">select * from vattuongnganh</string>
-    <string name="sql_insert_hosovattu_suco">INSERT INTO HoSoVatTuSuCo VALUES (?,?,?)</string>
-    <string name="sql_select_hosovattu_suco">select soluong, h.mavattu, tenvattu, donvitinh
-        from dbo.hosovattusuco h inner join vattu v on h.mavattu = v.MaVatTu
-        where idsuco = ?</string>
-    <string name="sql_delete_hosovattu_suco">delete from dbo.hosovattusuco where idsuco = ?</string>
+    <!--<string name="sql_select_ma_dma">select madma from sde.dma where madma is not null order by madma asc</string>-->
+    <!--<string name="sql_select_nguyennhan_ongchinh">  SELECT *  FROM NguyenNhanOngChinh</string>-->
+    <!--<string name="sql_select_sys_layer">SELECT *  FROM &table_sys_layer;-->
+        <!--l  inner join &table_sys_layer_account; la  on l.id = la.Layer  where account = ?</string>-->
+    <!--<string name="sql_select_nguyennhan_ongnganh">  SELECT *  FROM NguyenNhanOngNganh</string>-->
+    <!--<string name="sql_select_vatlieu_ongchinh">  SELECT *  FROM VatLieuOngChinh</string>-->
+    <!--<string name="sql_select_vatlieu_ongnganh">  SELECT *  FROM VatLieuOngNganh</string>-->
+    <!--<string name="sql_select_vattu_ongchinh">select * from vattuongchinh</string>-->
+    <!--<string name="sql_select_vattu_ongnganh">select * from vattuongnganh</string>-->
+    <!--<string name="sql_insert_hosovattu_suco">INSERT INTO HoSoVatTuSuCo VALUES (?,?,?)</string>-->
+    <!--<string name="sql_select_hosovattu_suco">select soluong, h.mavattu, tenvattu, donvitinh-->
+        <!--from dbo.hosovattusuco h inner join vattu v on h.mavattu = v.MaVatTu-->
+        <!--where idsuco = ?</string>-->
+    <!--<string name="sql_delete_hosovattu_suco">delete from dbo.hosovattusuco where idsuco = ?</string>-->
 
     <!--sql end-->
     <string name="find_khachhHang_message">Đang lấy thông tin khách hàng…</string>
@@ -317,7 +316,6 @@
     <string name="field_VatTu_maVatTu">MaVatTu</string>
     <string name="field_VatTu_tenVatTu">TenVatTu</string>
     <string name="field_VatTu_donViTinh">DonViTinh</string>
-    <string name="API_URL">&API_URL;/api/layerinfo</string>
     <string name="message_unloaded_map">Chưa khởi tạo xong bản đồ Vui lòng làm mới lại dữ liệu</string>
     <!--field sự cố end-->
 </resources>

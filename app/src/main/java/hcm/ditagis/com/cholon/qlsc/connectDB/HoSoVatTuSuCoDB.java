@@ -33,21 +33,21 @@ public class HoSoVatTuSuCoDB implements IDB<HoSoVatTuSuCo, Boolean, String> {
     public Boolean delete(String s) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
         boolean result = false;
-        try {
-            if (cnn == null)
-                return false;
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            PreparedStatement deleteStatement = cnn.prepareStatement(mContext.getString(R.string.sql_delete_hosovattu_suco));
-            deleteStatement.setString(1, s);
-            result = deleteStatement.execute();
-
-
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        } finally {
-
-        }
+//        try {
+//            if (cnn == null)
+//                return false;
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//            PreparedStatement deleteStatement = cnn.prepareStatement(mContext.getString(R.string.sql_delete_hosovattu_suco));
+//            deleteStatement.setString(1, s);
+//            result = deleteStatement.execute();
+//
+//
+//        } catch (SQLException e1) {
+//            e1.printStackTrace();
+//        } finally {
+//
+//        }
         return result;
     }
 
@@ -76,30 +76,30 @@ public class HoSoVatTuSuCoDB implements IDB<HoSoVatTuSuCo, Boolean, String> {
     public List<HoSoVatTuSuCo> find(String idSuCo) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
         List<HoSoVatTuSuCo> hoSoVatTuSuCos = new ArrayList<>();
-        ResultSet rs = null;
-        try {
-            if (cnn == null)
-                return null;
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            String query = mContext.getString(R.string.sql_select_hosovattu_suco);
-            PreparedStatement mStatement = cnn.prepareStatement(query);
-            mStatement.setString(1, idSuCo);
-            rs = mStatement.executeQuery();
-
-            while (rs.next()) {
-                hoSoVatTuSuCos.add(new HoSoVatTuSuCo(idSuCo, rs.getDouble(1), rs.getString(2), rs.getString(3), rs.getString(4)));
-            }
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        } finally {
-            try {
-                if (rs != null && !rs.isClosed())
-                    rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+//        ResultSet rs = null;
+//        try {
+//            if (cnn == null)
+//                return null;
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//            String query = mContext.getString(R.string.sql_select_hosovattu_suco);
+//            PreparedStatement mStatement = cnn.prepareStatement(query);
+//            mStatement.setString(1, idSuCo);
+//            rs = mStatement.executeQuery();
+//
+//            while (rs.next()) {
+//                hoSoVatTuSuCos.add(new HoSoVatTuSuCo(idSuCo, rs.getDouble(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+//            }
+//        } catch (SQLException e1) {
+//            e1.printStackTrace();
+//        } finally {
+//            try {
+//                if (rs != null && !rs.isClosed())
+//                    rs.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return hoSoVatTuSuCos;
     }
 
@@ -107,25 +107,25 @@ public class HoSoVatTuSuCoDB implements IDB<HoSoVatTuSuCo, Boolean, String> {
     public boolean insert(HoSoVatTuSuCo hoSoVatTuSuCo) {
         Connection cnn = ConnectionDB.getInstance().getConnection();
         int result = 0;
-        try {
-            if (cnn == null)
-                return false;
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-
-            String query = mContext.getString(R.string.sql_insert_hosovattu_suco);
-            PreparedStatement insertStatement = cnn.prepareStatement(query);
-            insertStatement.setString(1, hoSoVatTuSuCo.getIdSuCo());
-            insertStatement.setDouble(2, hoSoVatTuSuCo.getSoLuong());
-            insertStatement.setString(3, hoSoVatTuSuCo.getMaVatTu());
-
-            result = insertStatement.executeUpdate();
-
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        } finally {
-
-        }
+//        try {
+//            if (cnn == null)
+//                return false;
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//
+//            String query = mContext.getString(R.string.sql_insert_hosovattu_suco);
+//            PreparedStatement insertStatement = cnn.prepareStatement(query);
+//            insertStatement.setString(1, hoSoVatTuSuCo.getIdSuCo());
+//            insertStatement.setDouble(2, hoSoVatTuSuCo.getSoLuong());
+//            insertStatement.setString(3, hoSoVatTuSuCo.getMaVatTu());
+//
+//            result = insertStatement.executeUpdate();
+//
+//        } catch (SQLException e1) {
+//            e1.printStackTrace();
+//        } finally {
+//
+//        }
         return result > 0;
     }
 }
