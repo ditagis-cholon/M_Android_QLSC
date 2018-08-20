@@ -24,8 +24,9 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
-import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoDB;
+import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
@@ -41,25 +42,26 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
     private ArcGISFeature mSelectedArcGISFeature = null;
     private boolean isUpdateAttachment;
     private byte[] mImage;
-    private AsyncResponse mDelegate;
-    private List<HoSoVatTuSuCo> mListHoSoVatTuSuCo;
+
     private boolean mIsAddFeature;
+    private AsyncResponse mDelegate;
+    private List<HoSoVatTuSuCo> mHoSoVatTuSuCos;
 
     public interface AsyncResponse {
         void processFinish(ArcGISFeature feature);
     }
 
-    public EditAsync(Context context, ServiceFeatureTable serviceFeatureTable,
+    public EditAsync(List<HoSoVatTuSuCo> hoSoVatTuSuCos, Context context, ServiceFeatureTable serviceFeatureTable,
                      ArcGISFeature selectedArcGISFeature, boolean isUpdateAttachment, byte[] image,
-                     List<HoSoVatTuSuCo> hoSoVatTu_suCos, boolean isAddFeature, AsyncResponse delegate) {
+                     boolean isAddFeature, AsyncResponse delegate) {
         mContext = context;
+        mHoSoVatTuSuCos = hoSoVatTuSuCos;
         this.mDelegate = delegate;
         mServiceFeatureTable = serviceFeatureTable;
         mSelectedArcGISFeature = selectedArcGISFeature;
         mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
         this.isUpdateAttachment = isUpdateAttachment;
         this.mImage = image;
-        this.mListHoSoVatTuSuCo = hoSoVatTu_suCos;
         this.mIsAddFeature = isAddFeature;
     }
 
@@ -82,13 +84,14 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
         short loaiSuCoShort = 0;
         String trangThai = "";
         boolean hasDomain = false;
+        String idSuCo = "";
         for (FeatureViewMoreInfoAdapter.Item item : adapter.getItems()) {
-            if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_LoaiSuCo))) {
+            if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_LoaiSuCo)))
                 loaiSuCo = item.getValue();
-
-            } else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_TrangThai)))
+            else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_TrangThai)))
                 trangThai = item.getValue();
         }
+        idSuCo = mSelectedArcGISFeature.getAttributes().get(mContext.getString(R.string.Field_HoSoVatTuSuCo_IDSuCo)).toString();
         List<FeatureType> featureTypes = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes();
         Object idFeatureTypes = getIdFeatureTypes(featureTypes, loaiSuCo);
         if (idFeatureTypes != null) {
@@ -170,12 +173,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                 }
             } else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_VatTu))) {
                 hasDomain = false;
-                HoSoVatTuSuCoDB hoSoVatTuSuCoDB = new HoSoVatTuSuCoDB(mContext);
-                if (mListHoSoVatTuSuCo.size() > 0)
-                    hoSoVatTuSuCoDB.delete(mListHoSoVatTuSuCo.get(0).getIdSuCo());
-                for (HoSoVatTuSuCo hoSoVatTuSuCo : mListHoSoVatTuSuCo) {
-                    hoSoVatTuSuCoDB.insert(hoSoVatTuSuCo);
-                }
+
                 continue;
             }
             if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
@@ -250,30 +248,22 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                 UserDangNhap.getInstance().getUser().getUserName());
 
         mServiceFeatureTable.loadAsync();
-        mServiceFeatureTable.addDoneLoadingListener(new Runnable() {
-            @Override
-            public void run() {
-                // update feature in the feature table
-                mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature).addDoneListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        mServiceFeatureTable.applyEditsAsync().addDoneListener(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (isUpdateAttachment && mImage != null) {
-                                    if (mSelectedArcGISFeature.canEditAttachments())
-                                        addAttachment();
-                                    else
-                                        applyEdit();
-                                } else {
-                                    applyEdit();
 
-                                }
-                            }
-                        });
-                    }
-                });
-            }
+        xuLyVatTu(idSuCo);
+        mServiceFeatureTable.addDoneLoadingListener(() -> {
+            // update feature in the feature table
+            mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature).addDoneListener(()
+                    -> mServiceFeatureTable.applyEditsAsync().addDoneListener(() -> {
+                if (isUpdateAttachment && mImage != null) {
+                    if (mSelectedArcGISFeature.canEditAttachments())
+                        addAttachment();
+                    else
+                        applyEdit();
+                } else {
+                    applyEdit();
+
+                }
+            }));
         });
 //                            }
 //                        });
@@ -284,27 +274,39 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
         return null;
     }
 
+    private void xuLyVatTu(String idSuCo) {
+        ListObjectDB.getInstance().setLstHoSoVatTuSuCoInsert(mHoSoVatTuSuCos);
+        //xử lý vật tư
+        if (ListObjectDB.getInstance().getLstHoSoVatTuSuCoInsert().size() > 0) {
+            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsyncInsert = new HoSoVatTuSuCoAsync(mContext, object -> {
+            });
+            hoSoVatTuSuCoAsyncInsert.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , Constant.HOSOVATTUSUCO_METHOD.INSERT);
+        }
+        while (ListObjectDB.getInstance().getLstHoSoVatTuSuCoInsert().size() > 0) {
+
+        }
+
+    }
+
     private void addAttachment() {
 
         final String attachmentName = mContext.getString(R.string.attachment) + "_" + System.currentTimeMillis() + ".png";
         final ListenableFuture<Attachment> addResult = mSelectedArcGISFeature.addAttachmentAsync(mImage, Bitmap.CompressFormat.PNG.toString(), attachmentName);
-        addResult.addDoneListener(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Attachment attachment = addResult.get();
-                    if (attachment.getSize() > 0) {
-                        final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature);
-                        tableResult.addDoneListener(new Runnable() {
-                            @Override
-                            public void run() {
-                                applyEdit();
-                            }
-                        });
-                    }
-                } catch (Exception ignored) {
-                    publishProgress();
+        addResult.addDoneListener(() -> {
+            try {
+                Attachment attachment = addResult.get();
+                if (attachment.getSize() > 0) {
+                    final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature);
+                    tableResult.addDoneListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            applyEdit();
+                        }
+                    });
                 }
+            } catch (Exception ignored) {
+                publishProgress();
             }
         });
     }

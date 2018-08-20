@@ -1127,9 +1127,9 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
 //                            mMapViewHandler.addFeature(image);
 
-                            EditAsync editAsync = new EditAsync(this, (ServiceFeatureTable)
+                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(), this, (ServiceFeatureTable)
                                     mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, mPopUp.getListHoSoVatTuSuCo(), true, new EditAsync.AsyncResponse() {
+                                    true, image, true, new EditAsync.AsyncResponse() {
                                 @Override
                                 public void processFinish(ArcGISFeature arcGISFeature) {
 //                                    mPopUp.getDialog().dismiss();
@@ -1166,9 +1166,9 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
 //                            mMapViewHandler.addFeature(image);
 //                            mPopUp.getDialog().dismiss();
-                            EditAsync editAsync = new EditAsync(this, (ServiceFeatureTable)
+                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(),this, (ServiceFeatureTable)
                                     mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, mPopUp.getListHoSoVatTuSuCo(), false, new EditAsync.AsyncResponse() {
+                                    true, image, false, new EditAsync.AsyncResponse() {
                                 @Override
                                 public void processFinish(ArcGISFeature arcGISFeature) {
                                     mPopUp.getCallout().dismiss();

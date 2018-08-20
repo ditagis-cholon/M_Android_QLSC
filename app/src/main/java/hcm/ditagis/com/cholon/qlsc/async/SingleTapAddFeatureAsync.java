@@ -91,42 +91,39 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
             feature = mServiceFeatureTable.createFeature();
             feature.setGeometry(clickPoint);
             FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mContext, false,
-                    mGeocoder, mFeatureLayerDTGS, false, new FindLocationAsycn.AsyncResponse() {
-                @Override
-                public void processFinish(List<MyAddress> output) {
-                    if (output != null) {
-                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DiaChi), output.get(0).getLocation());
-                        String subAdminArea = output.get(0).getSubAdminArea();
-                        if (subAdminArea.equals(mContext.getString(R.string.Quan5Name)))
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan5Code));
-                        else if (subAdminArea.equals(mContext.getString(R.string.Quan8Name)))
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan8Code));
-                        else if (subAdminArea.equals(mContext.getString(R.string.Quan6Name)))
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan6Code));
-                        else if (subAdminArea.equals(mContext.getString(R.string.QuanBinhTanName)))
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
-                        Short intObj = (short) 0;
-                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
+                    mGeocoder, mFeatureLayerDTGS, false, output -> {
+                        if (output != null) {
+                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DiaChi), output.get(0).getLocation());
+                            String subAdminArea = output.get(0).getSubAdminArea();
+                            if (subAdminArea.equals(mContext.getString(R.string.Quan5Name)))
+                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan5Code));
+                            else if (subAdminArea.equals(mContext.getString(R.string.Quan8Name)))
+                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan8Code));
+                            else if (subAdminArea.equals(mContext.getString(R.string.Quan6Name)))
+                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan6Code));
+                            else if (subAdminArea.equals(mContext.getString(R.string.QuanBinhTanName)))
+                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
+                            Short intObj = (short) 0;
+                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
 
-                        String searchStr = "";
-                        String dateTime = "";
-                        String timeID;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            dateTime = getDateString();
-                            timeID = getTimeID();
-                            searchStr = mContext.getString(R.string.Field_SuCo_IDSuCo) + " like '%" + timeID + "'";
-                        }
-                        QueryParameters queryParameters = new QueryParameters();
-                        queryParameters.setWhereClause(searchStr);
-                        mServiceFeatureTable.queryFeaturesAsync(queryParameters).addDoneListener(new Runnable() {
-                            @Override
-                            public void run() {
-                                addFeatureAsync(feature);
+                            String searchStr = "";
+                            String dateTime = "";
+                            String timeID;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                dateTime = getDateString();
+                                timeID = getTimeID();
+                                searchStr = mContext.getString(R.string.Field_SuCo_IDSuCo) + " like '%" + timeID + "'";
                             }
-                        });
-                    }
-                }
-            });
+                            QueryParameters queryParameters = new QueryParameters();
+                            queryParameters.setWhereClause(searchStr);
+                            mServiceFeatureTable.queryFeaturesAsync(queryParameters).addDoneListener(new Runnable() {
+                                @Override
+                                public void run() {
+                                    addFeatureAsync(feature);
+                                }
+                            });
+                        }
+                    });
             Geometry project = GeometryEngine.project(clickPoint, SpatialReferences.getWgs84());
             double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
             findLocationAsycn.setmLongtitude(location[0]);
@@ -158,89 +155,74 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
     }
 
     private void addFeatureAsync(final Feature feature) {
-        new GenerateIDSuCoAsycn(mContext, new GenerateIDSuCoAsycn.AsyncResponse() {
-            @Override
-            public void processFinish(String output) {
-                if (output.isEmpty()) {
-                    publishProgress();
-                    return;
-                }
-                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_IDSuCo), output);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Calendar c = Calendar.getInstance();
-                    feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayXayRa), c);
-                    feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayThongBao), c);
-                }
-                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), UserDangNhap.getInstance().getUser().getUserName());
-                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_LoaiSuCo), (short) 0);
-                //---get DMA begin
-                final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false, 1);
-                listListenableFuture.addDoneListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<IdentifyLayerResult> identifyLayerResults;
-                        try {
-                            identifyLayerResults = listListenableFuture.get();
-                            for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
-                                {
-                                    List<GeoElement> elements = identifyLayerResult.getElements();
-                                    if (elements.size() > 0) {
-                                        if (elements.get(0) instanceof ArcGISFeature) {
-                                            mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
-                                        }
-                                    }
+        new GenerateIDSuCoAsycn(mContext, output -> {
+            if (output.isEmpty()) {
+                publishProgress();
+                return;
+            }
+            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_IDSuCo), output);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Calendar c = Calendar.getInstance();
+                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayXayRa), c);
+                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayThongBao), c);
+            }
+            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), UserDangNhap.getInstance().getUser().getUserName());
+            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_LoaiSuCo), (short) 0);
+            //---get DMA begin
+            final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false, 1);
+            listListenableFuture.addDoneListener(() -> {
+                List<IdentifyLayerResult> identifyLayerResults;
+                try {
+                    identifyLayerResults = listListenableFuture.get();
+                    for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
+                        {
+                            List<GeoElement> elements = identifyLayerResult.getElements();
+                            if (elements.size() > 0) {
+                                if (elements.get(0) instanceof ArcGISFeature) {
+                                    mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
                                 }
                             }
-//                        publishProgress(null);
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
                         }
                     }
-                });
-                //---get DMA end
-                ListenableFuture<Void> mapViewResult = mServiceFeatureTable.addFeatureAsync(feature);
-                mapViewResult.addDoneListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        final ListenableFuture<List<FeatureEditResult>> listListenableEditAsync = mServiceFeatureTable.applyEditsAsync();
-                        listListenableEditAsync.addDoneListener(new Runnable() {
-                            @Override
-                            public void run() {
+//                        publishProgress(null);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+            //---get DMA end
+            ListenableFuture<Void> mapViewResult = mServiceFeatureTable.addFeatureAsync(feature);
+            mapViewResult.addDoneListener(() -> {
+                final ListenableFuture<List<FeatureEditResult>> listListenableEditAsync = mServiceFeatureTable.applyEditsAsync();
+                listListenableEditAsync.addDoneListener(() -> {
+                    try {
+                        List<FeatureEditResult> featureEditResults = listListenableEditAsync.get();
+                        if (featureEditResults.size() > 0) {
+                            long objectId = featureEditResults.get(0).getObjectId();
+                            final QueryParameters queryParameters = new QueryParameters();
+                            final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId);
+                            queryParameters.setWhereClause(query);
+                            final ListenableFuture<FeatureQueryResult> featuresAsync = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
+                            featuresAsync.addDoneListener(() -> {
                                 try {
-                                    List<FeatureEditResult> featureEditResults = listListenableEditAsync.get();
-                                    if (featureEditResults.size() > 0) {
-                                        long objectId = featureEditResults.get(0).getObjectId();
-                                        final QueryParameters queryParameters = new QueryParameters();
-                                        final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId);
-                                        queryParameters.setWhereClause(query);
-                                        final ListenableFuture<FeatureQueryResult> featuresAsync = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-                                        featuresAsync.addDoneListener(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    FeatureQueryResult result = featuresAsync.get();
-                                                    if (result.iterator().hasNext()) {
-                                                        Feature item = result.iterator().next();
-                                                        if (mImage != null)
-                                                            addAttachment(featuresAsync, item);
-                                                        else publishProgress(item);
-                                                    }
-                                                } catch (InterruptedException | ExecutionException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
-                                        });
+                                    FeatureQueryResult result = featuresAsync.get();
+                                    if (result.iterator().hasNext()) {
+                                        Feature item = result.iterator().next();
+                                        if (mImage != null)
+                                            addAttachment(featuresAsync, item);
+                                        else publishProgress(item);
                                     }
                                 } catch (InterruptedException | ExecutionException e) {
                                     e.printStackTrace();
                                 }
 
-                            }
-                        });
+                            });
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
+
                 });
-            }
+            });
         }).execute();
 
 
@@ -256,49 +238,40 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                 mSelectedArcGISFeature = (ArcGISFeature) item;
                 final String attachmentName = mContext.getString(R.string.attachment) + "_" + System.currentTimeMillis() + ".png";
                 final ListenableFuture<Attachment> addResult = mSelectedArcGISFeature.addAttachmentAsync(mImage, Bitmap.CompressFormat.PNG.toString(), attachmentName);
-                addResult.addDoneListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mDialog != null && mDialog.isShowing()) {
-                            mDialog.dismiss();
-                        }
-                        try {
-                            Attachment attachment = addResult.get();
-                            if (attachment.getSize() > 0) {
-                                final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature);
-                                tableResult.addDoneListener(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        final ListenableFuture<List<FeatureEditResult>> updatedServerResult = mServiceFeatureTable.applyEditsAsync();
-                                        updatedServerResult.addDoneListener(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                List<FeatureEditResult> edits;
-                                                try {
-                                                    edits = updatedServerResult.get();
-                                                    if (edits.size() > 0) {
-                                                        if (!edits.get(0).hasCompletedWithErrors()) {
-                                                            publishProgress(feature);
-                                                        }
-                                                    }
-                                                } catch (InterruptedException | ExecutionException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                if (mDialog != null && mDialog.isShowing()) {
-                                                    mDialog.dismiss();
-                                                }
-
+                addResult.addDoneListener(() -> {
+                    if (mDialog != null && mDialog.isShowing()) {
+                        mDialog.dismiss();
+                    }
+                    try {
+                        Attachment attachment = addResult.get();
+                        if (attachment.getSize() > 0) {
+                            final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(mSelectedArcGISFeature);
+                            tableResult.addDoneListener(() -> {
+                                final ListenableFuture<List<FeatureEditResult>> updatedServerResult = mServiceFeatureTable.applyEditsAsync();
+                                updatedServerResult.addDoneListener(() -> {
+                                    List<FeatureEditResult> edits;
+                                    try {
+                                        edits = updatedServerResult.get();
+                                        if (edits.size() > 0) {
+                                            if (!edits.get(0).hasCompletedWithErrors()) {
+                                                publishProgress(feature);
                                             }
-                                        });
-
-
+                                        }
+                                    } catch (InterruptedException | ExecutionException e) {
+                                        e.printStackTrace();
                                     }
-                                });
-                            }
+                                    if (mDialog != null && mDialog.isShowing()) {
+                                        mDialog.dismiss();
+                                    }
 
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
+                                });
+
+
+                            });
                         }
+
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
                 });
                 Envelope extent = item.getGeometry().getExtent();

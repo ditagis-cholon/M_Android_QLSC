@@ -1,7 +1,9 @@
 package hcm.ditagis.com.cholon.qlsc.entities.entitiesDB;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 
 public class ListObjectDB {
@@ -11,8 +13,62 @@ public class ListObjectDB {
     private List<VatTu> vatTuOngChinhs;
     private List<String> dmas;
     private List<LayerInfoDTG> lstFeatureLayerDTG;
+    private List<String> lstHoSoVatTuSuCoDelete;
+    private List<HoSoVatTuSuCo> lstHoSoVatTuSuCoInsert;
+
+    public List<HoSoVatTuSuCo> getHoSoVatTuSuCos() {
+        return hoSoVatTuSuCos;
+    }
+
+    public void setHoSoVatTuSuCos(List<HoSoVatTuSuCo> hoSoVatTuSuCos) {
+        this.hoSoVatTuSuCos = hoSoVatTuSuCos;
+    }
+
+    public List<String> getLstHoSoVatTuSuCoDelete() {
+        return lstHoSoVatTuSuCoDelete;
+    }
+
+    public void setLstHoSoVatTuSuCoDelete(List<String> lstHoSoVatTuSuCoDelete) {
+        this.lstHoSoVatTuSuCoDelete = lstHoSoVatTuSuCoDelete;
+    }
+
+    public List<HoSoVatTuSuCo> getLstHoSoVatTuSuCoInsert() {
+        return lstHoSoVatTuSuCoInsert;
+    }
+
+    public void setLstHoSoVatTuSuCoInsert(List<HoSoVatTuSuCo> lstHoSoVatTuSuCoInsert) {
+        this.lstHoSoVatTuSuCoInsert = lstHoSoVatTuSuCoInsert;
+    }
+
+    public void removeHoSoVatTuSuCoDelete(String maVatTu) {
+        for (int i = 0; i < lstHoSoVatTuSuCoDelete.size(); i++) {
+            String iMaVatTu = lstHoSoVatTuSuCoDelete.get(i);
+            if (maVatTu.equals(iMaVatTu)) {
+                lstHoSoVatTuSuCoDelete.remove(i);
+                break;
+            }
+        }
+    }
+    public void removeHoSoVatTuSuCoInsert(String maVatTu) {
+        for (int i = 0; i < lstHoSoVatTuSuCoInsert.size(); i++) {
+            HoSoVatTuSuCo hoSoVatTuSuCo = lstHoSoVatTuSuCoInsert.get(i);
+            if (maVatTu.equals(hoSoVatTuSuCo.getMaVatTu())) {
+                lstHoSoVatTuSuCoInsert.remove(i);
+                break;
+            }
+        }
+    }
+    public void clearListHoSoVatTuSuCoChange() {
+        lstHoSoVatTuSuCoInsert.clear();
+        lstHoSoVatTuSuCoDelete.clear();
+    }
+
+    private List<HoSoVatTuSuCo> hoSoVatTuSuCos;
 
     private ListObjectDB() {
+        lstHoSoVatTuSuCoInsert = new ArrayList<>();
+        lstHoSoVatTuSuCoDelete = new ArrayList<>();
+        hoSoVatTuSuCos = new ArrayList<>();
     }
 
     public static ListObjectDB getInstance() {

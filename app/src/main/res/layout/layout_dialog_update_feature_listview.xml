@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -170,30 +174,32 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:layout_marginRight="@dimen/margin_small"
-        android:layout_weight="1"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_updateinfo_left"
-            style="@style/MyTextAppearance.Blue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/layout_border_transparent" />
-
-        <Button
-            android:id="@+id/btn_updateinfo_right"
-            style="@style/MyTextAppearance.White"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_small"
-            android:background="@color/colorPrimary"
-            android:paddingLeft="@dimen/padding_small"
-            android:paddingRight="@dimen/padding_small" />
-    </LinearLayout>
 </LinearLayout>
+
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_small"
+    android:layout_marginRight="@dimen/margin_small"
+    android:layout_gravity="bottom|right"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btn_updateinfo_left"
+        style="@style/MyTextAppearance.Blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/layout_border_transparent" />
+
+    <Button
+        android:id="@+id/btn_updateinfo_right"
+        style="@style/MyTextAppearance.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="@dimen/padding_small"
+        android:paddingRight="@dimen/padding_small" />
+</LinearLayout>
+</FrameLayout>

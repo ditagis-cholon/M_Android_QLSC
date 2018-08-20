@@ -9,7 +9,6 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.data.ArcGISFeatureTable;
 import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
@@ -18,7 +17,10 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 
 /**
@@ -100,10 +102,10 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     }
 
     public FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
-            for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
-                long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
-                if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
-            }
+        for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
+            long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
+            if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
+        }
         return null;
     }
 
@@ -125,12 +127,20 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     protected void onProgressUpdate(FeatureLayerDTG... values) {
         super.onProgressUpdate(values);
         if (values != null && values.length > 0 && mSelectedArcGISFeature != null) {
+            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mContext, object -> {
+                if (object != null) {
 
-            FeatureLayerDTG featureLayerDTG = values[0];
-            mPopUp.setFeatureLayerDTG(featureLayerDTG);
-            mPopUp.showPopup(mSelectedArcGISFeature, false);
-        }
-        if (mDialog != null && mDialog.isShowing()) {
+                    FeatureLayerDTG featureLayerDTG = values[0];
+                    mPopUp.setFeatureLayerDTG(featureLayerDTG);
+                    mPopUp.showPopup(mSelectedArcGISFeature, false);
+                }
+                if (mDialog != null && mDialog.isShowing()) {
+                    mDialog.dismiss();
+                }
+            });
+            hoSoVatTuSuCoAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Constant.HOSOVATTUSUCO_METHOD.FIND, mSelectedArcGISFeature.getAttributes()
+                    .get(mContext.getString(R.string.Field_SuCo_IDSuCo)));
+        } else if (mDialog != null && mDialog.isShowing()) {
             mDialog.dismiss();
         }
     }

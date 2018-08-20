@@ -11,7 +11,7 @@ import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
 public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-    //    public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+//        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
     private final String SERVER_API = "http://sawagis.vn/cholon/api";
     public String API_LOGIN;
 
@@ -42,7 +42,10 @@ public class Constant {
     {
         IS_ACCESS = SERVER_API + "/Account/IsAccess/m_qlsc";
     }
-
+   public class HOSOVATTUSUCO_METHOD{
+        public static final int FIND = 0;
+        public static final int INSERT = 2;
+   }
     private SettingsAdapter.Item[] mSettingsItems;
 
     private static Constant mInstance = null;
