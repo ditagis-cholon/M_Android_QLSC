@@ -30,6 +30,7 @@
 
     <!--field sự cố begin-->
     <string name="Field_SuCo_LoaiSuCo">LoaiSuCo</string>
+    <string name="Field_SuCo_DoiQuanLy">DoiQuanLy</string>
     <string name="Field_SuCo_NguyenNhan">NguyenNhan</string>
     <string name="Field_SuCo_VatLieu">VatLieu</string>
     <string name="Field_SuCo_ViTri">ViTri</string>

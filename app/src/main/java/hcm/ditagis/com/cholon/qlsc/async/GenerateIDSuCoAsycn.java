@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
@@ -44,7 +45,7 @@ public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
         //Tránh gặp lỗi networkOnMainThread nên phải dùng asyncTask
         String id = "";
         try {
-            String API_URL = Constant.getInstance().GENERATE_ID_SUCO;
+            String API_URL = Constant.getInstance().GENERATE_ID_SUCO + UserDangNhap.getInstance().getUser().getRole();
 
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

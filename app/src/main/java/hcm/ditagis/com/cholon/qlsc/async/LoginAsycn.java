@@ -153,9 +153,11 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
                 JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
                 String displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));
                 String username = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_username));
+                String role = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_role));
                 UserDangNhap.getInstance().setUser(new User());
                 UserDangNhap.getInstance().getUser().setDisplayName(displayName);
                 UserDangNhap.getInstance().getUser().setUserName(username);
+                UserDangNhap.getInstance().getUser().setRole(role);
             }
         }
     }

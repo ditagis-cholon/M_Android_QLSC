@@ -25,6 +25,8 @@ android {
         exclude 'META-INF/LGPL2.1'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+        pickFirst 'lib/x86/libruntimecore_java.so'
+        pickFirst 'lib/armeabi-v7a/libruntimecore_java.so'
     }
     buildTypes {
         release {
@@ -52,8 +54,9 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
-    implementation 'com.esri.arcgisruntime:arcgis-android:100.2.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.esri.arcgisruntime:arcgis-android:100.3.0'
+    implementation 'com.esri.arcgis.android:arcgis-android:10.2.9'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
     implementation 'com.google.android.gms:play-services:12.0.1'
 }

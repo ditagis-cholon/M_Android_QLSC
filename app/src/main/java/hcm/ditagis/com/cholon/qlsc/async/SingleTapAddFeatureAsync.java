@@ -99,6 +99,8 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                         feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
                     Short intObj = (short) 0;
                     feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
+                    feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DoiQuanLy),
+                            UserDangNhap.getInstance().getUser().getRole());
 
                     String searchStr = "";
                     String timeID;

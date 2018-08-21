@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import java.text.SimpleDateFormat;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 
 /**
  * Created by ThanLe on 3/1/2018.
@@ -15,7 +16,7 @@ public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-//        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+    //        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
     private final String SERVER_API = "http://sawagis.vn/cholon/api";
     public String API_LOGIN;
 
@@ -38,7 +39,7 @@ public class Constant {
     public String GENERATE_ID_SUCO;
 
     {
-        GENERATE_ID_SUCO = SERVER_API + "/quanlysuco/generateidsuco";
+        GENERATE_ID_SUCO = SERVER_API + "/quanlysuco/generateidsuco/" ;
     }
 
     public String IS_ACCESS;
@@ -46,10 +47,16 @@ public class Constant {
     {
         IS_ACCESS = SERVER_API + "/Account/IsAccess/m_qlsc";
     }
-   public class HOSOVATTUSUCO_METHOD{
+
+    public class HOSOVATTUSUCO_METHOD {
         public static final int FIND = 0;
         public static final int INSERT = 2;
-   }
+    }
+    public class ACCOUNT_ROLE {
+        public static final String QLCN1 = "qlcn1";
+        public static final String QLCN2 = "qlcn2";
+    }
+
     private SettingsAdapter.Item[] mSettingsItems;
 
     private static Constant mInstance = null;
