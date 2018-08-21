@@ -40,29 +40,26 @@ public class GetDMA {
                 final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
 //
                 final ListenableFuture<FeatureQueryResult> feature = serviceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-                feature.addDoneListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        final List<String> dmaList = new ArrayList<>();
-                        try {
-                            FeatureQueryResult result = feature.get();
-                            Iterator<Feature> iterator = result.iterator();
-                            Feature item;
-                            while (iterator.hasNext()) {
-                                item = iterator.next();
-                                String maDMA = (String) item.getAttributes().get(mContext.getString(R.string.field_DMA_maDMA));
-                                dmaList.add(maDMA);
-                            }
-
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                        }
-                        finally {
-                            ListObjectDB.getInstance().setDmas(dmaList);
+                feature.addDoneListener(() -> {
+                    final List<String> dmaList = new ArrayList<>();
+                    try {
+                        FeatureQueryResult result = feature.get();
+                        Iterator<Feature> iterator = result.iterator();
+                        Feature item;
+                        while (iterator.hasNext()) {
+                            item = iterator.next();
+                            String maDMA = (String) item.getAttributes().get(mContext.getString(R.string.field_DMA_maDMA));
+                            dmaList.add(maDMA);
                         }
 
-
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
+                    finally {
+                        ListObjectDB.getInstance().setDmas(dmaList);
+                    }
+
+
                 });
 
                 break;

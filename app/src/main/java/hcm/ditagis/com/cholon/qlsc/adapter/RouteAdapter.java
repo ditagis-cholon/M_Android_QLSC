@@ -9,13 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.utities.Distance;
-import hcm.ditagis.com.cholon.qlsc.utities.Duration;
 
 /**
  * Created by ThanLe on 04/10/2017.
@@ -49,7 +46,7 @@ public class RouteAdapter extends ArrayAdapter<RouteAdapter.Item> {
         return 0;
     }
 
-    @SuppressLint("InflateParams")
+    @SuppressLint({"InflateParams", "DefaultLocale"})
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -76,17 +73,13 @@ public class RouteAdapter extends ArrayAdapter<RouteAdapter.Item> {
 
     public static class Item {
         private Distance distance;
-        public Duration duration;
-        private LatLng endLocation;
-        private LatLng startLocation;
         private String html_instructions;
         private String html_sub_instructions;
-        private String travel_mode;
 
         public Item() {
         }
 
-        public String getHtml_sub_instructions() {
+        String getHtml_sub_instructions() {
             return html_sub_instructions;
         }
 
@@ -94,7 +87,7 @@ public class RouteAdapter extends ArrayAdapter<RouteAdapter.Item> {
             this.html_sub_instructions = html_sub_instructions;
         }
 
-        public Distance getDistance() {
+        Distance getDistance() {
             return distance;
         }
 
@@ -102,31 +95,8 @@ public class RouteAdapter extends ArrayAdapter<RouteAdapter.Item> {
             this.distance = distance;
         }
 
-        public Duration getDuration() {
-            return duration;
-        }
 
-        public void setDuration(Duration duration) {
-            this.duration = duration;
-        }
-
-        public LatLng getEndLocation() {
-            return endLocation;
-        }
-
-        public void setEndLocation(LatLng endLocation) {
-            this.endLocation = endLocation;
-        }
-
-        public LatLng getStartLocation() {
-            return startLocation;
-        }
-
-        public void setStartLocation(LatLng startLocation) {
-            this.startLocation = startLocation;
-        }
-
-        public String getHtml_instructions() {
+        String getHtml_instructions() {
             return html_instructions;
         }
 
@@ -134,12 +104,5 @@ public class RouteAdapter extends ArrayAdapter<RouteAdapter.Item> {
             this.html_instructions = html_instructions;
         }
 
-        public String getTravel_mode() {
-            return travel_mode;
-        }
-
-        public void setTravel_mode(String travel_mode) {
-            this.travel_mode = travel_mode;
-        }
     }
 }

@@ -13,8 +13,8 @@ public class ListObjectDB {
     private List<VatTu> vatTuOngChinhs;
     private List<String> dmas;
     private List<LayerInfoDTG> lstFeatureLayerDTG;
-    private List<String> lstHoSoVatTuSuCoDelete;
     private List<HoSoVatTuSuCo> lstHoSoVatTuSuCoInsert;
+    private List<HoSoVatTuSuCo> hoSoVatTuSuCos;
 
     public List<HoSoVatTuSuCo> getHoSoVatTuSuCos() {
         return hoSoVatTuSuCos;
@@ -22,14 +22,6 @@ public class ListObjectDB {
 
     public void setHoSoVatTuSuCos(List<HoSoVatTuSuCo> hoSoVatTuSuCos) {
         this.hoSoVatTuSuCos = hoSoVatTuSuCos;
-    }
-
-    public List<String> getLstHoSoVatTuSuCoDelete() {
-        return lstHoSoVatTuSuCoDelete;
-    }
-
-    public void setLstHoSoVatTuSuCoDelete(List<String> lstHoSoVatTuSuCoDelete) {
-        this.lstHoSoVatTuSuCoDelete = lstHoSoVatTuSuCoDelete;
     }
 
     public List<HoSoVatTuSuCo> getLstHoSoVatTuSuCoInsert() {
@@ -40,35 +32,19 @@ public class ListObjectDB {
         this.lstHoSoVatTuSuCoInsert = lstHoSoVatTuSuCoInsert;
     }
 
-    public void removeHoSoVatTuSuCoDelete(String maVatTu) {
-        for (int i = 0; i < lstHoSoVatTuSuCoDelete.size(); i++) {
-            String iMaVatTu = lstHoSoVatTuSuCoDelete.get(i);
-            if (maVatTu.equals(iMaVatTu)) {
-                lstHoSoVatTuSuCoDelete.remove(i);
-                break;
-            }
-        }
-    }
-    public void removeHoSoVatTuSuCoInsert(String maVatTu) {
-        for (int i = 0; i < lstHoSoVatTuSuCoInsert.size(); i++) {
-            HoSoVatTuSuCo hoSoVatTuSuCo = lstHoSoVatTuSuCoInsert.get(i);
-            if (maVatTu.equals(hoSoVatTuSuCo.getMaVatTu())) {
-                lstHoSoVatTuSuCoInsert.remove(i);
-                break;
-            }
-        }
-    }
     public void clearListHoSoVatTuSuCoChange() {
         lstHoSoVatTuSuCoInsert.clear();
-        lstHoSoVatTuSuCoDelete.clear();
     }
 
-    private List<HoSoVatTuSuCo> hoSoVatTuSuCos;
 
     private ListObjectDB() {
         lstHoSoVatTuSuCoInsert = new ArrayList<>();
-        lstHoSoVatTuSuCoDelete = new ArrayList<>();
         hoSoVatTuSuCos = new ArrayList<>();
+
+        vatTuOngChinhs = new ArrayList<>();
+        vatTuOngNganhs = new ArrayList<>();
+        dmas = new ArrayList<>();
+        lstFeatureLayerDTG = new ArrayList<>();
     }
 
     public static ListObjectDB getInstance() {

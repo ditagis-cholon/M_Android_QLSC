@@ -1,8 +1,8 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
@@ -14,7 +14,7 @@ import hcm.ditagis.com.cholon.qlsc.R;
 
 public class NotifyDataSetChangeAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void> {
     private ProgressDialog dialog;
-    private Context mContext;
+    @SuppressLint("StaticFieldLeak")
     private Activity mActivity;
 
     public NotifyDataSetChangeAsync(Activity activity) {
@@ -37,14 +37,8 @@ public class NotifyDataSetChangeAsync extends AsyncTask<FeatureViewMoreInfoAdapt
         final FeatureViewMoreInfoAdapter adapter = params[0];
         try {
             Thread.sleep(500);
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.notifyDataSetChanged();
-
-                }
-            });
-        } catch (InterruptedException e) {
+            mActivity.runOnUiThread(adapter::notifyDataSetChanged);
+        } catch (InterruptedException ignored) {
 
         }
 
@@ -61,7 +55,8 @@ public class NotifyDataSetChangeAsync extends AsyncTask<FeatureViewMoreInfoAdapt
 
     @Override
     protected void onPostExecute(Void result) {
-        if (dialog != null || dialog.isShowing())
+        assert dialog != null;
+        if (dialog.isShowing())
             dialog.dismiss();
         super.onPostExecute(result);
 

@@ -1,9 +1,7 @@
 package hcm.ditagis.com.cholon.qlsc.entities;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
@@ -20,10 +18,6 @@ public class CustomLinearLayout extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public CustomLinearLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
     @Override
     public boolean performClick() {
         super.performClick();

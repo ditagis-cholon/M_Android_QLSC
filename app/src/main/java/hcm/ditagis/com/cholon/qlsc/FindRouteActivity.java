@@ -57,6 +57,7 @@ public class FindRouteActivity extends AppCompatActivity implements OnMapReadyCa
     TextView txtSheetBehavior;
     CustomLinearLayout layoutSheetBehavior;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,32 +99,24 @@ public class FindRouteActivity extends AppCompatActivity implements OnMapReadyCa
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
-        layoutSheetBehavior.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_UP:
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        break;
-                    case MotionEvent.ACTION_DOWN:
-                        break;
-                }
-                return false;
+        layoutSheetBehavior.setOnTouchListener((v, event) -> {
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_UP:
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+                case MotionEvent.ACTION_DOWN:
+                    break;
             }
-
+            return false;
         });
-        layoutSheetBehavior.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        layoutSheetBehavior.setOnClickListener(v -> {
+            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 //                    txtSheetBehavior.setText("Xem bản đồ");
-                } else {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            } else {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 //                    txtSheetBehavior.setText("Các bước");
-                }
             }
         });
 
@@ -206,7 +199,7 @@ public class FindRouteActivity extends AppCompatActivity implements OnMapReadyCa
         destinationMarkers = new ArrayList<>();
 
         ListView lstViewRoute = layoutBottomSheet.findViewById(R.id.lstView_route);
-        RouteAdapter routeAdapter = new RouteAdapter(this, new ArrayList<RouteAdapter.Item>());
+        RouteAdapter routeAdapter = new RouteAdapter(this, new ArrayList<>());
         lstViewRoute.setAdapter(routeAdapter);
 
         for (Route route : routes) {

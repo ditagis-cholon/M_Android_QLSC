@@ -39,7 +39,6 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -94,8 +93,6 @@ import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.MapViewHandler;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
@@ -168,19 +165,14 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         requestPermisson();
 
 //        prepare1();
-        final PreparingAsycn preparingAsycn = new PreparingAsycn(this, new PreparingAsycn.AsyncResponse() {
-            @Override
-            public void processFinish(Void output) {
-                prepare2();
-            }
-        });
+        final PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
 
 
         if (CheckConnectInternet.isOnline(this))
             preparingAsycn.execute();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     private void prepare2() {
         // create an empty map instance
         setLicense();
@@ -214,13 +206,7 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         mMapView = findViewById(R.id.mapView);
         mMapView.setMap(new ArcGISMap(Basemap.Type.OPEN_STREET_MAP, 10.7554041, 106.6546293, 12));
 
-        mMapView.getMap().addDoneLoadingListener(new Runnable() {
-            @Override
-            public void run() {
-                setService();
-
-            }
-        });
+        mMapView.getMap().addDoneLoadingListener(this::setService);
         changeStatusOfLocationDataSource();
         final EditText edit_latitude_vido = findViewById(R.id.edit_latitude_vido);
         final EditText edit_longtitude_kinhdo = findViewById(R.id.edit_longtitude_kinhdo);
@@ -244,15 +230,15 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     Point center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
 
                     //project is long, lat
-                    Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
+//                    Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
 
                     //geometry is x,y
-                    Geometry geometry = GeometryEngine.project(project, SpatialReferences.getWebMercator());
+//                    Geometry geometry = GeometryEngine.project(project, SpatialReferences.getWebMercator());
                     SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS, Color.RED, 20);
                     Graphic graphic = new Graphic(center, symbol);
                     mGraphicsOverlay.getGraphics().clear();
                     mGraphicsOverlay.getGraphics().add(graphic);
-                    double[] location = mMapViewHandler.onScroll(e1, e2, distanceX, distanceY);
+                    double[] location = mMapViewHandler.onScroll(e2);
                     edit_longtitude_kinhdo.setText(location[0] + "");
                     edit_latitude_vido.setText(location[1] + "");
 
@@ -267,15 +253,11 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                 return super.onScale(detector);
             }
         });
-        mLocationDisplay.addLocationChangedListener(new LocationDisplay.LocationChangedListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
-                Point position = locationChangedEvent.getLocation().getPosition();
-                edit_longtitude_kinhdo.setText(position.getX() + "");
-                edit_latitude_vido.setText(position.getY() + "");
-                setViewPointCenter(position);
-            }
+        mLocationDisplay.addLocationChangedListener(locationChangedEvent -> {
+            Point position = locationChangedEvent.getLocation().getPosition();
+            edit_longtitude_kinhdo.setText(position.getX() + "");
+            edit_latitude_vido.setText(position.getY() + "");
+            setViewPointCenter(position);
         });
         mGraphicsOverlay = new GraphicsOverlay();
         mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
@@ -363,17 +345,14 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     hanhChinhImageLayers = new ArcGISMapImageLayer(url);
                     hanhChinhImageLayers.setId(layerInfoDTG.getId());
                     mMapView.getMap().getOperationalLayers().add(hanhChinhImageLayers);
-                    hanhChinhImageLayers.addDoneLoadingListener(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (hanhChinhImageLayers.getLoadStatus() == LoadStatus.LOADED) {
-                                ListenableList<ArcGISSublayer> sublayerList = hanhChinhImageLayers.getSublayers();
-                                for (ArcGISSublayer sublayer : sublayerList) {
-                                    addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, true);
-
-                                }
+                    hanhChinhImageLayers.addDoneLoadingListener(() -> {
+                        if (hanhChinhImageLayers.getLoadStatus() == LoadStatus.LOADED) {
+                            ListenableList<ArcGISSublayer> sublayerList = hanhChinhImageLayers.getSublayers();
+                            for (ArcGISSublayer sublayer : sublayerList) {
+                                addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, true);
 
                             }
+
                         }
                     });
                     hanhChinhImageLayers.loadAsync();
@@ -390,22 +369,19 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     featureLayer.setPopupEnabled(true);
 
 
-                    featureLayer.addDoneLoadingListener(new Runnable() {
-                        @Override
-                        public void run() {
-                            setRendererSuCoFeatureLayer(featureLayer);
-                            mFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
-                            mFeatureLayerDTGS.add(mFeatureLayerDTG);
-                            Callout callout = mMapView.getCallout();
-                            mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mGeocoder, mFeatureLayerDTGS);
+                    featureLayer.addDoneLoadingListener(() -> {
+                        setRendererSuCoFeatureLayer(featureLayer);
+                        mFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
+                        mFeatureLayerDTGS.add(mFeatureLayerDTG);
+                        Callout callout = mMapView.getCallout();
+                        mPopUp = new Popup(QuanLySuCo.this, mMapView, serviceFeatureTable, callout, mGeocoder);
 
 
-                            FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
+                        FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
 
-                            mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp, QuanLySuCo.this, mGeocoder);
-                            mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
-
-                        }
+                        mMapViewHandler = new MapViewHandler(mFeatureLayerDTG, callout, mMapView, mPopUp,
+                                QuanLySuCo.this, mGeocoder);
+                        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
 
                     });
                     mMapView.getMap().getOperationalLayers().add(featureLayer);
@@ -418,37 +394,31 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     taiSanImageLayers.setMaxScale(0);
                     taiSanImageLayers.setMinScale(1000000);
                     mMapView.getMap().getOperationalLayers().add(taiSanImageLayers);
-                    taiSanImageLayers.addDoneLoadingListener(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (taiSanImageLayers.getLoadStatus() == LoadStatus.LOADED) {
+                    taiSanImageLayers.addDoneLoadingListener(() -> {
+                        if (taiSanImageLayers.getLoadStatus() == LoadStatus.LOADED) {
 
-                                ListenableList<ArcGISSublayer> sublayerList = taiSanImageLayers.getSublayers();
-                                for (ArcGISSublayer sublayer : sublayerList) {
-                                    if (sublayer.getId() == 13) {
-                                        sublayer.setVisible(false);
-                                    } else
-                                        addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, false);
-                                }
-
+                            ListenableList<ArcGISSublayer> sublayerList = taiSanImageLayers.getSublayers();
+                            for (ArcGISSublayer sublayer : sublayerList) {
+                                if (sublayer.getId() == 13) {
+                                    sublayer.setVisible(false);
+                                } else
+                                    addCheckBox((ArcGISMapImageSublayer) sublayer, states, colors, false);
                             }
+
                         }
                     });
                     taiSanImageLayers.loadAsync();
                 }
 
             }
-        } catch (
-                Exception e)
-
-        {
+        } catch (Exception e) {
             Log.e("error", e.toString());
         }
 //        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
     }
 
     private void addCheckBox(final ArcGISMapImageSublayer layer, int[][] states, int[] colors, boolean isAdministrator) {
-        LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
+        @SuppressLint("InflateParams") LinearLayout layoutFeature = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_feature, null);
         final CheckBox checkBox = layoutFeature.findViewById(R.id.ckb_layout_feature);
         final TextView textView = layoutFeature.findViewById(R.id.txt_layout_feature);
         textView.setTextColor(getResources().getColor(android.R.color.black));
@@ -456,20 +426,16 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         checkBox.setChecked(false);
         layer.setVisible(false);
         CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(states, colors));
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (buttonView.isChecked()) {
-                    if (textView.getText().equals(layer.getName()))
-                        layer.setVisible(true);
+            if (buttonView.isChecked()) {
+                if (textView.getText().equals(layer.getName()))
+                    layer.setVisible(true);
 
 
-                } else {
-                    if (textView.getText().equals(layer.getName()))
-                        layer.setVisible(false);
-                }
+            } else {
+                if (textView.getText().equals(layer.getName()))
+                    layer.setVisible(false);
             }
         });
         if (!mListLayerID.contains(layer.getName())) {
@@ -544,29 +510,26 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
     private void changeStatusOfLocationDataSource() {
         mLocationDisplay = mMapView.getLocationDisplay();
 //        changeStatusOfLocationDataSource();
-        mLocationDisplay.addDataSourceStatusChangedListener(new LocationDisplay.DataSourceStatusChangedListener() {
-            @Override
-            public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
+        mLocationDisplay.addDataSourceStatusChangedListener(dataSourceStatusChangedEvent -> {
 
-                // If LocationDisplay started OK, then continue.
-                if (dataSourceStatusChangedEvent.isStarted()) return;
+            // If LocationDisplay started OK, then continue.
+            if (dataSourceStatusChangedEvent.isStarted()) return;
 
-                // No error is reported, then continue.
-                if (dataSourceStatusChangedEvent.getError() == null) return;
+            // No error is reported, then continue.
+            if (dataSourceStatusChangedEvent.getError() == null) return;
 
-                // If an error is found, handle the failure to start.
-                // Check permissions to see if failure may be due to lack of permissions.
-                boolean permissionCheck1 = ContextCompat.checkSelfPermission(QuanLySuCo.this,
-                        reqPermissions[0]) == PackageManager.PERMISSION_GRANTED;
-                boolean permissionCheck2 = ContextCompat.checkSelfPermission(QuanLySuCo.this,
-                        reqPermissions[1]) == PackageManager.PERMISSION_GRANTED;
+            // If an error is found, handle the failure to start.
+            // Check permissions to see if failure may be due to lack of permissions.
+            boolean permissionCheck1 = ContextCompat.checkSelfPermission(QuanLySuCo.this,
+                    reqPermissions[0]) == PackageManager.PERMISSION_GRANTED;
+            boolean permissionCheck2 = ContextCompat.checkSelfPermission(QuanLySuCo.this,
+                    reqPermissions[1]) == PackageManager.PERMISSION_GRANTED;
 
-                if (!(permissionCheck1 && permissionCheck2)) {
-                    // If permissions are not already granted, request permission from the user.
-                    ActivityCompat.requestPermissions(QuanLySuCo.this, reqPermissions, requestCode);
-                }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(QuanLySuCo.this, message, Toast.LENGTH_LONG).show();
+            if (!(permissionCheck1 && permissionCheck2)) {
+                // If permissions are not already granted, request permission from the user.
+                ActivityCompat.requestPermissions(QuanLySuCo.this, reqPermissions, requestCode);
+            }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(QuanLySuCo.this, message, Toast.LENGTH_LONG).show();
 
-            }
         });
     }
 
@@ -576,19 +539,16 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
         } else {
             final Geometry geometry = GeometryEngine.project(position, SpatialReferences.getWebMercator());
             final ListenableFuture<Boolean> booleanListenableFuture = mMapView.setViewpointCenterAsync(geometry.getExtent().getCenter());
-            booleanListenableFuture.addDoneListener(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (booleanListenableFuture.get()) {
-                            QuanLySuCo.this.mPointFindLocation = position;
-                        }
-                        mPopUp.showPopupFindLocation(position);
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
+            booleanListenableFuture.addDoneListener(() -> {
+                try {
+                    if (booleanListenableFuture.get()) {
+                        QuanLySuCo.this.mPointFindLocation = position;
                     }
-
+                    mPopUp.showPopupFindLocation(position);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
+
             });
         }
 
@@ -648,8 +608,8 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        boolean GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        return GpsStatus;
+        assert locationManager != null;
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     private void optionSearchFeature() {
@@ -673,28 +633,24 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
     private void themDiemSuCoNoCapture() {
         FindLocationAsycn findLocationAsycn = new FindLocationAsycn(this, false,
-                mGeocoder, mFeatureLayerDTGS, true, new FindLocationAsycn.AsyncResponse() {
-            @Override
-            public void processFinish(List<MyAddress> output) {
-                if (output != null) {
-                    User user = UserDangNhap.getInstance().getUser();
-                    String subAdminArea = output.get(0).getSubAdminArea();
-                    //nếu tài khoản có quyền truy cập vào
-                    if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
-                            subAdminArea.equals(getString(R.string.Quan6Name)) ||
-                            subAdminArea.equals(getString(R.string.Quan8Name)) ||
-                            subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
-                        mTxtSearchView.setQuery("", true);
-                        mMapViewHandler.addFeature(null, mPointFindLocation);
-                        deleteSearching();
-                    } else {
-                        Toast.makeText(QuanLySuCo.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
-                    }
+                mGeocoder, output -> {
+            if (output != null) {
+                String subAdminArea = output.get(0).getSubAdminArea();
+                //nếu tài khoản có quyền truy cập vào
+                if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
+                        subAdminArea.equals(getString(R.string.Quan6Name)) ||
+                        subAdminArea.equals(getString(R.string.Quan8Name)) ||
+                        subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
+                    mTxtSearchView.setQuery("", true);
+                    mMapViewHandler.addFeature(null, mPointFindLocation);
+                    deleteSearching();
                 } else {
                     Toast.makeText(QuanLySuCo.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
                 }
-
+            } else {
+                Toast.makeText(QuanLySuCo.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
             }
+
         });
         Geometry project = GeometryEngine.project(mPointFindLocation, SpatialReferences.getWgs84());
         double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
@@ -737,26 +693,23 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     else if (query.length() > 0) {
                         deleteSearching();
                         FindLocationAsycn findLocationAsycn = new FindLocationAsycn(QuanLySuCo.this,
-                                true, mGeocoder, mFeatureLayerDTGS, false, new FindLocationAsycn.AsyncResponse() {
-                            @Override
-                            public void processFinish(List<MyAddress> output) {
-                                if (output != null) {
-                                    mSearchAdapter.clear();
-                                    mSearchAdapter.notifyDataSetChanged();
-                                    if (output.size() > 0) {
-                                        for (MyAddress address : output) {
-                                            TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", 0, "", address.getLocation());
-                                            item.setLatitude(address.getLatitude());
-                                            item.setLongtitude(address.getLongtitude());
-                                            mSearchAdapter.add(item);
-                                        }
-                                        mSearchAdapter.notifyDataSetChanged();
-
-//                                    }
+                                true, mGeocoder, output -> {
+                            if (output != null) {
+                                mSearchAdapter.clear();
+                                mSearchAdapter.notifyDataSetChanged();
+                                if (output.size() > 0) {
+                                    for (MyAddress address : output) {
+                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", 0, "", address.getLocation());
+                                        item.setLatitude(address.getLatitude());
+                                        item.setLongtitude(address.getLongtitude());
+                                        mSearchAdapter.add(item);
                                     }
-                                }
+                                    mSearchAdapter.notifyDataSetChanged();
 
+                                    //                                    }
+                                }
                             }
+
                         });
                         findLocationAsycn.execute(query);
 
@@ -1129,14 +1082,11 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
 
                             EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(), this, (ServiceFeatureTable)
                                     mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, true, new EditAsync.AsyncResponse() {
-                                @Override
-                                public void processFinish(ArcGISFeature arcGISFeature) {
-//                                    mPopUp.getDialog().dismiss();
-                                    mPopUp.getCallout().dismiss();
-                                    if (!arcGISFeature.canEditAttachments())
-                                        MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
-                                }
+                                    true, image, arcGISFeature -> {
+                                //                                    mPopUp.getDialog().dismiss();
+                                mPopUp.getCallout().dismiss();
+                                if (!arcGISFeature.canEditAttachments())
+                                    MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
                             });
                             editAsync.execute(mFeatureViewMoreInfoAdapter);
                         }
@@ -1166,15 +1116,12 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                             Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
 //                            mMapViewHandler.addFeature(image);
 //                            mPopUp.getDialog().dismiss();
-                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(),this, (ServiceFeatureTable)
+                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(), this, (ServiceFeatureTable)
                                     mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, false, new EditAsync.AsyncResponse() {
-                                @Override
-                                public void processFinish(ArcGISFeature arcGISFeature) {
-                                    mPopUp.getCallout().dismiss();
-                                    if (!arcGISFeature.canEditAttachments())
-                                        MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
-                                }
+                                    true, image, arcGISFeature -> {
+                                mPopUp.getCallout().dismiss();
+                                if (!arcGISFeature.canEditAttachments())
+                                    MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
                             });
                             editAsync.execute(mFeatureViewMoreInfoAdapter);
                         }

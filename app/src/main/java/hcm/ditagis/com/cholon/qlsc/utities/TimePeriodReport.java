@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.utities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.format.DateFormat;
 
@@ -10,8 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.ThongKeAdapter;
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.adapter.ThongKeAdapter;
 
 /**
  * Created by NGUYEN HONG on 4/26/2018.
@@ -45,13 +46,15 @@ public class TimePeriodReport {
     public void setItems(List<ThongKeAdapter.Item> items) {
         this.items = items;
     }
-    private String formatTimeToGMT(Date date){
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(mContext.getString(R.string.format_day_yearfirst));
+
+    private String formatTimeToGMT(Date date) {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormatGmt = new SimpleDateFormat(mContext.getString(R.string.format_day_yearfirst));
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormatGmt.format(date);
     }
+
     private String dayToFirstDayString(Date firstDate, Date lastDate) {
-        return (String) DateFormat.format(mContext.getString(R.string.format_time_day_month_year), firstDate) + " - " + (String) DateFormat.format(mContext.getString(R.string.format_time_day_month_year), lastDate);
+        return DateFormat.format(mContext.getString(R.string.format_time_day_month_year), firstDate) + " - " +  DateFormat.format(mContext.getString(R.string.format_time_day_month_year), lastDate);
     }
 
     private Date getFirstDayofMonth() {
@@ -139,18 +142,20 @@ public class TimePeriodReport {
         calendar.set(Calendar.MONTH, 11);
         return calendar.getTime();
     }
-    private void resetToday(){
+
+    private void resetToday() {
         calendar.setTime(today);
         calendar.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
         calendar.clear(Calendar.MINUTE);
         calendar.clear(Calendar.SECOND);
         calendar.clear(Calendar.MILLISECOND);
     }
-    private void getActualMaximumToday(){
+
+    private void getActualMaximumToday() {
         calendar.setTime(today);
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND,999);
+        calendar.set(Calendar.MILLISECOND, 999);
     }
 }

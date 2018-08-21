@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,7 +11,6 @@ import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.data.ArcGISFeatureTable;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.mapping.GeoElement;
-import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.connectDB.HoSoVatTuSuCoAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
@@ -29,34 +28,22 @@ import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 
 public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Void> {
     private ProgressDialog mDialog;
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
-    private FeatureLayerDTG mFeatureLayerDTG;
-    private Point mPoint;
     private List<FeatureLayerDTG> mFeatureLayerDTGs;
+    @SuppressLint("StaticFieldLeak")
     private MapView mMapView;
     private ArcGISFeature mSelectedArcGISFeature;
+    @SuppressLint("StaticFieldLeak")
     private Popup mPopUp;
-    //    private Callout mCallOut;
-    private static double DELTA_MOVE_Y = 0;//7000;
     private android.graphics.Point mClickPoint;
     private boolean isFound = false;
 
-    public SingleTapMapViewAsync(Context context, List<FeatureLayerDTG> featureLayerDTGS, Popup popup, android.graphics.Point clickPoint, MapView mapview) {
+    public SingleTapMapViewAsync(Context context, List<FeatureLayerDTG> featureLayerDTGS, Popup popup,
+                                 android.graphics.Point clickPoint, MapView mapview) {
         this.mMapView = mapview;
         this.mFeatureLayerDTGs = featureLayerDTGS;
         this.mPopUp = popup;
-        this.mClickPoint = clickPoint;
-        this.mContext = context;
-        this.mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
-    }
-
-    public SingleTapMapViewAsync(Context context, List<FeatureLayerDTG> featureLayerDTGS,
-                                 Popup popup, Callout callout, android.graphics.Point clickPoint,
-                                 MapView mapview) {
-        this.mMapView = mapview;
-        this.mFeatureLayerDTGs = featureLayerDTGS;
-        this.mPopUp = popup;
-//        this.mCallOut = callout;
         this.mClickPoint = clickPoint;
         this.mContext = context;
         this.mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
@@ -64,44 +51,34 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
 
     @Override
     protected Void doInBackground(Point... points) {
-        final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false);
-        listListenableFuture.addDoneListener(new Runnable() {
-            @Override
-            public void run() {
-                List<IdentifyLayerResult> identifyLayerResults = null;
-                try {
-                    identifyLayerResults = listListenableFuture.get();
-                    for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
-                        {
-                            List<GeoElement> elements = identifyLayerResult.getElements();
-                            if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
-                                isFound = true;
-                                mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
-                                long serviceLayerId = mSelectedArcGISFeature.getFeatureTable().
-                                        getServiceLayerId();
-                                FeatureLayerDTG featureLayerDTG = getmFeatureLayerDTG(serviceLayerId);
-                                publishProgress(featureLayerDTG);
-                            }
+        final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView
+                .identifyLayersAsync(mClickPoint, 5, false);
+        listListenableFuture.addDoneListener(() -> {
+            List<IdentifyLayerResult> identifyLayerResults;
+            try {
+                identifyLayerResults = listListenableFuture.get();
+                for (IdentifyLayerResult identifyLayerResult : identifyLayerResults) {
+                    {
+                        List<GeoElement> elements = identifyLayerResult.getElements();
+                        if (elements.size() > 0 && elements.get(0) instanceof ArcGISFeature && !isFound) {
+                            isFound = true;
+                            mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
+                            long serviceLayerId = mSelectedArcGISFeature.getFeatureTable().
+                                    getServiceLayerId();
+                            FeatureLayerDTG featureLayerDTG = getmFeatureLayerDTG(serviceLayerId);
+                            publishProgress(featureLayerDTG);
                         }
                     }
-                    publishProgress(null);
-                } catch (
-                        InterruptedException e)
-
-                {
-                    e.printStackTrace();
-                } catch (
-                        ExecutionException e)
-
-                {
-                    e.printStackTrace();
                 }
+                publishProgress();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         });
         return null;
     }
 
-    public FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
+    private FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
         for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
             long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
             if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
@@ -114,12 +91,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
         super.onPreExecute();
         mDialog.setMessage("Đang xử lý...");
         mDialog.setCancelable(false);
-        mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Hủy", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                publishProgress();
-            }
-        });
+        mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Hủy", (dialogInterface, i) -> publishProgress());
         mDialog.show();
     }
 

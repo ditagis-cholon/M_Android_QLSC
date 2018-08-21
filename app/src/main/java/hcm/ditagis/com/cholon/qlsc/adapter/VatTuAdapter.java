@@ -1,6 +1,8 @@
 package hcm.ditagis.com.cholon.qlsc.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,10 +45,13 @@ public class VatTuAdapter extends ArrayAdapter<VatTuAdapter.Item> {
         return 0;
     }
 
+    @SuppressLint({"InflateParams", "SetTextI18n"})
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            assert inflater != null;
             convertView = inflater.inflate(R.layout.item_tracuu, null);
         }
         Item item = items.get(position);
@@ -58,7 +63,7 @@ public class VatTuAdapter extends ArrayAdapter<VatTuAdapter.Item> {
             txtTop.setText(item.getTenVatTu());
 
 
-        TextView txtRight = (TextView) convertView.findViewById(R.id.txt_right);
+        TextView txtRight =  convertView.findViewById(R.id.txt_right);
         txtRight.setText(item.getSoLuong() + " " + item.getDonVi());
 
         TextView txtBottom = convertView.findViewById(R.id.txt_bottom);

@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -38,8 +37,6 @@ import java.util.concurrent.ExecutionException;
 import hcm.ditagis.com.cholon.qlsc.adapter.ThongKeAdapter;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class ThongKeActivity extends AppCompatActivity {
@@ -74,12 +71,7 @@ public class ThongKeActivity extends AppCompatActivity {
         this.mTxtPhanTramChuaSua = this.findViewById(R.id.txtPhanTramChuaSua);
         this.mTxtPhanTramDangSua = this.findViewById(R.id.txtPhanTramDangSua);
         this.mTxtPhanTramHoanThanh = this.findViewById(R.id.txtPhanTramHoanThanh);
-        ThongKeActivity.this.findViewById(R.id.layout_thongke_thoigian).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogSelectTime();
-            }
-        });
+        ThongKeActivity.this.findViewById(R.id.layout_thongke_thoigian).setOnClickListener(v -> showDialogSelectTime());
         query(items.get(0));
     }
 
@@ -93,59 +85,43 @@ public class ThongKeActivity extends AppCompatActivity {
         selectTimeDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         selectTimeDialog.show();
         final List<ThongKeAdapter.Item> finalItems = mThongKeAdapter.getItems();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final ThongKeAdapter.Item itemAtPosition = (ThongKeAdapter.Item) parent.getItemAtPosition(position);
-                selectTimeDialog.dismiss();
-                if (itemAtPosition.getId() == finalItems.size()) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(ThongKeActivity.this, android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
-                    @SuppressLint("InflateParams") View layout = getLayoutInflater().inflate(R.layout.layout_thongke_thoigiantuychinh, null);
-                    builder.setView(layout);
-                    final AlertDialog tuychinhDateDialog = builder.create();
-                    tuychinhDateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    tuychinhDateDialog.show();
-                    final EditText edit_thongke_tuychinh_ngaybatdau = layout.findViewById(R.id.edit_thongke_tuychinh_ngaybatdau);
-                    final EditText edit_thongke_tuychinh_ngayketthuc = layout.findViewById(R.id.edit_thongke_tuychinh_ngayketthuc);
-                    if (itemAtPosition.getThoigianbatdau() != null)
-                        edit_thongke_tuychinh_ngaybatdau.setText(itemAtPosition.getThoigianbatdau());
-                    if (itemAtPosition.getThoigianketthuc() != null)
-                        edit_thongke_tuychinh_ngayketthuc.setText(itemAtPosition.getThoigianketthuc());
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            final ThongKeAdapter.Item itemAtPosition = (ThongKeAdapter.Item) parent.getItemAtPosition(position);
+            selectTimeDialog.dismiss();
+            if (itemAtPosition.getId() == finalItems.size()) {
+                final AlertDialog.Builder builder1 = new AlertDialog.Builder(ThongKeActivity.this, android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+                @SuppressLint("InflateParams") View layout1 = getLayoutInflater().inflate(R.layout.layout_thongke_thoigiantuychinh, null);
+                builder1.setView(layout1);
+                final AlertDialog tuychinhDateDialog = builder1.create();
+                tuychinhDateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                tuychinhDateDialog.show();
+                final EditText edit_thongke_tuychinh_ngaybatdau = layout1.findViewById(R.id.edit_thongke_tuychinh_ngaybatdau);
+                final EditText edit_thongke_tuychinh_ngayketthuc = layout1.findViewById(R.id.edit_thongke_tuychinh_ngayketthuc);
+                if (itemAtPosition.getThoigianbatdau() != null)
+                    edit_thongke_tuychinh_ngaybatdau.setText(itemAtPosition.getThoigianbatdau());
+                if (itemAtPosition.getThoigianketthuc() != null)
+                    edit_thongke_tuychinh_ngayketthuc.setText(itemAtPosition.getThoigianketthuc());
 
-                    final StringBuilder finalThoigianbatdau = new StringBuilder();
-                    finalThoigianbatdau.append(itemAtPosition.getThoigianbatdau());
-                    edit_thongke_tuychinh_ngaybatdau.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showDateTimePicker(edit_thongke_tuychinh_ngaybatdau, finalThoigianbatdau, "START");
-                        }
-                    });
-                    final StringBuilder finalThoigianketthuc = new StringBuilder();
-                    finalThoigianketthuc.append(itemAtPosition.getThoigianketthuc());
-                    edit_thongke_tuychinh_ngayketthuc.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showDateTimePicker(edit_thongke_tuychinh_ngayketthuc, finalThoigianketthuc, "FINISH");
-                        }
-                    });
+                final StringBuilder finalThoigianbatdau = new StringBuilder();
+                finalThoigianbatdau.append(itemAtPosition.getThoigianbatdau());
+                edit_thongke_tuychinh_ngaybatdau.setOnClickListener(v -> showDateTimePicker(edit_thongke_tuychinh_ngaybatdau, finalThoigianbatdau, "START"));
+                final StringBuilder finalThoigianketthuc = new StringBuilder();
+                finalThoigianketthuc.append(itemAtPosition.getThoigianketthuc());
+                edit_thongke_tuychinh_ngayketthuc.setOnClickListener(v -> showDateTimePicker(edit_thongke_tuychinh_ngayketthuc, finalThoigianketthuc, "FINISH"));
 
-                    layout.findViewById(R.id.btn_layngaythongke).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (kiemTraThoiGianNhapVao(finalThoigianbatdau.toString(), finalThoigianketthuc.toString())) {
-                                tuychinhDateDialog.dismiss();
-                                itemAtPosition.setThoigianbatdau(finalThoigianbatdau.toString());
-                                itemAtPosition.setThoigianketthuc(finalThoigianketthuc.toString());
-                                itemAtPosition.setThoigianhienthi(edit_thongke_tuychinh_ngaybatdau.getText() + " - " + edit_thongke_tuychinh_ngayketthuc.getText());
-                                mThongKeAdapter.notifyDataSetChanged();
-                                query(itemAtPosition);
-                            }
-                        }
-                    });
+                layout1.findViewById(R.id.btn_layngaythongke).setOnClickListener(v -> {
+                    if (kiemTraThoiGianNhapVao(finalThoigianbatdau.toString(), finalThoigianketthuc.toString())) {
+                        tuychinhDateDialog.dismiss();
+                        itemAtPosition.setThoigianbatdau(finalThoigianbatdau.toString());
+                        itemAtPosition.setThoigianketthuc(finalThoigianketthuc.toString());
+                        itemAtPosition.setThoigianhienthi(edit_thongke_tuychinh_ngaybatdau.getText() + " - " + edit_thongke_tuychinh_ngayketthuc.getText());
+                        mThongKeAdapter.notifyDataSetChanged();
+                        query(itemAtPosition);
+                    }
+                });
 
-                } else {
-                    query(itemAtPosition);
-                }
+            } else {
+                query(itemAtPosition);
             }
         });
     }
@@ -156,9 +132,7 @@ public class ThongKeActivity extends AppCompatActivity {
         try {
             Date date1 = dateFormat.parse(startDate);
             Date date2 = dateFormat.parse(endDate);
-            if (date1.after(date2)) {
-                return false;
-            } else return true;
+            return !date1.after(date2);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -169,31 +143,28 @@ public class ThongKeActivity extends AppCompatActivity {
         output.delete(0, output.length());
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                String displaytime = (String) DateFormat.format(getString(R.string.format_time_day_month_year), calendar.getTime());
-                String format;
-                if (typeInput.equals("START")) {
-                    calendar.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
-                    calendar.clear(Calendar.MINUTE);
-                    calendar.clear(Calendar.SECOND);
-                    calendar.clear(Calendar.MILLISECOND);
-                } else if (typeInput.equals("FINISH")) {
-                    calendar.set(Calendar.HOUR_OF_DAY, 23);
-                    calendar.set(Calendar.MINUTE, 59);
-                    calendar.set(Calendar.SECOND, 59);
-                    calendar.set(Calendar.MILLISECOND, 999);
-                }
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormatGmt = new SimpleDateFormat(getString(R.string.format_day_yearfirst));
-                dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-                format = dateFormatGmt.format(calendar.getTime());
-                editText.setText(displaytime);
-                output.append(format);
-                alertDialog.dismiss();
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(view -> {
+            DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+            Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+            String displaytime = (String) DateFormat.format(getString(R.string.format_time_day_month_year), calendar.getTime());
+            String format;
+            if (typeInput.equals("START")) {
+                calendar.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+                calendar.clear(Calendar.MINUTE);
+                calendar.clear(Calendar.SECOND);
+                calendar.clear(Calendar.MILLISECOND);
+            } else if (typeInput.equals("FINISH")) {
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                calendar.set(Calendar.MILLISECOND, 999);
             }
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormatGmt = new SimpleDateFormat(getString(R.string.format_day_yearfirst));
+            dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+            format = dateFormatGmt.format(calendar.getTime());
+            editText.setText(displaytime);
+            output.append(format);
+            alertDialog.dismiss();
         });
         alertDialog.setView(dialogView);
         alertDialog.show();
@@ -209,7 +180,6 @@ public class ThongKeActivity extends AppCompatActivity {
             txtThoiGian.setText(item.getThoigianhienthi());
             txtThoiGian.setVisibility(View.VISIBLE);
         }
-        User user = UserDangNhap.getInstance().getUser();
         String whereClause = "";
         if (item.getThoigianbatdau() == null || item.getThoigianketthuc() == null) {
 
@@ -239,41 +209,36 @@ public class ThongKeActivity extends AppCompatActivity {
         QueryParameters queryParameters = new QueryParameters();
         queryParameters.setWhereClause(whereClause);
 
-        List<String> outFields = new ArrayList<>();
-        outFields.add(getString(R.string.trangthai));
 
 //        final ListenableFuture<FeatureQueryResult> feature =
 //                mServiceFeatureTable.populateFromServiceAsync(queryParameters, true, outFields);
         final ListenableFuture<FeatureQueryResult> feature = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-        feature.addDoneListener(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    FeatureQueryResult result = feature.get();
-                    Iterator<Feature> iterator = result.iterator();
-                    Feature item;
-                    while (iterator.hasNext()) {
-                        item = iterator.next();
+        feature.addDoneListener(() -> {
+            try {
+                FeatureQueryResult result = feature.get();
+                Iterator<Feature> iterator = result.iterator();
+                Feature item1;
+                while (iterator.hasNext()) {
+                    item1 = iterator.next();
 //                    for (Object i : result) {
 //                        Feature item = (Feature) i;
-                        Object value = item.getAttributes().get(getString(R.string.trangthai));
-                        int trangThai = getResources().getInteger(R.integer.trang_thai_chua_sua_chua);
-                        if (value != null) {
-                            trangThai = Integer.parseInt(value.toString());
-                        }
-                        if (trangThai == getResources().getInteger(R.integer.trang_thai_chua_sua_chua))
-                            mChuaSuaChua++;
-                        else if (trangThai == getResources().getInteger(R.integer.trang_thai_dang_sua_chua))
-                            mDangSuaChua++;
-                        else if (trangThai == getResources().getInteger(R.integer.trang_thai_hoan_thanh))
-                            mHoanThanh++;
-
+                    Object value = item1.getAttributes().get(getString(R.string.trangthai));
+                    int trangThai = getResources().getInteger(R.integer.trang_thai_chua_sua_chua);
+                    if (value != null) {
+                        trangThai = Integer.parseInt(value.toString());
                     }
-                    displayReport();
+                    if (trangThai == getResources().getInteger(R.integer.trang_thai_chua_sua_chua))
+                        mChuaSuaChua++;
+                    else if (trangThai == getResources().getInteger(R.integer.trang_thai_dang_sua_chua))
+                        mDangSuaChua++;
+                    else if (trangThai == getResources().getInteger(R.integer.trang_thai_hoan_thanh))
+                        mHoanThanh++;
 
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
                 }
+                displayReport();
+
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         });
 
@@ -287,8 +252,8 @@ public class ThongKeActivity extends AppCompatActivity {
         mTxtChuaSua.setText(mChuaSuaChua + "");
         mTxtDangSua.setText(mDangSuaChua + "");
         mTxtHoanThanh.setText(mHoanThanh + "");
-        double percentChuaSua, percentDangSua, percentDaSua, percentHoanThanh;
-        percentChuaSua = percentDangSua = percentDaSua = percentHoanThanh = 0.0;
+        double percentChuaSua, percentDangSua,  percentHoanThanh;
+        percentChuaSua = percentDangSua = percentHoanThanh = 0.0;
         if (tongloaitrangthai > 0) {
             percentChuaSua = mChuaSuaChua * 100 / tongloaitrangthai;
             percentDangSua = mDangSuaChua * 100 / tongloaitrangthai;

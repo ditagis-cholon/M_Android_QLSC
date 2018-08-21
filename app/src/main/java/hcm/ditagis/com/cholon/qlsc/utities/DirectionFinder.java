@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.utities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.Html;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 import hcm.ditagis.com.cholon.qlsc.R;
 
 public class DirectionFinder {
-//    private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
+    //    private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
 //    private static final String GOOGLE_API_KEY = "AIzaSyDnwLF2-WfK8cVZt9OoDYJ9Y8kspXhEHfI";
     private DirectionFinderListener listener;
     private String origin;
@@ -51,6 +51,7 @@ public class DirectionFinder {
                 "&destination=" + urlDestination + "&key=" + mContext.getString(R.string.google_api) + "&language=vi";
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class DownloadRawData extends AsyncTask<String, Void, String> {
 
         @Override
@@ -59,18 +60,16 @@ public class DirectionFinder {
             try {
                 URL url = new URL(link);
                 InputStream is = url.openConnection().getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder builder = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
+                    builder.append(line).append("\n");
                 }
 
-                return buffer.toString();
+                return builder.toString();
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -91,7 +90,7 @@ public class DirectionFinder {
         if (data == null)
             return;
 
-        List<Route> routes = new ArrayList<Route>();
+        List<Route> routes = new ArrayList<>();
         JSONObject jsonData = new JSONObject(data);
         JSONArray jsonRoutes = jsonData.getJSONArray("routes");
         for (int i = 0; i < jsonRoutes.length(); i++) {
@@ -146,17 +145,18 @@ public class DirectionFinder {
         listener.onDirectionFinderSuccess(routes);
     }
 
-    public String stripHtml(String html) {
+    private String stripHtml(String html) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString();
         } else {
-            return Html.fromHtml(html).toString();
+            return "";
+//            return Html.fromHtml(html).toString();
         }
     }
 
-    public String translateEnglishToVietnamese(String eng) {
-        String viet = "";
-        viet = String.valueOf(
+    private String translateEnglishToVietnamese(String eng) {
+
+        return String.valueOf(
                 eng
                         .replace("Head", "Đi về")
                         .replace("Pass by", "Băng qua")
@@ -172,17 +172,13 @@ public class DirectionFinder {
                         .replace("onto", "vào")
                         .replace("on", "trên")
                         .replace("at", "tại")
-                        .replace("toward", "về phía"))
-
-        ;
-
-        return viet;
+                        .replace("toward", "về phía"));
     }
 
     private List<LatLng> decodePolyLine(final String poly) {
         int len = poly.length();
         int index = 0;
-        List<LatLng> decoded = new ArrayList<LatLng>();
+        List<LatLng> decoded = new ArrayList<>();
         int lat = 0;
         int lng = 0;
 

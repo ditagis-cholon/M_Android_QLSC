@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import hcm.ditagis.com.cholon.qlsc.async.NewLoginAsycn;
+import hcm.ditagis.com.cholon.qlsc.async.LoginAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
@@ -19,6 +20,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private boolean isLastLogin;
     private TextView mTxtValidation;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,15 +79,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             handleInfoLoginEmpty();
             return;
         }
-        NewLoginAsycn loginAsycn = new NewLoginAsycn(this, new NewLoginAsycn.AsyncResponse() {
-
-            @Override
-            public void processFinish(User output) {
-                if (output != null)
-                    handleLoginSuccess(output);
-                else
-                    handleLoginFail();
-            }
+        LoginAsycn loginAsycn = new LoginAsycn(this, output -> {
+            if (output != null)
+                handleLoginSuccess(output);
+            else
+                handleLoginFail();
         });
         loginAsycn.execute(userName, passWord);
     }

@@ -33,15 +33,11 @@ public class DoiMatKhauActivity extends AppCompatActivity implements View.OnClic
         mLayoutChangePassword = findViewById(R.id.layout_changepassword);
 
         findViewById(R.id.btn_change_password).setOnClickListener(this);
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
-
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    changPassword();
-                }
-                return false;
+        View.OnKeyListener keyListener = (v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                changPassword();
             }
+            return false;
         };
         mEtxtNewPasswordConfirm.setOnKeyListener(keyListener);
 
@@ -64,27 +60,24 @@ public class DoiMatKhauActivity extends AppCompatActivity implements View.OnClic
 
     private void changPassword() {
         if (validate()) {
-            ChangePasswordAsycn asycn = new ChangePasswordAsycn(this, new ChangePasswordAsycn.AsyncResponse() {
-                @Override
-                public void processFinish(Integer output) {
-                    if (output != null) {
-                        int value = output.intValue();
-                        switch (value) {
-                            case Utils.CHANGE_PASSWORD_OLD_PASSWORD_WRONG:
-                                mTxtValidation.setVisibility(View.VISIBLE);
-                                mTxtValidation.setText(getString(R.string.validate_password_old));
-                                break;
-                            case Utils.CHANGE_PASSWORD_FAILURE:
-                                mTxtValidation.setVisibility(View.VISIBLE);
-                                mTxtValidation.setText(getString(R.string.validate_change_password_fail));
-                                break;
-                            case Utils.CHANGE_PASSWORD_SUCCESS:
-                                mTxtChangePassword.setVisibility(View.VISIBLE);
-                                mLayoutChangePassword.setVisibility(View.GONE);
-                                break;
-                        }
-
+            ChangePasswordAsycn asycn = new ChangePasswordAsycn(this, output -> {
+                if (output != null) {
+                    int value = output;
+                    switch (value) {
+                        case Utils.CHANGE_PASSWORD_OLD_PASSWORD_WRONG:
+                            mTxtValidation.setVisibility(View.VISIBLE);
+                            mTxtValidation.setText(getString(R.string.validate_password_old));
+                            break;
+                        case Utils.CHANGE_PASSWORD_FAILURE:
+                            mTxtValidation.setVisibility(View.VISIBLE);
+                            mTxtValidation.setText(getString(R.string.validate_change_password_fail));
+                            break;
+                        case Utils.CHANGE_PASSWORD_SUCCESS:
+                            mTxtChangePassword.setVisibility(View.VISIBLE);
+                            mLayoutChangePassword.setVisibility(View.GONE);
+                            break;
                     }
+
                 }
             });
             asycn.execute(Preference.getInstance().loadPreference(getString(R.string.preference_username)), mEtxtOldPassord.getText().toString().trim(),

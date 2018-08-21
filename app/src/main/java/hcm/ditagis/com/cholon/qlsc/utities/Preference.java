@@ -1,9 +1,9 @@
 package hcm.ditagis.com.cholon.qlsc.utities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -13,6 +13,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class Preference {
     private Context mContext;
+    @SuppressLint("StaticFieldLeak")
     private static Preference mInstance = null;
 
     public static Preference getInstance() {
@@ -29,7 +30,7 @@ public class Preference {
 
     }
 
-    public SharedPreferences getPreferences() {
+    private SharedPreferences getPreferences() {
         return mContext.getSharedPreferences("LOGGED_IN", MODE_PRIVATE);
     }
 
@@ -40,27 +41,14 @@ public class Preference {
         SharedPreferences sharedPreferences = getPreferences();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
     }
 
-    public void savePreferences(String key, Set<String> values) {
-        SharedPreferences sharedPreferences = getPreferences();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putStringSet(key, values);
-        editor.commit();
-    }
-
-    public boolean deletePreferences(String key) {
+    public void deletePreferences(String key) {
         SharedPreferences.Editor editor = getPreferences().edit();
-        editor.remove(key).commit();
-        return false;
+        editor.remove(key).apply();
     }
 
-    public boolean deletePreferences() {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.clear().commit();
-        return false;
-    }
 
     /**
      * Method used to load Preferences
@@ -68,20 +56,10 @@ public class Preference {
     public String loadPreference(String key) {
         try {
             SharedPreferences sharedPreferences = getPreferences();
-            String strSavedMemo = sharedPreferences.getString(key, "");
-            return strSavedMemo;
+            return sharedPreferences.getString(key, "");
         } catch (NullPointerException nullPointerException) {
             return null;
         }
     }
 
-    public Set<String> loadPreferences(String key) {
-        try {
-            SharedPreferences sharedPreferences = getPreferences();
-            Set<String> strSavedMemo = sharedPreferences.getStringSet(key, null);
-            return strSavedMemo;
-        } catch (NullPointerException nullPointerException) {
-            return null;
-        }
-    }
 }

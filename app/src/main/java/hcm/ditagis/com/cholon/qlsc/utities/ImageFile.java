@@ -14,15 +14,13 @@ import hcm.ditagis.com.cholon.qlsc.R;
  */
 
 public class ImageFile {
-    public static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     public static File getFile(Context context) {
         String path = Environment.getExternalStorageDirectory().getPath();
         File outFile = new File(path, context.getResources().getString(R.string.path_saveImage));
         if (!outFile.exists())
             outFile.mkdir();
-        File f = new File(outFile, "xxx.png");
-        return f;
+        return new File(outFile, "xxx.png");
     }
 
 }

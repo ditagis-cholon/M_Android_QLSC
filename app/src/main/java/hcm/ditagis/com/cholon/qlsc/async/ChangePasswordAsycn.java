@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -13,8 +14,8 @@ import hcm.ditagis.com.cholon.qlsc.utities.Utils;
 
 public class ChangePasswordAsycn extends AsyncTask<String, Void, Integer> {
     private ProgressDialog mDialog;
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
-    private final int SAI_MAT_KHAU_CU = 1;
     private AsyncResponse mDelegate;
 
     public interface AsyncResponse {
@@ -47,15 +48,15 @@ public class ChangePasswordAsycn extends AsyncTask<String, Void, Integer> {
                 publishProgress();
                 User user1 = changePasswordDB.change(danhBo, newPin);
                 if (user1 != null) {
-                    return Utils.getInstance().CHANGE_PASSWORD_SUCCESS;
-                } else return Utils.getInstance().CHANGE_PASSWORD_FAILURE;
+                    return Utils.CHANGE_PASSWORD_SUCCESS;
+                } else return Utils.CHANGE_PASSWORD_FAILURE;
             } else {
                 return null;
             }
         } catch (Exception e) {
             Log.e("Lỗi đổi mật khẩu", e.toString());
         }
-        return Utils.getInstance().CHANGE_PASSWORD_FAILURE;
+        return Utils.CHANGE_PASSWORD_FAILURE;
     }
 
     @Override

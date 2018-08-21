@@ -1,6 +1,8 @@
 package hcm.ditagis.com.cholon.qlsc.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,19 +44,22 @@ public class SettingsAdapter extends ArrayAdapter<SettingsAdapter.Item> {
     }
 
 
+    @SuppressLint("InflateParams")
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            assert inflater != null;
             convertView = inflater.inflate(R.layout.item_search, null);
         }
         Item item = items[position];
 
 
-        TextView txtTitle = (TextView) convertView.findViewById(R.id.txt_settings_title);
+        TextView txtTitle =  convertView.findViewById(R.id.txt_settings_title);
         txtTitle.setText(item.getTitle());
 
-        TextView txtSubTitle = (TextView) convertView.findViewById(R.id.txt_settings_subtitle);
+        TextView txtSubTitle =  convertView.findViewById(R.id.txt_settings_subtitle);
         txtSubTitle.setText(item.getSubTitle());
 
 
@@ -73,11 +78,11 @@ public class SettingsAdapter extends ArrayAdapter<SettingsAdapter.Item> {
             this.title = title;
         }
 
-        public String getSubTitle() {
+        String getSubTitle() {
             return subTitle;
         }
 
-        public void setSubTitle(String subTitle) {
+        void setSubTitle(String subTitle) {
             this.subTitle = subTitle;
         }
 

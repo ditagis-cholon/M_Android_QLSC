@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -20,17 +21,17 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
-public class NewLoginAsycn extends AsyncTask<String, Void, User> {
-    private Exception exception;
+public class LoginAsycn extends AsyncTask<String, Void, User> {
     private ProgressDialog mDialog;
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
-    private NewLoginAsycn.AsyncResponse mDelegate;
+    private LoginAsycn.AsyncResponse mDelegate;
 
     public interface AsyncResponse {
         void processFinish(User output);
     }
 
-    public NewLoginAsycn(Context context, NewLoginAsycn.AsyncResponse delegate) {
+    public LoginAsycn(Context context, LoginAsycn.AsyncResponse delegate) {
         this.mContext = context;
         this.mDelegate = delegate;
     }
@@ -60,28 +61,24 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
                 conn.setRequestMethod("GET");
                 conn.connect();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line);
-                    break;
-                }
-                Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), stringBuilder.toString().replace("\"", ""));
-                bufferedReader.close();
+                String line = bufferedReader.readLine();
+                if (line != null) {
+                    Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), line.replace("\"", ""));
+                    bufferedReader.close();
 
-                if (checkAccess()) {
-                    UserDangNhap.getInstance().setUser(new User());
-                    UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
-
+                    if (checkAccess()) {
+                        UserDangNhap.getInstance().setUser(new User());
+                        UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
+                    }
                 }
             } finally {
                 conn.disconnect();
             }
         } catch (Exception e) {
             Log.e("ERROR", e.getMessage(), e);
-        } finally {
-            return UserDangNhap.getInstance().getUser();
         }
+        return UserDangNhap.getInstance().getUser();
+
     }
 
     @Override
@@ -115,9 +112,9 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
             }
         } catch (Exception e) {
             Log.e("error", e.toString());
-        } finally {
-            return isAccess;
         }
+        return isAccess;
+
     }
 
     private String getDisplayName() {
@@ -132,13 +129,9 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
+                String line = bufferedReader.readLine();
+                if (line != null)
                     pajsonRouteeJSon(line);
-
-                    break;
-                }
-
             } catch (Exception e) {
                 Log.e("error", e.toString());
             } finally {
@@ -146,9 +139,9 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
             }
         } catch (Exception e) {
             Log.e("error", e.toString());
-        } finally {
-            return displayName;
         }
+        return displayName;
+
     }
 
     private void pajsonRouteeJSon(String data) throws JSONException {
@@ -156,7 +149,6 @@ public class NewLoginAsycn extends AsyncTask<String, Void, User> {
             String myData = "{ \"account\": [".concat(data).concat("]}");
             JSONObject jsonData = new JSONObject(myData);
             JSONArray jsonRoutes = jsonData.getJSONArray("account");
-//        jsonData.getJSONArray("account");
             for (int i = 0; i < jsonRoutes.length(); i++) {
                 JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
                 String displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));

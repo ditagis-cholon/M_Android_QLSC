@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
@@ -26,15 +25,11 @@ import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
@@ -55,14 +50,13 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
     private AsyncResponse mDelegate;
     private android.graphics.Point mClickPoint;
     private Geocoder mGeocoder;
-    private List<FeatureLayerDTG> mFeatureLayerDTGS;
 
     public interface AsyncResponse {
         void processFinish(Feature output);
     }
 
     public SingleTapAddFeatureAsync(android.graphics.Point clickPoint, Context context, byte[] image,
-                                    ServiceFeatureTable serviceFeatureTable, MapView mapView, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS, AsyncResponse delegate) {
+                                    ServiceFeatureTable serviceFeatureTable, MapView mapView, Geocoder geocoder, AsyncResponse delegate) {
         this.mServiceFeatureTable = serviceFeatureTable;
         this.mMapView = mapView;
         this.mImage = image;
@@ -71,7 +65,6 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
         this.mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
         this.mDelegate = delegate;
         this.mGeocoder = geocoder;
-        this.mFeatureLayerDTGS = featureLayerDTGS;
     }
 
     @Override
@@ -91,39 +84,33 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
             feature = mServiceFeatureTable.createFeature();
             feature.setGeometry(clickPoint);
             FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mContext, false,
-                    mGeocoder, mFeatureLayerDTGS, false, output -> {
-                        if (output != null) {
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DiaChi), output.get(0).getLocation());
-                            String subAdminArea = output.get(0).getSubAdminArea();
-                            if (subAdminArea.equals(mContext.getString(R.string.Quan5Name)))
-                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan5Code));
-                            else if (subAdminArea.equals(mContext.getString(R.string.Quan8Name)))
-                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan8Code));
-                            else if (subAdminArea.equals(mContext.getString(R.string.Quan6Name)))
-                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan6Code));
-                            else if (subAdminArea.equals(mContext.getString(R.string.QuanBinhTanName)))
-                                feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
-                            Short intObj = (short) 0;
-                            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
+                    mGeocoder, output -> {
+                if (output != null) {
 
-                            String searchStr = "";
-                            String dateTime = "";
-                            String timeID;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                dateTime = getDateString();
-                                timeID = getTimeID();
-                                searchStr = mContext.getString(R.string.Field_SuCo_IDSuCo) + " like '%" + timeID + "'";
-                            }
-                            QueryParameters queryParameters = new QueryParameters();
-                            queryParameters.setWhereClause(searchStr);
-                            mServiceFeatureTable.queryFeaturesAsync(queryParameters).addDoneListener(new Runnable() {
-                                @Override
-                                public void run() {
-                                    addFeatureAsync(feature);
-                                }
-                            });
-                        }
-                    });
+                    feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DiaChi), output.get(0).getLocation());
+                    String subAdminArea = output.get(0).getSubAdminArea();
+                    if (subAdminArea.equals(mContext.getString(R.string.Quan5Name)))
+                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan5Code));
+                    else if (subAdminArea.equals(mContext.getString(R.string.Quan8Name)))
+                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan8Code));
+                    else if (subAdminArea.equals(mContext.getString(R.string.Quan6Name)))
+                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.Quan6Code));
+                    else if (subAdminArea.equals(mContext.getString(R.string.QuanBinhTanName)))
+                        feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_MaQuan), mContext.getString(R.string.QuanBinhTanCode));
+                    Short intObj = (short) 0;
+                    feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
+
+                    String searchStr = "";
+                    String timeID;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        timeID = getTimeID();
+                        searchStr = mContext.getString(R.string.Field_SuCo_IDSuCo) + " like '%" + timeID + "'";
+                    }
+                    QueryParameters queryParameters = new QueryParameters();
+                    queryParameters.setWhereClause(searchStr);
+                    mServiceFeatureTable.queryFeaturesAsync(queryParameters).addDoneListener(() -> addFeatureAsync(feature));
+                }
+            });
             Geometry project = GeometryEngine.project(clickPoint, SpatialReferences.getWgs84());
             double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
             findLocationAsycn.setmLongtitude(location[0]);
@@ -139,16 +126,6 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
 
         return null;
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private String getDateString() {
-//        String timeStamp = Constant.DATE_FORMAT.format(Calendar.getInstance().getTime());
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat writeDate = new SimpleDateFormat("dd_MM_yyyy HH:mm:ss");
-        writeDate.setTimeZone(TimeZone.getTimeZone("GMT+07:00"));
-        return writeDate.format(Calendar.getInstance().getTime());
-    }
-
 
     private String getTimeID() {
         return Constant.DATE_FORMAT.format(Calendar.getInstance().getTime());

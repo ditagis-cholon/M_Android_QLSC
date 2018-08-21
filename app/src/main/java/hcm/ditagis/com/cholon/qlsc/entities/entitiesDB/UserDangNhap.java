@@ -24,7 +24,4 @@ public class UserDangNhap {
         this.user = user;
     }
 
-    public static void setInstance(UserDangNhap instance) {
-        UserDangNhap.instance = instance;
-    }
 }

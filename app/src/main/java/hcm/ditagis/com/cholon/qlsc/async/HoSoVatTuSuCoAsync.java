@@ -1,5 +1,6 @@
-package hcm.ditagis.com.cholon.qlsc.connectDB;
+package hcm.ditagis.com.cholon.qlsc.async;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,8 +13,6 @@ import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +28,7 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 public class HoSoVatTuSuCoAsync extends AsyncTask<Object, Object, Void> {
-    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private ServiceFeatureTable mServiceFeatureTable;
     private AsyncResponse mDelegate;
@@ -58,7 +57,8 @@ public class HoSoVatTuSuCoAsync extends AsyncTask<Object, Object, Void> {
         String queryClause = String.format("%s = '%s'", mContext.getString(R.string.Field_HoSoVatTuSuCo_IDSuCo), idSuCo);
 //        String queryClause = "1 = 1";
         queryParameters.setWhereClause(queryClause);
-        final ListenableFuture<FeatureQueryResult> queryResultListenableFuture = this.mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
+        final ListenableFuture<FeatureQueryResult> queryResultListenableFuture =
+                this.mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
         queryResultListenableFuture.addDoneListener(() -> {
             try {
                 FeatureQueryResult result = queryResultListenableFuture.get();

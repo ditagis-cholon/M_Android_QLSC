@@ -73,7 +73,6 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
-    private static final int REQUEST_ID_IMAGE_CAPTURE = 44;
     private List<String> mListTenVatTuOngChinh, mListTenVatTuOngNganh;
     private QuanLySuCo mMainActivity;
     private ArcGISFeature mSelectedArcGISFeature = null;
@@ -82,7 +81,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private FeatureLayerDTG mFeatureLayerDTG;
     private List<String> lstFeatureType;
     private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
-    private DialogInterface mDialog;
     private LinearLayout linearLayout;
     private MapView mMapView;
     private String mLoaiSuCo;
@@ -90,11 +88,10 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private Geocoder mGeocoder;
     private List<HoSoVatTuSuCo> mListHoSoVatTuSuCo;
     private String mIDSuCo;
-    private List<FeatureLayerDTG> mFeatureLayerDTGS;
     private Button mBtnLeft;
 
     public Popup(QuanLySuCo mainActivity, MapView mapView, ServiceFeatureTable serviceFeatureTable,
-                 Callout callout, Geocoder geocoder, List<FeatureLayerDTG> featureLayerDTGS) {
+                 Callout callout, Geocoder geocoder) {
         this.mMainActivity = mainActivity;
         this.mMapView = mapView;
         this.mServiceFeatureTable = serviceFeatureTable;
@@ -102,7 +99,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         this.mGeocoder = geocoder;
 
 
-        this.mFeatureLayerDTGS = featureLayerDTGS;
     }
 
     private void initializeVatTu() {
@@ -117,9 +113,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    public DialogInterface getDialog() {
-        return mDialog;
-    }
 
     public Button getmBtnLeft() {
         return mBtnLeft;
@@ -141,7 +134,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         mSelectedArcGISFeature = arcGISFeature;
         Map<String, Object> attributes = mSelectedArcGISFeature.getAttributes();
         ListView listView = linearLayout.findViewById(R.id.lstview_thongtinsuco);
-        FeatureViewInfoAdapter featureViewInfoAdapter = new FeatureViewInfoAdapter(mMainActivity, new ArrayList<FeatureViewInfoAdapter.Item>());
+        FeatureViewInfoAdapter featureViewInfoAdapter = new FeatureViewInfoAdapter(mMainActivity, new ArrayList<>());
         listView.setAdapter(featureViewInfoAdapter);
         String typeIdField = mSelectedArcGISFeature.getFeatureTable().getTypeIdField();
         String[] noDisplayFields = mMainActivity.getResources().getStringArray(R.array.no_display_fields_arrays);
@@ -207,7 +200,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     StringBuilder builder = new StringBuilder();
                     this.mListHoSoVatTuSuCo = ListObjectDB.getInstance().getHoSoVatTuSuCos();
                     for (HoSoVatTuSuCo hoSoVatTuSuCo : mListHoSoVatTuSuCo) {
-                        builder.append(hoSoVatTuSuCo.getTenVatTu() + " " + hoSoVatTuSuCo.getSoLuong() + " " + hoSoVatTuSuCo.getDonViTinh() + "\n");
+                        builder.append(hoSoVatTuSuCo.getTenVatTu()).append(" ").append(hoSoVatTuSuCo.getSoLuong()).append(" ").append(hoSoVatTuSuCo.getDonViTinh()).append("\n");
                     }
                     if (builder.length() > 0)
                         builder.replace(builder.length() - 2, builder.length(), "");
@@ -231,7 +224,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void viewMoreInfo(ArcGISFeature feature, final boolean isAddFeature) {
+    private void viewMoreInfo(final boolean isAddFeature) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mMainActivity, android.R.style.Theme_Material_Light_NoActionBar_Fullscreen);
         @SuppressLint("InflateParams") final View layout = mMainActivity.getLayoutInflater().inflate(R.layout.layout_viewmoreinfo_feature, null);
         mFeatureViewMoreInfoAdapter = new FeatureViewMoreInfoAdapter(mMainActivity, new ArrayList<>());
@@ -255,29 +248,23 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             mBtnLeft.setOnClickListener(view -> {
                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
                         (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
-                        mSelectedArcGISFeature, true, null, isAddFeature, new EditAsync.AsyncResponse() {
-                    @Override
-                    public void processFinish(ArcGISFeature arcGISFeature) {
-                        mCallout.dismiss();
-                        dialog.dismiss();
-                    }
-                });
+                        mSelectedArcGISFeature, true, null, arcGISFeature -> {
+                            mCallout.dismiss();
+                            dialog.dismiss();
+                        });
                 editAsync.execute(mFeatureViewMoreInfoAdapter);
 
             });
-            btnRight.setOnClickListener(view -> {
-                capture(true);
-                mDialog = dialog;
-            });
+            btnRight.setOnClickListener((View view) -> capture(true));
         } else {
             layout.findViewById(R.id.framelayout_viewmoreinfo_attachment).setVisibility(View.VISIBLE);
             mBtnLeft.setText(mMainActivity.getString(R.string.btnLeftUpdateFeature));
             btnRight.setText(mMainActivity.getString(R.string.btnRightUpdateFeature));
-            mBtnLeft.setOnClickListener(view -> {
+            mBtnLeft.setOnClickListener((View view) -> {
                 boolean isComplete = false;
                 for (FeatureViewMoreInfoAdapter.Item item : mFeatureViewMoreInfoAdapter.getItems())
                     if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_TrangThai))
-                            && item.getValue().toString().equals(mMainActivity.getResources().getString(R.string.SuCo_TrangThai_HoanThanh))) {
+                            && item.getValue().equals(mMainActivity.getResources().getString(R.string.SuCo_TrangThai_HoanThanh))) {
                         isComplete = true;
                     }
                 if (isComplete) {
@@ -292,13 +279,10 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                             } else {
                                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
                                         (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
-                                        mSelectedArcGISFeature, true, null, isAddFeature, new EditAsync.AsyncResponse() {
-                                    @Override
-                                    public void processFinish(ArcGISFeature arcGISFeature) {
-                                        mCallout.dismiss();
-                                        dialog.dismiss();
-                                    }
-                                });
+                                        mSelectedArcGISFeature, true, null, arcGISFeature -> {
+                                            mCallout.dismiss();
+                                            dialog.dismiss();
+                                        });
                                 editAsync.execute(mFeatureViewMoreInfoAdapter);
                             }
                         } catch (InterruptedException | ExecutionException e) {
@@ -309,7 +293,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 } else {
                     EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
                             (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
-                            mSelectedArcGISFeature, true, null, isAddFeature, arcGISFeature -> {
+                            mSelectedArcGISFeature, true, null, (ArcGISFeature arcGISFeature) -> {
                         mCallout.dismiss();
                         dialog.dismiss();
                     });
@@ -317,23 +301,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 }
 
             });
-            btnRight.setOnClickListener(view -> {
-                capture(false);
-                mDialog = dialog;
-            });
+            btnRight.setOnClickListener(view -> capture(false));
         }
         dialog.show();
-    }
-
-    private Object getIdFeatureTypes(List<FeatureType> featureTypes, String value) {
-        Object code = null;
-        for (FeatureType featureType : featureTypes) {
-            if (featureType.getName().equals(value)) {
-                code = featureType.getId();
-                break;
-            }
-        }
-        return code;
     }
 
     private void loadDataViewMoreInfo(boolean isAddFeature, View layout) {
@@ -500,7 +470,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 builder.setTitle("Cập nhật thuộc tính");
                 builder.setMessage(item.getAlias());
 
-                @SuppressLint("InflateParams") final FrameLayout layout = (FrameLayout) mMainActivity.getLayoutInflater().
+                @SuppressLint("InflateParams") final LinearLayout layout = (LinearLayout) mMainActivity.getLayoutInflater().
                         inflate(R.layout.layout_dialog_update_feature_listview, null);
                 Button btnLeft = layout.findViewById(R.id.btn_updateinfo_left);
                 Button btnRight = layout.findViewById(R.id.btn_updateinfo_right);
@@ -527,14 +497,14 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void loadDataEdit(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         //Load danh sách madma từ csdl
         if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_MADMA))) {
             loadDataEdit_DMA(item, layout);
         }
         //Trường hợp vị trí thì không dùng domain, vì còn có nhập khoảng cách
         else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_ViTri))) {
-            loadDataEdit_ViTri(item, layout);
+            loadDataEdit_ViTri(layout);
         }
         //Trường hợp nguyên nhân, không tự động lấy được domain
         else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))) {
@@ -547,7 +517,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         }
         //Trường hợp vật tư, không tự động lấy được domain
         else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_VatTu))) {
-            loadDataEdit_VatTu(item, layout);
+            loadDataEdit_VatTu(layout);
         } else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))) {
             loadDataEdit_DuongKinhOng(item, layout);
         } else {
@@ -555,7 +525,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void loadDataEdit_DMA(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_DMA(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
         layoutSpin.setVisibility(View.VISIBLE);
@@ -565,7 +535,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             spin.setSelection(ListObjectDB.getInstance().getDmas().indexOf(item.getValue()));
     }
 
-    private void loadDataEdit_ViTri(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_ViTri( LinearLayout layout) {
         final LinearLayout layoutEditText = layout.findViewById(R.id.layout_edit_viewmoreinfo_Editext);
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
@@ -582,7 +552,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 //            spin.setSelection(mListObjectDB.indexOf(item.getValue()));
     }
 
-    private void loadDataEdit_NguyenNhan(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_NguyenNhan(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
 
@@ -603,7 +573,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             spin.setSelection(codes.indexOf(item.getValue()));
     }
 
-    private void loadDataEdit_VatLieu(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_VatLieu(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
         final AutoCompleteTextView autoCompleteTextView = layout.findViewById(R.id.autoCompleteTV_edit_viewmoreinfo);
@@ -626,7 +596,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             spin.setSelection(codes.indexOf(item.getValue()));
     }
 
-    private void loadDataEdit_DuongKinhOng(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_DuongKinhOng(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
 
@@ -648,7 +618,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     }
 
 
-    private void loadDataEdit_VatTu(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_VatTu(LinearLayout layout) {
         final LinearLayout layoutAutoCompleteTV = layout.findViewById(R.id.layout_edit_viewmoreinfo_AutoCompleteTV);
         final AutoCompleteTextView autoCompleteTextView = layout.findViewById(R.id.autoCompleteTV_edit_viewmoreinfo);
         autoCompleteTextView.setBackgroundResource(R.drawable.layout_border);
@@ -756,7 +726,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void loadDataEdit_Another(FeatureViewMoreInfoAdapter.Item item, FrameLayout layout) {
+    private void loadDataEdit_Another(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         final FrameLayout layoutTextView = layout.findViewById(R.id.layout_edit_viewmoreinfo_TextView);
         final TextView textView = layout.findViewById(R.id.txt_edit_viewmoreinfo);
         final Button button = layout.findViewById(R.id.btn_edit_viewmoreinfo);
@@ -824,7 +794,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void updateEdit(FeatureViewMoreInfoAdapter.Item item, FrameLayout
+    private void updateEdit(FeatureViewMoreInfoAdapter.Item item, LinearLayout
             layout, AdapterView<?> parent, DialogInterface dialog) {
         boolean isCanUpdate = true;
         final TextView textView = layout.findViewById(R.id.txt_edit_viewmoreinfo);
@@ -857,6 +827,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     }
                     if (mListHoSoVatTuSuCo.size() > 0) {
                         VatTuAdapter.Item itemVatTu = vatTuAdapter.getItem(0);
+                        assert itemVatTu != null;
                         item.setValue(itemVatTu.getTenVatTu() + "\n" + itemVatTu.getSoLuong() + " " + itemVatTu.getDonVi() + "\n...");
                     }
                 }
@@ -1072,7 +1043,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 //                        }
 //                    }
 //                    queryFeatureAsycn.execute(idSuCo);
-                viewMoreInfo(mSelectedArcGISFeature, true);
+                viewMoreInfo(true);
             }
         });
     }
@@ -1113,7 +1084,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 return;
 
             @SuppressLint("InflateParams") FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mMainActivity, false,
-                    mGeocoder, mFeatureLayerDTGS, false, output -> {
+                    mGeocoder, output -> {
                 if (output != null && output.size() > 0) {
                     clearSelection();
                     dimissCallout();
@@ -1154,7 +1125,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     mCallout.dismiss();
                 break;
             case R.id.imgBtn_ViewMoreInfo:
-                viewMoreInfo(mSelectedArcGISFeature, false);
+                viewMoreInfo( false);
                 break;
             case R.id.imgBtn_delete:
                 mSelectedArcGISFeature.getFeatureTable().getFeatureLayer().clearSelection();

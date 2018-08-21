@@ -1,16 +1,13 @@
 package hcm.ditagis.com.cholon.qlsc;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
@@ -31,20 +28,16 @@ public class SettingsActivity extends AppCompatActivity {
         ListView mLstViewSettings = findViewById(R.id.lstView_Settings);
         mSettingsAdapter = new SettingsAdapter(this, Constant.getInstance().getSettingsItems());
         mLstViewSettings.setAdapter(mSettingsAdapter);
-        mLstViewSettings.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        showPhuongThucThemDiemSuCo();
-                        break;
-                    case 1:
-                        showOptionTimKiem();
-                        break;
-                }
-
+        mLstViewSettings.setOnItemClickListener((parent, view, position, id) -> {
+            switch (position) {
+                case 0:
+                    showPhuongThucThemDiemSuCo();
+                    break;
+                case 1:
+                    showOptionTimKiem();
+                    break;
             }
+
         });
         setSubTitle();
     }
@@ -72,12 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
         builder.setCancelable(true);
         builder.setTitle(getString(R.string.nav_cai_dat_them_su_co_title));
-        builder.setPositiveButton(getString(R.string.quit), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setPositiveButton(getString(R.string.quit), (dialog, which) -> dialog.dismiss());
 
         LayoutInflater inflater = getLayoutInflater();
         @SuppressLint("InflateParams") LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.layout_settings_phuong_thuc_them_diem_su_co, null);
@@ -94,28 +82,25 @@ public class SettingsActivity extends AppCompatActivity {
 //        builder.setView(layout);
         final AlertDialog dialog = builder.create();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
+        group.setOnCheckedChangeListener((group1, checkedId) -> {
 
-                Preference.getInstance().deletePreferences(key);
-                switch (checkedId) {
-                    case R.id.rd_layout_settings_cham_diem:
-                        Preference.getInstance().savePreferences(key,
-                                getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_cham_diem));
-                        break;
-                    case R.id.rd_layout_settings_toa_do:
-                        Preference.getInstance().savePreferences(key,
-                                getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_toa_do));
-                        break;
-                    case R.id.rd_layout_settings_keo_tha:
-                        Preference.getInstance().savePreferences(key,
-                                getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_keo_tha));
-                        break;
-                }
-                setSubTitle();
-                dialog.dismiss();
+            Preference.getInstance().deletePreferences(key);
+            switch (checkedId) {
+                case R.id.rd_layout_settings_cham_diem:
+                    Preference.getInstance().savePreferences(key,
+                            getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_cham_diem));
+                    break;
+                case R.id.rd_layout_settings_toa_do:
+                    Preference.getInstance().savePreferences(key,
+                            getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_toa_do));
+                    break;
+                case R.id.rd_layout_settings_keo_tha:
+                    Preference.getInstance().savePreferences(key,
+                            getString(R.string.preference_settings_phuong_thuc_them_diem_su_co_keo_tha));
+                    break;
             }
+            setSubTitle();
+            dialog.dismiss();
         });
         dialog.setView(layout);
         dialog.show();
@@ -127,12 +112,7 @@ public class SettingsActivity extends AppCompatActivity {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
         builder.setCancelable(true);
         builder.setTitle(getString(R.string.nav_cai_dat_tim_kiem_title));
-        builder.setPositiveButton(getString(R.string.quit), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setPositiveButton(getString(R.string.quit), (dialog, which) -> dialog.dismiss());
 
         LayoutInflater inflater = getLayoutInflater();
         @SuppressLint("InflateParams") LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.layout_settings_tuy_chon_tim_kiem, null);
@@ -147,24 +127,21 @@ public class SettingsActivity extends AppCompatActivity {
 //        builder.setView(layout);
         final AlertDialog dialog = builder.create();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
+        group.setOnCheckedChangeListener((group1, checkedId) -> {
 
-                Preference.getInstance().deletePreferences(key);
-                switch (checkedId) {
-                    case R.id.rd_layout_settings_chua_co:
-                        Preference.getInstance().savePreferences(key,
-                                getString(R.string.preference_settings_tuy_chon_tim_kiem_chua_co));
-                        break;
-                    case R.id.rd_layout_settings_co_san:
-                        Preference.getInstance().savePreferences(key,
-                               getString(R.string.preference_settings_tuy_chon_tim_kiem_co_san));
-                        break;
-                }
-                setSubTitle();
-                dialog.dismiss();
+            Preference.getInstance().deletePreferences(key);
+            switch (checkedId) {
+                case R.id.rd_layout_settings_chua_co:
+                    Preference.getInstance().savePreferences(key,
+                            getString(R.string.preference_settings_tuy_chon_tim_kiem_chua_co));
+                    break;
+                case R.id.rd_layout_settings_co_san:
+                    Preference.getInstance().savePreferences(key,
+                           getString(R.string.preference_settings_tuy_chon_tim_kiem_co_san));
+                    break;
             }
+            setSubTitle();
+            dialog.dismiss();
         });
         dialog.setView(layout);
         dialog.show();

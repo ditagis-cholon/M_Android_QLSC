@@ -1,5 +1,7 @@
 package hcm.ditagis.com.cholon.qlsc.utities;
 
+import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
@@ -9,7 +11,9 @@ import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
  */
 
 public class Constant {
+    @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
+    @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 //        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
     private final String SERVER_API = "http://sawagis.vn/cholon/api";

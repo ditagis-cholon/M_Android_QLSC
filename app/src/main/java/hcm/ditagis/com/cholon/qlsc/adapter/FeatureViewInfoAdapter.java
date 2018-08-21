@@ -1,13 +1,14 @@
 package hcm.ditagis.com.cholon.qlsc.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.esri.arcgisruntime.data.Field;
 
 import java.util.List;
 
@@ -46,18 +47,21 @@ public class FeatureViewInfoAdapter extends ArrayAdapter<FeatureViewInfoAdapter.
         return 0;
     }
 
+    @SuppressLint("InflateParams")
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            assert inflater != null;
             convertView = inflater.inflate(R.layout.item_viewinfo, null);
         }
         Item item = items.get(position);
 
-        TextView txtAlias = (TextView) convertView.findViewById(R.id.txt_viewinfo_alias);
+        TextView txtAlias = convertView.findViewById(R.id.txt_viewinfo_alias);
         txtAlias.setText(item.getAlias());
 
-        TextView txtValue = (TextView) convertView.findViewById(R.id.txt_viewinfo_value);
+        TextView txtValue =  convertView.findViewById(R.id.txt_viewinfo_value);
         txtValue.setText(item.getValue());
         if (item.getValue() == null)
             txtValue.setVisibility(View.GONE);
@@ -71,19 +75,7 @@ public class FeatureViewInfoAdapter extends ArrayAdapter<FeatureViewInfoAdapter.
         private String alias;
         private String value;
         private String fieldName;
-        private boolean isEdit;
-        private Field.Type fieldType;
-
         public Item() {
-        }
-
-
-        public Field.Type getFieldType() {
-            return fieldType;
-        }
-
-        public void setFieldType(Field.Type fieldType) {
-            this.fieldType = fieldType;
         }
 
         public String getFieldName() {
@@ -94,15 +86,8 @@ public class FeatureViewInfoAdapter extends ArrayAdapter<FeatureViewInfoAdapter.
             this.fieldName = fieldName;
         }
 
-        public boolean isEdit() {
-            return isEdit;
-        }
 
-        public void setEdit(boolean edit) {
-            isEdit = edit;
-        }
-
-        public String getAlias() {
+        private String getAlias() {
             return alias;
         }
 

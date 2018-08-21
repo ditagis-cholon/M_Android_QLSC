@@ -1,6 +1,8 @@
 package hcm.ditagis.com.cholon.qlsc.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,15 +47,18 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
         return 0;
     }
 
+    @SuppressLint("InflateParams")
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            assert inflater != null;
             convertView = inflater.inflate(R.layout.item_tracuu, null);
         }
         Item item = items.get(position);
 
-        LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.layout_tracuu);
+        LinearLayout layout =  convertView.findViewById(R.id.layout_tracuu);
         switch (item.getTrangThai()) {
             //chưa sửa chữa
             case 0:
@@ -81,13 +86,13 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
         else
             txtID.setText(item.getId());
 
-        TextView txtDiaChi = (TextView) convertView.findViewById(R.id.txt_bottom);
+        TextView txtDiaChi =  convertView.findViewById(R.id.txt_bottom);
         if (item.getDiaChi() == null || item.getDiaChi().isEmpty())
             txtDiaChi.setVisibility(View.GONE);
         else
             txtDiaChi.setText(item.getDiaChi());
 
-        TextView txtNgayCapNhat = (TextView) convertView.findViewById(R.id.txt_right);
+        TextView txtNgayCapNhat =  convertView.findViewById(R.id.txt_right);
         if (item.getNgayCapNhat() == null || item.getNgayCapNhat().isEmpty())
             txtNgayCapNhat.setVisibility(View.GONE);
         else
@@ -145,9 +150,6 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             return objectID;
         }
 
-        public void setObjectID(int objectID) {
-            this.objectID = objectID;
-        }
 
         public String getId() {
             return id;
@@ -157,29 +159,20 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.id = id;
         }
 
-        public int getTrangThai() {
+        int getTrangThai() {
             return trangThai;
         }
 
-        public void setTrangThai(int trangThai) {
-            this.trangThai = trangThai;
-        }
 
-        public String getNgayCapNhat() {
+        String getNgayCapNhat() {
             return ngayCapNhat;
         }
 
-        public void setNgayCapNhat(String ngayCapNhat) {
-            this.ngayCapNhat = ngayCapNhat;
-        }
 
         public String getDiaChi() {
             return diaChi;
         }
 
-        public void setDiaChi(String diaChi) {
-            this.diaChi = diaChi;
-        }
 
         @Override
         public String toString() {

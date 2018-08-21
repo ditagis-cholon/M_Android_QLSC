@@ -34,9 +34,6 @@ public class FeatureViewMoreInfoAdapter extends ArrayAdapter<FeatureViewMoreInfo
         return items;
     }
 
-    public void addAll(List<Item> items) {
-        this.items = items;
-    }
 
     public void clear() {
         items.clear();

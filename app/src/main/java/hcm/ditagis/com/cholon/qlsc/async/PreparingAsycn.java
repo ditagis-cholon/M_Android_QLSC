@@ -126,8 +126,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_title)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
-                    jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
-                    jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_outfield)), jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_definition))));
+                    jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview))));
 
 
         }

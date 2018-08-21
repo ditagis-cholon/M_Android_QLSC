@@ -15,23 +15,14 @@ public class VatTu {
         return maVatTu;
     }
 
-    public void setMaVatTu(String maVatTu) {
-        this.maVatTu = maVatTu;
-    }
 
     public String getTenVatTu() {
         return tenVatTu;
     }
 
-    public void setTenVatTu(String tenVatTu) {
-        this.tenVatTu = tenVatTu;
-    }
 
     public String getDonViTinh() {
         return donViTinh;
     }
 
-    public void setDonViTinh(String donViTinh) {
-        this.donViTinh = donViTinh;
-    }
 }

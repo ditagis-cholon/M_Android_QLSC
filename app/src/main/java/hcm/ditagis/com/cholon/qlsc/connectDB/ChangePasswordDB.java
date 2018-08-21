@@ -1,16 +1,10 @@
 package hcm.ditagis.com.cholon.qlsc.connectDB;
 
 import android.content.Context;
-import android.os.StrictMode;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
-import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.EncodeMD5;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 
 public class ChangePasswordDB implements IDB<User, Boolean, String> {
