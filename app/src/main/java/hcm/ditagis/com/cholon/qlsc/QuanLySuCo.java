@@ -360,7 +360,8 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     TimePeriodReport timePeriodReport = new TimePeriodReport(QuanLySuCo.this);
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     final FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
-                    featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
+//                    featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
+                    featureLayer.setDefinitionExpression(layerInfoDTG.getDefinition());
                     featureLayer.setId(layerInfoDTG.getId());
                     featureLayer.setName(layerInfoDTG.getTitleLayer());
                     featureLayer.setMaxScale(0);

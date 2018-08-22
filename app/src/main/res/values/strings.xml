@@ -241,7 +241,7 @@
     <string name="btnRight_editItemViewMoreInfo">Cập nhật</string>
     <string name="btnLeft_editItemViewMoreInfo">Hủy</string>
     <string name="IDLayer_Basemap">BASEMAP</string>
-    <string name="LayerInfo_vatTuOngChinh">vattuongchinhTBL</string>
+    <string name="LayerInfo_vatTu">vattuTBL</string>
     <string name="LayerInfo_DMA">dmaLYR</string>
     <string name="LayerInfo_vatTuOngNganh">vattuongnganhTBL</string>
     <string name="field_DMA_maDMA">MADMA</string>
@@ -249,6 +249,7 @@
     <string name="field_VatTu_tenVatTu">TenVatTu</string>
     <string name="field_VatTu_donViTinh">DonViTinh</string>
     <string name="message_unloaded_map">Chưa khởi tạo xong bản đồ Vui lòng làm mới lại dữ liệu</string>
+    <string name="sql_column_sys_definition">Definition</string>
     <!--field sự cố end-->
 
 

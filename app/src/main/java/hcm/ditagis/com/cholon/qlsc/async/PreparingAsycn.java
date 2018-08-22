@@ -24,8 +24,7 @@ import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 import hcm.ditagis.com.cholon.qlsc.services.GetDMA;
-import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngChinh;
-import hcm.ditagis.com.cholon.qlsc.services.GetVatTuOngNganh;
+import hcm.ditagis.com.cholon.qlsc.services.GetVatTu;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
@@ -57,8 +56,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
     protected Void doInBackground(Void... params) {
         try {
             getLayerInfoAPI();
-            new GetVatTuOngChinh(mContext).getVatTuFromService();
-            new GetVatTuOngNganh(mContext).getVatTuFromService();
+            new GetVatTu(mContext).getVatTuFromService();
             new GetDMA(mContext).getMaDMAFromService();
 
         } catch (Exception e) {
@@ -126,7 +124,8 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_title)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
-                    jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview))));
+                    jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
+                    jsonRoute.getString(mContext.getString(R.string.sql_column_sys_definition))));
 
 
         }

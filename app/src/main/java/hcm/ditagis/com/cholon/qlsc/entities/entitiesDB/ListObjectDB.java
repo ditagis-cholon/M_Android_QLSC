@@ -9,8 +9,7 @@ import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 public class ListObjectDB {
 
     private static ListObjectDB instance = null;
-    private List<VatTu> vatTuOngNganhs;
-    private List<VatTu> vatTuOngChinhs;
+    private List<VatTu> vatTus;
     private List<String> dmas;
     private List<LayerInfoDTG> lstFeatureLayerDTG;
     private List<HoSoVatTuSuCo> lstHoSoVatTuSuCoInsert;
@@ -41,8 +40,7 @@ public class ListObjectDB {
         lstHoSoVatTuSuCoInsert = new ArrayList<>();
         hoSoVatTuSuCos = new ArrayList<>();
 
-        vatTuOngChinhs = new ArrayList<>();
-        vatTuOngNganhs = new ArrayList<>();
+        vatTus = new ArrayList<>();
         dmas = new ArrayList<>();
         lstFeatureLayerDTG = new ArrayList<>();
     }
@@ -53,20 +51,12 @@ public class ListObjectDB {
         return instance;
     }
 
-    public List<VatTu> getVatTuOngNganhs() {
-        return vatTuOngNganhs;
+    public List<VatTu> getVatTus() {
+        return vatTus;
     }
 
-    public void setVatTuOngNganhs(List<VatTu> vatTuOngNganhs) {
-        this.vatTuOngNganhs = vatTuOngNganhs;
-    }
-
-    public List<VatTu> getVatTuOngChinhs() {
-        return vatTuOngChinhs;
-    }
-
-    public void setVatTuOngChinhs(List<VatTu> vatTuOngChinhs) {
-        this.vatTuOngChinhs = vatTuOngChinhs;
+    public void setVatTus(List<VatTu> vatTuList) {
+        this.vatTus = vatTuList;
     }
 
     public List<String> getDmas() {

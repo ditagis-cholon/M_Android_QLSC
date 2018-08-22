@@ -69,7 +69,7 @@ public class HoSoVatTuSuCoAsync extends AsyncTask<Object, Object, Void> {
                     boolean isFound = false;
 
                     //Lấy tên vật tư và mã vật tư
-                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs())
+                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTus())
                         if (vatTu.getMaVatTu().equals(maVatTu)) {
                             list.add(new HoSoVatTuSuCo(attributes.get(mContext.getString(R.string.Field_HoSoVatTuSuCo_IDSuCo)).toString(),
                                     Double.parseDouble(attributes.get(mContext.getString(R.string.Field_HoSoVatTuSuCo_SoLuong)).toString()),
@@ -79,7 +79,7 @@ public class HoSoVatTuSuCoAsync extends AsyncTask<Object, Object, Void> {
                             break;
                         }
                     if (!isFound)
-                        for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs())
+                        for (VatTu vatTu : ListObjectDB.getInstance().getVatTus())
                             if (vatTu.getMaVatTu().equals(maVatTu)) {
                                 list.add(new HoSoVatTuSuCo(attributes.get(mContext.getString(R.string.Field_HoSoVatTuSuCo_IDSuCo)).toString(),
                                         Double.parseDouble(attributes.get(mContext.getString(R.string.Field_HoSoVatTuSuCo_SoLuong)).toString()),

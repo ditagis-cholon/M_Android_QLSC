@@ -48,14 +48,14 @@ public class GetDMA {
                         Feature item;
                         while (iterator.hasNext()) {
                             item = iterator.next();
-                            String maDMA = (String) item.getAttributes().get(mContext.getString(R.string.field_DMA_maDMA));
-                            dmaList.add(maDMA);
+                            Object dma = item.getAttributes().get(mContext.getString(R.string.field_DMA_maDMA));
+                            if (dma != null)
+                                dmaList.add(dma.toString());
                         }
 
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
-                    }
-                    finally {
+                    } finally {
                         ListObjectDB.getInstance().setDmas(dmaList);
                     }
 

@@ -16,8 +16,8 @@ public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-    //        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
-    private final String SERVER_API = "http://sawagis.vn/cholon/api";
+            public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+//    private final String SERVER_API = "http://sawagis.vn/cholon/api";
     public String API_LOGIN;
 
     {

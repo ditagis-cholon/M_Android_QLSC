@@ -18,18 +18,18 @@ import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 
-public class GetVatTuOngChinh {
+public class GetVatTu {
     private Context mContext;
 
 
-    public GetVatTuOngChinh(Context context) {
+    public GetVatTu(Context context) {
         this.mContext = context;
     }
 
 
     public void getVatTuFromService() {
 
-        String layerInfoVatTu = mContext.getString(R.string.LayerInfo_vatTuOngChinh);
+        String layerInfoVatTu = mContext.getString(R.string.LayerInfo_vatTu);
 
         for (LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
             if (layerInfoDTG.getId().equals(layerInfoVatTu)) {
@@ -60,7 +60,7 @@ public class GetVatTuOngChinh {
                         e.printStackTrace();
                     }
                     finally {
-                        ListObjectDB.getInstance().setVatTuOngChinhs(vatTuList);
+                        ListObjectDB.getInstance().setVatTus(vatTuList);
                     }
 
 

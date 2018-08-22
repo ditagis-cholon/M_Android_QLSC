@@ -73,7 +73,7 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 
 @SuppressLint("Registered")
 public class Popup extends AppCompatActivity implements View.OnClickListener {
-    private List<String> mListTenVatTuOngChinh, mListTenVatTuOngNganh;
+    private List<String> mListTenVatTu;
     private QuanLySuCo mMainActivity;
     private ArcGISFeature mSelectedArcGISFeature = null;
     private ServiceFeatureTable mServiceFeatureTable;
@@ -102,13 +102,10 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void initializeVatTu() {
-        if (mListTenVatTuOngChinh == null || mListTenVatTuOngNganh == null) {
-            mListTenVatTuOngChinh = new ArrayList<>();
-            mListTenVatTuOngNganh = new ArrayList<>();
-            for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs())
-                mListTenVatTuOngChinh.add(vatTu.getTenVatTu());
-            for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs())
-                mListTenVatTuOngNganh.add(vatTu.getTenVatTu());
+        if (mListTenVatTu == null) {
+            mListTenVatTu = new ArrayList<>();
+            for (VatTu vatTu : ListObjectDB.getInstance().getVatTus())
+                mListTenVatTu.add(vatTu.getTenVatTu());
         }
 
     }
@@ -249,9 +246,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
                         (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
                         mSelectedArcGISFeature, true, null, arcGISFeature -> {
-                            mCallout.dismiss();
-                            dialog.dismiss();
-                        });
+                    mCallout.dismiss();
+                    dialog.dismiss();
+                });
                 editAsync.execute(mFeatureViewMoreInfoAdapter);
 
             });
@@ -280,9 +277,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
                                         (ServiceFeatureTable) mFeatureLayerDTG.getLayer().getFeatureTable(),
                                         mSelectedArcGISFeature, true, null, arcGISFeature -> {
-                                            mCallout.dismiss();
-                                            dialog.dismiss();
-                                        });
+                                    mCallout.dismiss();
+                                    dialog.dismiss();
+                                });
                                 editAsync.execute(mFeatureViewMoreInfoAdapter);
                             }
                         } catch (InterruptedException | ExecutionException e) {
@@ -529,13 +526,17 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
         layoutSpin.setVisibility(View.VISIBLE);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1,
+                new ArrayList<>());
+        if (ListObjectDB.getInstance().getDmas() != null)
+            adapter.addAll(ListObjectDB.getInstance().getDmas());
+        adapter.notifyDataSetChanged();
         spin.setAdapter(adapter);
         if (item.getValue() != null)
             spin.setSelection(ListObjectDB.getInstance().getDmas().indexOf(item.getValue()));
     }
 
-    private void loadDataEdit_ViTri( LinearLayout layout) {
+    private void loadDataEdit_ViTri(LinearLayout layout) {
         final LinearLayout layoutEditText = layout.findViewById(R.id.layout_edit_viewmoreinfo_Editext);
         final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
         final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
@@ -627,13 +628,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         final TextView txtDonViTinh = layout.findViewById(R.id.txt_donvitinh);
         final TextView txtThemVatTu = layout.findViewById(R.id.txt_them_vattu);
         ListObjectDB.getInstance().clearListHoSoVatTuSuCoChange();
-        if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))) {
+        if (mLoaiSuCo != null ) {
             layoutAutoCompleteTV.setVisibility(View.VISIBLE);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListTenVatTuOngNganh);
-            autoCompleteTextView.setAdapter(adapter);
-        } else if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh))) {
-            layoutAutoCompleteTV.setVisibility(View.VISIBLE);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListTenVatTuOngChinh);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListTenVatTu);
             autoCompleteTextView.setAdapter(adapter);
         }
         final VatTuAdapter vatTuAdapter = new VatTuAdapter(layout.getContext(), new ArrayList<>());
@@ -670,16 +667,8 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable editable) {
                 String tenVatTu = editable.toString();
-                if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))) {
-                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngNganhs()) {
-                        if (vatTu.getTenVatTu().equals(tenVatTu)) {
-                            txtDonViTinh.setText(vatTu.getDonViTinh());
-                            maVatTu[0] = vatTu.getMaVatTu();
-                            break;
-                        }
-                    }
-                } else if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh))) {
-                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTuOngChinhs()) {
+                if (mLoaiSuCo != null ) {
+                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTus()) {
                         if (vatTu.getTenVatTu().equals(tenVatTu)) {
                             txtDonViTinh.setText(vatTu.getDonViTinh());
                             maVatTu[0] = vatTu.getMaVatTu();
@@ -1125,7 +1114,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     mCallout.dismiss();
                 break;
             case R.id.imgBtn_ViewMoreInfo:
-                viewMoreInfo( false);
+                viewMoreInfo(false);
                 break;
             case R.id.imgBtn_delete:
                 mSelectedArcGISFeature.getFeatureTable().getFeatureLayer().clearSelection();

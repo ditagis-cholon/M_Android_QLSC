@@ -15,9 +15,9 @@ public class LayerInfoDTG {
     private boolean isDelete;
     private boolean isEdit;
     private boolean isView;
+    private String definition;
 
-    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete,
-                        boolean isEdit, boolean isView) {
+    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete, boolean isEdit, boolean isView, String definition) {
         this.id = id;
         this.titleLayer = titleLayer;
         this.url = url;
@@ -25,15 +25,11 @@ public class LayerInfoDTG {
         this.isDelete = isDelete;
         this.isEdit = isEdit;
         this.isView = isView;
+        this.definition = definition;
     }
-
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getTitleLayer() {
@@ -44,36 +40,23 @@ public class LayerInfoDTG {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public boolean isCreate() {
         return isCreate;
-    }
-
-    public void setCreate(boolean create) {
-        isCreate = create;
     }
 
     public boolean isDelete() {
         return isDelete;
     }
 
-
     public boolean isEdit() {
         return isEdit;
     }
-
 
     public boolean isView() {
         return isView;
     }
 
-    public void setView(boolean view) {
-        isView = view;
+    public String getDefinition() {
+        return definition;
     }
-
-
-
 }

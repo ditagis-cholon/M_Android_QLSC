@@ -157,7 +157,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
                 UserDangNhap.getInstance().setUser(new User());
                 UserDangNhap.getInstance().getUser().setDisplayName(displayName);
                 UserDangNhap.getInstance().getUser().setUserName(username);
-                UserDangNhap.getInstance().getUser().setRole(role);
+                UserDangNhap.getInstance().getUser().setRole(role.toUpperCase());
             }
         }
     }
