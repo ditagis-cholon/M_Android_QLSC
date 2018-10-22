@@ -364,8 +364,6 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     featureLayer.setDefinitionExpression(layerInfoDTG.getDefinition());
                     featureLayer.setId(layerInfoDTG.getId());
                     featureLayer.setName(layerInfoDTG.getTitleLayer());
-                    featureLayer.setMaxScale(0);
-                    featureLayer.setMinScale(1000000);
                     featureLayer.setId(layerInfoDTG.getId());
                     featureLayer.setPopupEnabled(true);
 
@@ -392,8 +390,6 @@ public class QuanLySuCo extends AppCompatActivity implements NavigationView.OnNa
                     taiSanImageLayers = new ArcGISMapImageLayer(url.replaceFirst("FeatureServer(.*)", "MapServer"));
                     taiSanImageLayers.setName(layerInfoDTG.getTitleLayer());
                     taiSanImageLayers.setId(layerInfoDTG.getId());
-                    taiSanImageLayers.setMaxScale(0);
-                    taiSanImageLayers.setMinScale(1000000);
                     mMapView.getMap().getOperationalLayers().add(taiSanImageLayers);
                     taiSanImageLayers.addDoneLoadingListener(() -> {
                         if (taiSanImageLayers.getLoadStatus() == LoadStatus.LOADED) {
