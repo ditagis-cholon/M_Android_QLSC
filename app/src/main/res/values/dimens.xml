@@ -22,12 +22,14 @@
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="padding_title_popup">10dp</dimen>
     <dimen name="margin_view_setting">1dp</dimen>
+    <dimen name="width_title_tra_cuu_su_co">110dp</dimen>
     <dimen name="margin_popup">20dp</dimen>
     <dimen name="padding_popup">20dp</dimen>
     <dimen name="width_title_item_docso">100dp</dimen>
     <dimen name="width_title_item_popup">100dp</dimen>
     <dimen name="padding_small">8dp</dimen>
-    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_small">8dp</dimen><dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">60dp</dimen>
     <dimen name="padding_layout">20dp</dimen>
 
 </resources>

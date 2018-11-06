@@ -252,5 +252,14 @@
     <string name="sql_column_sys_definition">Definition</string>
     <!--field sự cố end-->
 
+    <string name="txt_list_task_chua_xu_ly">Công việc chưa xử lý: %1$d</string>
+    <string name="txt_list_task_dang_xu_ly">Công việc đang xử lý: %1$d</string>
+    <string name="txt_list_task_hoan_thanh">Công việc đã hoàn thành: %1$d</string>
 
+    <string name="message_list_task_title">Vui lòng đợi!</string>
+    <string name="message_list_task_message">Đang lấy danh sách công việc…</string>
+    <string name="message_title_confirm">Xác nhận</string>
+    <string name="message_click_list_task">Bạn có muốn xem thông tin sự cố có id là: %1$s?</string>
+    <string name="message_btn_ok">OK</string>
+    <string name="message_btn_cancel">Hủy</string>
 </resources>

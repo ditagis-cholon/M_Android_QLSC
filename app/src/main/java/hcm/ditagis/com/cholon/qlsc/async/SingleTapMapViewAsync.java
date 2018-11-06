@@ -1,8 +1,8 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 
@@ -17,7 +17,9 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
@@ -29,7 +31,7 @@ import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Void> {
     private ProgressDialog mDialog;
     @SuppressLint("StaticFieldLeak")
-    private Context mContext;
+    private Activity mActivity;
     private List<FeatureLayerDTG> mFeatureLayerDTGs;
     @SuppressLint("StaticFieldLeak")
     private MapView mMapView;
@@ -38,15 +40,17 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     private Popup mPopUp;
     private android.graphics.Point mClickPoint;
     private boolean isFound = false;
+    private DApplication mApplication;
 
-    public SingleTapMapViewAsync(Context context, List<FeatureLayerDTG> featureLayerDTGS, Popup popup,
+    public SingleTapMapViewAsync(MainActivity activity, List<FeatureLayerDTG> featureLayerDTGS, Popup popup,
                                  android.graphics.Point clickPoint, MapView mapview) {
         this.mMapView = mapview;
         this.mFeatureLayerDTGs = featureLayerDTGS;
         this.mPopUp = popup;
         this.mClickPoint = clickPoint;
-        this.mContext = context;
-        this.mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
+        this.mActivity = activity;
+        this.mApplication = (DApplication) activity.getApplication();
+        this.mDialog = new ProgressDialog(activity, android.R.style.Theme_Material_Dialog_Alert);
     }
 
     @Override
@@ -99,19 +103,18 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     protected void onProgressUpdate(FeatureLayerDTG... values) {
         super.onProgressUpdate(values);
         if (values != null && values.length > 0 && mSelectedArcGISFeature != null) {
-            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mContext, object -> {
+            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mActivity, object -> {
                 if (object != null) {
 
-                    FeatureLayerDTG featureLayerDTG = values[0];
-                    mPopUp.setFeatureLayerDTG(featureLayerDTG);
-                    mPopUp.showPopup(mSelectedArcGISFeature, false);
+                    mApplication.getDiemSuCo().setArcGISFeature(mSelectedArcGISFeature);
+                    mPopUp.showPopup(false);
                 }
                 if (mDialog != null && mDialog.isShowing()) {
                     mDialog.dismiss();
                 }
             });
             hoSoVatTuSuCoAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Constant.HOSOVATTUSUCO_METHOD.FIND, mSelectedArcGISFeature.getAttributes()
-                    .get(mContext.getString(R.string.Field_SuCo_IDSuCo)));
+                    .get(mActivity.getString(R.string.Field_SuCo_IDSuCo)));
         } else if (mDialog != null && mDialog.isShowing()) {
             mDialog.dismiss();
         }

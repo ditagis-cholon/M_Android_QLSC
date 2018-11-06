@@ -86,7 +86,9 @@
     <style name="MyTextAppearance.Blue.Small" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
-
+    <style name="MyTextAppearance.Blue.VeryBig.Bold" parent="MyTextAppearance.Blue.Big.Bold">
+        <item name="android:textSize">20sp</item>
+    </style>
     <style name="MyTextAppearance.Blue.Big" parent="@android:style/TextAppearance">
         <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/colorPrimary</item>

@@ -58,7 +58,7 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
         }
         Item item = items.get(position);
 
-        LinearLayout layout =  convertView.findViewById(R.id.layout_tracuu);
+        LinearLayout layout = convertView.findViewById(R.id.layout_tracuu);
         switch (item.getTrangThai()) {
             //chưa sửa chữa
             case 0:
@@ -80,24 +80,23 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
                 break;
         }
 
-        TextView txtID =  convertView.findViewById(R.id.txt_top);
+        TextView txtID = convertView.findViewById(R.id.txt_top);
         if (item.getId() == null || item.getId().isEmpty())
             txtID.setVisibility(View.GONE);
         else
             txtID.setText(item.getId());
 
-        TextView txtDiaChi =  convertView.findViewById(R.id.txt_bottom);
+        TextView txtDiaChi = convertView.findViewById(R.id.txt_bottom);
         if (item.getDiaChi() == null || item.getDiaChi().isEmpty())
             txtDiaChi.setVisibility(View.GONE);
         else
             txtDiaChi.setText(item.getDiaChi());
 
-        TextView txtNgayCapNhat =  convertView.findViewById(R.id.txt_right);
-        if (item.getNgayCapNhat() == null || item.getNgayCapNhat().isEmpty())
+        TextView txtNgayCapNhat = convertView.findViewById(R.id.txt_right);
+        if (item.getNgayThongBao() == null || item.getNgayThongBao().isEmpty())
             txtNgayCapNhat.setVisibility(View.GONE);
         else
-            txtNgayCapNhat.setText(item.getNgayCapNhat());
-
+            txtNgayCapNhat.setText(item.getNgayThongBao());
 
 
         return convertView;
@@ -110,7 +109,7 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
         int objectID;
         String id;
         int trangThai;
-        String ngayCapNhat;
+        String ngayThongBao;
         String diaChi;
         double latitude;
         double longtitude;
@@ -119,14 +118,14 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.objectID = objectID;
             this.id = id;
             this.trangThai = trangThai;
-            this.ngayCapNhat = ngayCapNhat;
+            this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
         }
 
         public Item(int objectID, String id, String ngayCapNhat, String diaChi) {
             this.objectID = objectID;
             this.id = id;
-            this.ngayCapNhat = ngayCapNhat;
+            this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
         }
 
@@ -159,13 +158,13 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.id = id;
         }
 
-        int getTrangThai() {
+        public int getTrangThai() {
             return trangThai;
         }
 
 
-        String getNgayCapNhat() {
-            return ngayCapNhat;
+        public String getNgayThongBao() {
+            return ngayThongBao;
         }
 
 
@@ -176,7 +175,7 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
 
         @Override
         public String toString() {
-            return "Item{" + "objectID=" + objectID + ", id='" + id + '\'' + ", trangThai=" + trangThai + ", ngayCapNhat='" + ngayCapNhat + '\'' + ", diaChi='" + diaChi + '\'' + '}';
+            return "Item{" + "objectID=" + objectID + ", id='" + id + '\'' + ", trangThai=" + trangThai + ", ngayThongBao='" + ngayThongBao + '\'' + ", diaChi='" + diaChi + '\'' + '}';
         }
     }
 }

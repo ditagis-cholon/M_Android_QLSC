@@ -29,11 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.QuanLySuCo;
+import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
+import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapAddFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 
 /**
@@ -52,6 +54,8 @@ public class MapViewHandler extends Activity {
     private Popup mPopUp;
     private Context mContext;
     private Geocoder mGeocoder;
+    private DApplication mApplication;
+    private MainActivity mActivity;
 
     public void setFeatureLayerDTGs(List<FeatureLayerDTG> mFeatureLayerDTGs) {
         this.mFeatureLayerDTGs = mFeatureLayerDTGs;
@@ -59,8 +63,10 @@ public class MapViewHandler extends Activity {
 
     private List<FeatureLayerDTG> mFeatureLayerDTGs;
 
-    public MapViewHandler(FeatureLayerDTG featureLayerDTG, Callout mCallout, MapView mapView,
+    public MapViewHandler(MainActivity activity, FeatureLayerDTG featureLayerDTG, Callout mCallout, MapView mapView,
                           Popup popupInfos, Context mContext, Geocoder geocoder) {
+        this.mActivity = activity;
+        mApplication = (DApplication) activity.getApplication();
         this.mCallout = mCallout;
         this.mMapView = mapView;
         this.mServiceFeatureTable = (ServiceFeatureTable) featureLayerDTG.getLayer().getFeatureTable();
@@ -79,17 +85,17 @@ public class MapViewHandler extends Activity {
 
         SingleTapAddFeatureAsync singleTapAdddFeatureAsync = new SingleTapAddFeatureAsync(mClickPoint, mContext,
                 image, mServiceFeatureTable, mMapView, mGeocoder, output -> {
-                    if (output != null && QuanLySuCo.FeatureLayerDTGDiemSuCo != null) {
-                        mPopUp.setFeatureLayerDTG(QuanLySuCo.FeatureLayerDTGDiemSuCo);
-                        mPopUp.showPopup((ArcGISFeature) output, true);
-                    }
-                });
+            if (output != null && MainActivity.FeatureLayerDTGDiemSuCo != null) {
+                mApplication.getDiemSuCo().setArcGISFeature((ArcGISFeature) output);
+                mPopUp.showPopup(true);
+            }
+        });
 //        Point add_point = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
         singleTapAdddFeatureAsync.execute(pointFindLocation);
     }
 
 
-    public double[] onScroll( MotionEvent e2) {
+    public double[] onScroll(MotionEvent e2) {
         Point center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
         Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
         double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
@@ -105,14 +111,14 @@ public class MapViewHandler extends Activity {
             mMapView.setViewpointCenterAsync(clickPoint, 10);
         } else {
 
-            SingleTapMapViewAsync singleTapMapViewAsync = new SingleTapMapViewAsync(mContext, mFeatureLayerDTGs, mPopUp, mClickPoint, mMapView);
+            SingleTapMapViewAsync singleTapMapViewAsync = new SingleTapMapViewAsync(mActivity, mFeatureLayerDTGs, mPopUp, mClickPoint, mMapView);
             singleTapMapViewAsync.execute(clickPoint);
         }
     }
 
     public void queryByObjectID(int objectID) {
         final QueryParameters queryParameters = new QueryParameters();
-        final String query = "OBJECTID = " + objectID;
+        final String query = "OBJECT_ID = " + objectID;
         queryParameters.setWhereClause(query);
         final ListenableFuture<FeatureQueryResult> feature =
                 mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
@@ -125,11 +131,53 @@ public class MapViewHandler extends Activity {
 
                     mMapView.setViewpointGeometryAsync(extent);
                     suCoTanHoaLayer.selectFeature(item);
-                    if (QuanLySuCo.FeatureLayerDTGDiemSuCo != null) {
+                    if (MainActivity.FeatureLayerDTGDiemSuCo != null) {
                         mSelectedArcGISFeature = (ArcGISFeature) item;
-                        mPopUp.setFeatureLayerDTG(QuanLySuCo.FeatureLayerDTGDiemSuCo);
-                        if (mSelectedArcGISFeature != null)
-                            mPopUp.showPopup(mSelectedArcGISFeature, false);
+                        if (mSelectedArcGISFeature != null) {
+                            mApplication.getDiemSuCo().setArcGISFeature(mSelectedArcGISFeature);
+                            mPopUp.showPopup(false);
+                        }
+                    }
+                }
+
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void query(String query) {
+
+        final QueryParameters queryParameters = new QueryParameters();
+        queryParameters.setWhereClause(query);
+        final ListenableFuture<FeatureQueryResult> feature;
+        feature = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
+        feature.addDoneListener(() -> {
+            try {
+                FeatureQueryResult result = feature.get();
+                if (result.iterator().hasNext()) {
+                    Feature item = result.iterator().next();
+                    if (item != null) {
+                        if (item.getGeometry() != null) {
+                            Envelope extent = item.getGeometry().getExtent();
+                            mApplication.setGeometry(item.getGeometry());
+                            mMapView.setViewpointGeometryAsync(extent);
+                        }
+                        if (suCoTanHoaLayer != null) {
+                            suCoTanHoaLayer.selectFeature(item);
+                            String queryClause = String.format("%s = '%s' ",
+                                    Constant.FIELD_SUCO.ID_SUCO, item.getAttributes().get(Constant.FIELD_SUCO.ID_SUCO).toString());
+                            QueryParameters queryParameters1 = new QueryParameters();
+                            queryParameters1.setWhereClause(queryClause);
+                            new QueryServiceFeatureTableAsync(mActivity,
+                                    mApplication.getServiceFeatureTable(), output -> {
+                                if (output != null) {
+                                    mApplication.getDiemSuCo().setArcGISFeature((ArcGISFeature) output);
+                                    mPopUp.showPopup(false);
+                                }
+                            }).execute(queryParameters1);
+
+                        }
                     }
                 }
 
@@ -205,7 +253,7 @@ public class MapViewHandler extends Activity {
                             Integer.parseInt(attributes.get(mContext.getString(R.string.Field_SuCo_TrangThai)).toString()), format_date, viTri));
                     adapter.notifyDataSetChanged();
 
-//                        queryByObjectID(Integer.parseInt(attributes.get(Constant.OBJECTID).toString()));
+//                        queryByObjectID(Integer.parseInt(attributes.get(Constant.OBJECT_ID).toString()));
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

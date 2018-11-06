@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Preference.getInstance().savePreferences(getString(R.string.preference_displayname), user.getDisplayName());
         mTxtUsername.setText("");
         mTxtPassword.setText("");
-        Intent intent = new Intent(this, QuanLySuCo.class);
+        Intent intent = new Intent(this, MainActivity.class);
 
         startActivity(intent);
     }
