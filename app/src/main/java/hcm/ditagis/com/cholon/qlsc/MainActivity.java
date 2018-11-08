@@ -100,7 +100,6 @@ import hcm.ditagis.com.cholon.qlsc.utities.MapViewHandler;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
-import hcm.ditagis.com.cholon.qlsc.utities.TimePeriodReport;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
     public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
@@ -360,16 +359,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
                     hanhChinhImageLayers.loadAsync();
                 } else if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
-                    TimePeriodReport timePeriodReport = new TimePeriodReport(MainActivity.this);
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     final FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
-//                    featureLayer.setDefinitionExpression(String.format(getString(R.string.format_definitionExp_DiemSuCo), timePeriodReport.getItems().get(2).getThoigianbatdau()));
-                    featureLayer.setDefinitionExpression(layerInfoDTG.getDefinition());
+                    featureLayer.setDefinitionExpression(layerInfoDTG.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
                     featureLayer.setId(layerInfoDTG.getId());
                     featureLayer.setName(layerInfoDTG.getTitleLayer());
                     featureLayer.setId(layerInfoDTG.getId());
                     featureLayer.setPopupEnabled(true);
-                    mApplication.setServiceFeatureTable(serviceFeatureTable);
 
                     featureLayer.addDoneLoadingListener(() -> {
                         setRendererSuCoFeatureLayer(featureLayer);
@@ -754,6 +750,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    private void showHideComplete() {
+        if (mApplication.getFeatureLayerDTG().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
+            mApplication.getFeatureLayerDTG().getLayer().setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition());
+        } else {
+            mApplication.getFeatureLayerDTG().getLayer().setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition()
+                    .concat(Constant.DEFINITION_HIDE_COMPLETE));
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -782,10 +787,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                intent = new Intent(this, TraCuuActivity.class);
 //                this.startActivityForResult(intent, 1);
 //                break;
-            case R.id.nav_setting:
-                intent = new Intent(this, SettingsActivity.class);
-                this.startActivityForResult(intent, 1);
-                break;
             case R.id.nav_change_password:
                 Intent intentChangePassword = new Intent(this, DoiMatKhauActivity.class);
                 startActivity(intentChangePassword);
@@ -793,6 +794,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_reload:
                 if (CheckConnectInternet.isOnline(this))
                     prepare1();
+                break;
+            case R.id.nav_show_hide_complete:
+                showHideComplete();
                 break;
             case R.id.nav_logOut:
                 Preference.getInstance().deletePreferences(getString(R.string.preference_login_api));

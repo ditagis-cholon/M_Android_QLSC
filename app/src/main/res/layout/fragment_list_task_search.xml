@@ -88,7 +88,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/margin_small"
                 android:layout_marginRight="@dimen/margin_medium"
-                android:text="Được giao từ" />
+                android:text="Xảy ra từ" />
 
             <TextView
                 android:id="@+id/txt_list_task_search_thoi_gian"

@@ -60,6 +60,7 @@
         <item>TENDMA</item>
         <item>MaDuong</item>
         <item>MaPhuong</item>
+        <item>LoaiSuCo</item>
     </string-array>
     <string-array name="vitri_ongnganh_arrays">
         <item>Bên phải nhà</item>

@@ -2,27 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-
-    <!--<group android:checkableBehavior="single">-->
-    <!--<item-->
-    <!--android:id="@+id/nav_camera"-->
-    <!--android:icon="@drawable/ic_menu_camera"-->
-    <!--andraliasitle="Import" />-->
-    <!--<item-->
-    <!--android:id="@+id/nav_gallery"-->
-    <!--android:icon="@drawable/ic_menu_gallery"-->
-    <!--andraliasitle="Gallery" />-->
-    <!--<item-->
-    <!--android:id="@+id/nav_slideshow"-->
-    <!--android:icon="@drawable/ic_menu_slideshow"-->
-    <!--andraliasitle="Slideshow" />-->
-    <!--<item-->
-    <!--android:id="@+id/nav_manage"-->
-    <!--android:icon="@drawable/ic_menu_manage"-->
-    <!--andraliasitle="Tools" />-->
-    <!--</group>-->
-
-    <item android:title="Chức năng">
+    <item android:title="Chức năng"
+        tools:ignore="HardcodedText">
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -44,6 +25,10 @@
             android:icon="@drawable/ic_refresh"
             android:title="@string/nav_refresh" />
         <item
+            android:id="@+id/nav_show_hide_complete"
+            android:icon="@drawable/ic_complete_gray_32dp"
+            android:title="@string/nav_showHideComplete" />
+        <item
             android:id="@+id/nav_delete_searching"
             android:icon="@drawable/ic_delete"
             android:title="@string/nav_xoa_tim_kiem" />
@@ -51,10 +36,6 @@
             android:id="@+id/nav_visible_float_button"
             android:icon="@drawable/ic_action_visible"
             android:title="@string/nav_an_hien_nut_chuc_nang" />
-        <item
-            android:id="@+id/nav_setting"
-            android:icon="@drawable/ic_settings"
-            android:title="@string/nav_cai_dat" />
         <item
             android:id="@+id/nav_change_password"
             android:icon="@drawable/ic_password"

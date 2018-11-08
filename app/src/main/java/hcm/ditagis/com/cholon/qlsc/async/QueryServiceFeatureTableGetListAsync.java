@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 
 /**
@@ -42,11 +41,10 @@ public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<F
         void processFinish(List<Feature> output);
     }
 
-    public QueryServiceFeatureTableGetListAsync(Activity activity, ServiceFeatureTable serviceFeatureTable,
-                                                AsyncResponse delegate) {
+    public QueryServiceFeatureTableGetListAsync(Activity activity, AsyncResponse delegate) {
         this.mActivity = activity;
         this.mApplication = (DApplication) activity.getApplication();
-        this.mServiceFeatureTable = serviceFeatureTable;
+        this.mServiceFeatureTable = (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable();
         this.mDelegate = delegate;
     }
 

@@ -81,7 +81,8 @@
     <string name="location_permission_denied">Chưa có quyền truy cập vị trí</string>
 
     <!--navigation-->
-    <string name="nav_refresh">Làm mới dữ liệu</string>
+    <string name="nav_refresh">Tải lại bản đồ</string>
+    <string name="nav_showHideComplete">Ẩn/hiện sự cố hoàn thành</string>
     <string name="nav_tra_cuu">Tra cứu</string>
     <string name="nav_find_route">Tìm đường đi</string>
     <string name="nav_xoa_tim_kiem">Xóa các tìm kiếm</string>
@@ -262,4 +263,5 @@
     <string name="message_click_list_task">Bạn có muốn xem thông tin sự cố có id là: %1$s?</string>
     <string name="message_btn_ok">OK</string>
     <string name="message_btn_cancel">Hủy</string>
+    <string name="message_select_loai_su_co">Vui lòng chọn loại sự cố!</string>
 </resources>

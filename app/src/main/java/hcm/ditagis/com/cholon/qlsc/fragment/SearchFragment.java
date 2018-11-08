@@ -80,14 +80,15 @@ public class SearchFragment extends Fragment {
     }
 
     private void initSpinTrangThai() {
-        Domain domain = mApplication.getServiceFeatureTable().getField(Constant.FIELD_SUCO.TRANG_THAI).getDomain();
+        Domain domain = mApplication.getFeatureLayerDTG().getLayer().getFeatureTable().getField(Constant.FIELD_SUCO.TRANG_THAI).getDomain();
         if (domain != null) {
             mCodeValues = ((CodedValueDomain) domain).getCodedValues();
             if (mCodeValues != null) {
                 List<String> codes = new ArrayList<>();
                 codes.add("Tất cả");
                 for (CodedValue codedValue : mCodeValues)
-                    codes.add(codedValue.getName());
+                    if (!Constant.DEFINITION_HIDE_COMPLETE.contains(codedValue.getCode().toString()))
+                        codes.add(codedValue.getName());
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(mRootView.getContext(), android.R.layout.simple_list_item_1, codes);
                 mSpinTrangThai.setAdapter(adapter);
             }

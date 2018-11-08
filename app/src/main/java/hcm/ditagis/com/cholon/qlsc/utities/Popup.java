@@ -82,8 +82,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
     private LinearLayout linearLayout;
     private MapView mMapView;
-    private String mLoaiSuCo;
-    private short mLoaiSuCoShort;
+    //    private Object mLoaiSuCoID;
     private Geocoder mGeocoder;
     private List<HoSoVatTuSuCo> mListHoSoVatTuSuCo;
     private String mIDSuCo;
@@ -127,17 +126,17 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     public void refreshPopup(ArcGISFeature arcGISFeature) {
         mSelectedArcGISFeature = arcGISFeature;
-        Map<String, Object> attributes = mSelectedArcGISFeature.getAttributes();
+        Map<String, Object> attributes = arcGISFeature.getAttributes();
         ListView listView = linearLayout.findViewById(R.id.lstview_thongtinsuco);
         FeatureViewInfoAdapter featureViewInfoAdapter = new FeatureViewInfoAdapter(mMainActivity, new ArrayList<>());
         listView.setAdapter(featureViewInfoAdapter);
-        String typeIdField = mSelectedArcGISFeature.getFeatureTable().getTypeIdField();
+        String typeIdField = arcGISFeature.getFeatureTable().getTypeIdField();
         String[] noDisplayFields = mMainActivity.getResources().getStringArray(R.array.no_display_fields_arrays);
         boolean isFoundField = false;
-        mIDSuCo = attributes.get(mMainActivity.getString(R.string.Field_SuCo_IDSuCo)).toString();
+        mIDSuCo = attributes.get(Constant.FIELD_SUCO.ID_SUCO).toString();
 
 
-        for (Field field : this.mSelectedArcGISFeature.getFeatureTable().getFields()) {
+        for (Field field : arcGISFeature.getFeatureTable().getFields()) {
             for (String noDisplayField : noDisplayFields)
                 if (noDisplayField.equals(field.getName())) {
                     isFoundField = true;
@@ -153,41 +152,11 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
                 item.setAlias(field.getAlias());
                 item.setFieldName(field.getName());
-                if (item.getFieldName().equals(typeIdField)) {
-                    List<FeatureType> featureTypes = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes();
-                    Object valueFeatureType = getValueFeatureType(featureTypes, value.toString());
-
-                    if (valueFeatureType != null) {
-                        mLoaiSuCo = valueFeatureType.toString();
-                        mLoaiSuCoShort = (Short.parseShort(attributes.get(mMainActivity.getString(R.string.Field_SuCo_LoaiSuCo)).toString()));
-                        item.setValue(mLoaiSuCo);
-                    } else continue;
-                } else if (field.getDomain() != null) {
+                if (field.getDomain() != null) {
                     List<CodedValue> codedValues = new ArrayList<>();
-                    if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))) {
-                        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                            codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
-
-                        }
-                    } else if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_VatLieu))) {
-                        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                            codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
-
-                        }
-                    } else if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))) {
-                        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                            codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
-
-                        }
-                    } else {
-                        codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
-
+                    try {
+                        codedValues = ((CodedValueDomain) arcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
+                    } catch (Exception ignored) {
                     }
                     Object valueDomain = getValueDomain(codedValues, value.toString());
                     if (valueDomain != null) item.setValue(valueDomain.toString());
@@ -242,7 +211,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             btnRight.setText(mMainActivity.getString(R.string.btnRightAddFeature));
             mBtnLeft.setOnClickListener(view -> {
                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
-                        mApplication.getServiceFeatureTable(),
+                        (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable(),
                         mSelectedArcGISFeature, true, null, arcGISFeature -> {
                     mCallout.dismiss();
                     dialog.dismiss();
@@ -273,7 +242,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                                 MySnackBar.make(mBtnLeft, R.string.message_ChupAnh_HoanThanh, true);
                             } else {
                                 EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
-                                        mApplication.getServiceFeatureTable(),
+                                        (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable(),
                                         mSelectedArcGISFeature, true, null, arcGISFeature -> {
                                     mCallout.dismiss();
                                     dialog.dismiss();
@@ -287,7 +256,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
                 } else {
                     EditAsync editAsync = new EditAsync(getListHoSoVatTuSuCo(), mMainActivity,
-                            mApplication.getServiceFeatureTable(),
+                            (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable(),
                             mSelectedArcGISFeature, true, null, (ArcGISFeature arcGISFeature) -> {
                         mCallout.dismiss();
                         dialog.dismiss();
@@ -350,40 +319,36 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 item.setAlias(field.getAlias());
                 item.setFieldName(field.getName());
                 if (value != null) {
-                    if (item.getFieldName().equals(typeIdField)) {
-                        List<FeatureType> featureTypes = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes();
-                        Object valueFeatureType = getValueFeatureType(featureTypes, value.toString());
-                        mLoaiSuCo = "";
-                        if (valueFeatureType != null) {
-                            item.setValue(valueFeatureType.toString());
-                            mLoaiSuCo = valueFeatureType.toString();
-                        }
-
-                    } else if (field.getDomain() != null) {
+//                    if (item.getFieldName().equals(typeIdField)) {
+//                        List<FeatureType> featureTypes = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes();
+//                        Object valueFeatureType = getValueFeatureType(featureTypes, value.toString());
+////                        mLoaiSuCoID = Short.parseShort(value.toString());
+//                        if (valueFeatureType != null) {
+//                            item.setValue(valueFeatureType.toString());
+//                        }
+//
+//                    } else
+                    if (field.getDomain() != null) {
                         List<CodedValue> codedValues = new ArrayList<>();
-                        if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))) {
-                            if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                    || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                                codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                        .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
+                        try {
+//                            switch (field.getName()) {
+//                                case Constant.FIELD_SUCO.NGUYEN_NHAN:
+//                                case Constant.FIELD_SUCO.VAT_LIEU:
+//                                case Constant.FIELD_SUCO.DUONG_KINH_ONG:
+//                                    for (FeatureType featureType : mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()) {
+//                                        if (featureType.getId().equals(mLoaiSuCoID)) {
+//                                            codedValues = ((CodedValueDomain) featureType.getDomains()
+//                                                    .get(field.getName())).getCodedValues();
+//                                            break;
+//                                        }
+//                                    }
+//                                    break;
+//                                default:
+                            codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
 
-                            }
-                        } else if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_VatLieu))) {
-                            if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                    || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                                codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                        .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
-
-                            }
-                        } else if (field.getName().equals(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))) {
-                            if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                                    || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-                                codedValues = ((CodedValueDomain) mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                        .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
-
-                            }
-                        } else {
-                            codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
+//                                    break;
+//                            }
+                        } catch (Exception ignored) {
 
                         }
                         Object valueDomain = getValueDomain(codedValues, value.toString());
@@ -493,127 +458,54 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void loadDataEdit(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
-        //Load danh sách madma từ csdl
-        if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_MADMA))) {
-            loadDataEdit_DMA(item, layout);
-        }
-        //Trường hợp vị trí thì không dùng domain, vì còn có nhập khoảng cách
-        else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_ViTri))) {
-            loadDataEdit_ViTri(layout);
-        }
-        //Trường hợp nguyên nhân, không tự động lấy được domain
-        else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))) {
-            loadDataEdit_NguyenNhan(item, layout);
-        }
-        //Trường hợp vật liệu, không tự động lấy được domain
-        else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_VatLieu))) {
-            loadDataEdit_VatLieu(item, layout);
-
-        }
-        //Trường hợp vật tư, không tự động lấy được domain
-        else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_VatTu))) {
-            loadDataEdit_VatTu(layout);
-        } else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))) {
-            loadDataEdit_DuongKinhOng(item, layout);
-        } else {
-            loadDataEdit_Another(item, layout);
+        switch (item.getFieldName()) {
+//            case Constant.FIELD_SUCO.DMA:
+//            case Constant.FIELD_SUCO.VI_TRI:
+//            case Constant.FIELD_SUCO.NGUYEN_NHAN:
+//            case Constant.FIELD_SUCO.VAT_LIEU:
+//            case Constant.FIELD_SUCO.DUONG_KINH_ONG:
+//                loadDataEdit_Domain(item, layout, mSelectedArcGISFeature);
+//                break;
+            case Constant.FIELD_SUCO.VAT_TU:
+                loadDataEdit_VatTu(layout);
+                break;
+            default:
+                loadDataEdit_Another(item, layout);
+                break;
         }
     }
 
-    private void loadDataEdit_DMA(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
-        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
-        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
-        layoutSpin.setVisibility(View.VISIBLE);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1,
-                new ArrayList<>());
-        if (ListObjectDB.getInstance().getDmas() != null)
-            adapter.addAll(ListObjectDB.getInstance().getDmas());
-        adapter.notifyDataSetChanged();
-        spin.setAdapter(adapter);
-        if (item.getValue() != null)
-            spin.setSelection(ListObjectDB.getInstance().getDmas().indexOf(item.getValue()));
-    }
-
-    private void loadDataEdit_ViTri(LinearLayout layout) {
-        final LinearLayout layoutEditText = layout.findViewById(R.id.layout_edit_viewmoreinfo_Editext);
-        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
-        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
-        layoutSpin.setVisibility(View.VISIBLE);
-        if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mMainActivity.getResources().getStringArray(R.array.vitri_ongnganh_arrays));
-            spin.setAdapter(adapter);
-        } else if (mLoaiSuCo != null && mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh))) {
-            layoutEditText.setVisibility(View.VISIBLE);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mMainActivity.getResources().getStringArray(R.array.vitri_ongchinh1_arrays));
-            spin.setAdapter(adapter);
-        }
+//    private void loadDataEdit_Domain(FeatureViewMoreInfoAdapter.Item item, LinearLayout
+//            layout, ArcGISFeature arcGISFeatureSuCoThongTin) {
+//        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
+//        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
+//
+//        layoutSpin.setVisibility(View.VISIBLE);
+//        List<String> codes = new ArrayList<>();
+//        try {
+//            List<CodedValue> codedValues = null;
+//            for (FeatureType featureType : arcGISFeatureSuCoThongTin.getFeatureTable().getFeatureTypes()) {
+//                if (featureType.getId().equals(mLoaiSuCoID)) {
+//                    codedValues = ((CodedValueDomain) featureType.getDomains()
+//                            .get(item.getFieldName())).getCodedValues();
+//                    break;
+//                }
+//            }
+//            if (codedValues != null) {
+//                for (CodedValue codedValue : codedValues)
+//                    codes.add(codedValue.getName());
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, codes);
+//                spin.setAdapter(adapter);
+//            }
+//        } catch (Exception e) {
+//            message_select_loaiSuCo();
+//        }
 //        if (item.getValue() != null)
-//            spin.setSelection(mListObjectDB.indexOf(item.getValue()));
-    }
+//            spin.setSelection(codes.indexOf(item.getValue()));
+//    }
 
-    private void loadDataEdit_NguyenNhan(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
-        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
-        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
-
-        layoutSpin.setVisibility(View.VISIBLE);
-        List<String> codes = new ArrayList<>();
-        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-            List<CodedValue> codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
-            if (codedValues != null) {
-                for (CodedValue codedValue : codedValues)
-                    codes.add(codedValue.getName());
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, codes);
-                spin.setAdapter(adapter);
-            }
-        }
-        if (item.getValue() != null)
-            spin.setSelection(codes.indexOf(item.getValue()));
-    }
-
-    private void loadDataEdit_VatLieu(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
-        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
-        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
-        final AutoCompleteTextView autoCompleteTextView = layout.findViewById(R.id.autoCompleteTV_edit_viewmoreinfo);
-        autoCompleteTextView.setBackgroundResource(R.drawable.layout_border);
-
-        layoutSpin.setVisibility(View.VISIBLE);
-        List<String> codes = new ArrayList<>();
-        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-            List<CodedValue> codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
-            if (codedValues != null) {
-                for (CodedValue codedValue : codedValues)
-                    codes.add(codedValue.getName());
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, codes);
-                spin.setAdapter(adapter);
-            }
-        }
-        if (item.getValue() != null)
-            spin.setSelection(codes.indexOf(item.getValue()));
-    }
-
-    private void loadDataEdit_DuongKinhOng(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
-        final LinearLayout layoutSpin = layout.findViewById(R.id.layout_edit_viewmoreinfo_Spinner);
-        final Spinner spin = layout.findViewById(R.id.spin_edit_viewmoreinfo);
-
-        layoutSpin.setVisibility(View.VISIBLE);
-        List<String> codes = new ArrayList<>();
-        if (mLoaiSuCo != null && (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))
-                || mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh)))) {
-            List<CodedValue> codedValues = ((CodedValueDomain) this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                    .get(mLoaiSuCoShort - 1).getDomains().get(mMainActivity.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
-            if (codedValues != null) {
-                for (CodedValue codedValue : codedValues)
-                    codes.add(codedValue.getName());
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, codes);
-                spin.setAdapter(adapter);
-            }
-        }
-        if (item.getValue() != null)
-            spin.setSelection(codes.indexOf(item.getValue()));
+    private void message_select_loaiSuCo() {
+        Toast.makeText(mMainActivity.getApplicationContext(), R.string.message_select_loai_su_co, Toast.LENGTH_LONG).show();
     }
 
 
@@ -626,11 +518,13 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         final TextView txtDonViTinh = layout.findViewById(R.id.txt_donvitinh);
         final TextView txtThemVatTu = layout.findViewById(R.id.txt_them_vattu);
         ListObjectDB.getInstance().clearListHoSoVatTuSuCoChange();
-        if (mLoaiSuCo != null) {
-            layoutAutoCompleteTV.setVisibility(View.VISIBLE);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListTenVatTu);
-            autoCompleteTextView.setAdapter(adapter);
-        }
+//        if (mLoaiSuCoID == null) {
+//            message_select_loaiSuCo();
+//            return;
+//        }
+        layoutAutoCompleteTV.setVisibility(View.VISIBLE);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, mListTenVatTu);
+        autoCompleteTextView.setAdapter(adapter);
         final VatTuAdapter vatTuAdapter = new VatTuAdapter(layout.getContext(), new ArrayList<>());
         final String[] maVatTu = {""};
         listViewVatTu.setAdapter(vatTuAdapter);
@@ -665,13 +559,11 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable editable) {
                 String tenVatTu = editable.toString();
-                if (mLoaiSuCo != null) {
-                    for (VatTu vatTu : ListObjectDB.getInstance().getVatTus()) {
-                        if (vatTu.getTenVatTu().equals(tenVatTu)) {
-                            txtDonViTinh.setText(vatTu.getDonViTinh());
-                            maVatTu[0] = vatTu.getMaVatTu();
-                            break;
-                        }
+                for (VatTu vatTu : ListObjectDB.getInstance().getVatTus()) {
+                    if (vatTu.getTenVatTu().equals(tenVatTu)) {
+                        txtDonViTinh.setText(vatTu.getDonViTinh());
+                        maVatTu[0] = vatTu.getMaVatTu();
+                        break;
                     }
                 }
             }
@@ -725,14 +617,15 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         autoCompleteTextView.setBackgroundResource(R.drawable.layout_border);
 
         final Domain domain = mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain();
-        if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
-            layoutSpin.setVisibility(View.VISIBLE);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, lstFeatureType);
-            spin.setAdapter(adapter);
-            if (item.getValue() != null) {
-                spin.setSelection(lstFeatureType.indexOf(item.getValue()));
-            }
-        } else if (domain != null) {
+//        if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
+//            layoutSpin.setVisibility(View.VISIBLE);
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(layout.getContext(), android.R.layout.simple_list_item_1, lstFeatureType);
+//            spin.setAdapter(adapter);
+//            if (item.getValue() != null) {
+//                spin.setSelection(lstFeatureType.indexOf(item.getValue()));
+//            }
+//        } else
+        if (domain != null) {
             layoutSpin.setVisibility(View.VISIBLE);
             List<CodedValue> codedValues = ((CodedValueDomain) domain).getCodedValues();
 
@@ -792,14 +685,13 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         final ListView listViewVatTu = layout.findViewById(R.id.lstview_viewmoreinfo_autoCompleteTV);
 
         final Domain domain = mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain();
-        if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_MADMA))) {
+        if (item.getFieldName().equals(Constant.FIELD_SUCO.DMA) ||
+                item.getFieldName().equals(Constant.FIELD_SUCO.NGUYEN_NHAN) ||
+                item.getFieldName().equals(Constant.FIELD_SUCO.VAT_LIEU) ||
+                item.getFieldName().equals(Constant.FIELD_SUCO.DUONG_KINH_ONG)) {
             item.setValue(spin.getSelectedItem().toString());
-        } else if (mLoaiSuCo != null && item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_ViTri))) {
-            if (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngNganh))) {
-                item.setValue(spin.getSelectedItem().toString());
-            } else if (mLoaiSuCo.equals(mMainActivity.getString(R.string.LoaiSuCo_OngChinh))) {
-                item.setValue(spin.getSelectedItem().toString() + editText.getText().toString());
-            }
+        } else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_ViTri))) {
+            item.setValue(spin.getSelectedItem().toString());
         } else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_VatTu))) {
             mListHoSoVatTuSuCo = new ArrayList<>();
 
@@ -838,17 +730,16 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 }
             }
             item.setValue(spin.getSelectedItem().toString());
-            if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
-                for (int i = 0; i < mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().size(); i++) {
-                    FeatureType featureType = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().get(i);
-                    if (featureType.getName().equals(item.getValue())) {
-                        mLoaiSuCoShort = (Short.parseShort(featureType.getId().toString()));
-                        break;
-                    }
-                }
-
-                mLoaiSuCo = item.getValue();
-            }
+//            if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
+//                for (int i = 0; i < mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().size(); i++) {
+//                    FeatureType featureType = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().get(i);
+//                    if (featureType.getName().equals(item.getValue())) {
+//                        mLoaiSuCoID = (Short.parseShort(featureType.getId().toString()));
+//                        break;
+//                    }
+//                }
+//
+//            }
         } else {
             switch (item.getFieldType()) {
                 case DATE:

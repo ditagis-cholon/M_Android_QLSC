@@ -15,9 +15,10 @@ public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-    public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+        public static final String DEFINITION_HIDE_COMPLETE = " and TrangThai <> 3";
+        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
+//    private final String SERVER_API = "http://sawagis.vn/cholon/api";
 
-    //    private final String SERVER_API = "http://sawagis.vn/cholon/api";
     public static class DateFormat {
         public static final String DATE_FORMAT_STRING = "dd/MM/yyyy";
         public static final SimpleDateFormat DATE_FORMAT_YEAR_FIRST = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -43,10 +44,15 @@ public class Constant {
 
     public class FIELD_SUCO {
         public static final String ID_SUCO = "IDSuCo";
+        public static final String DMA = "MADMA";
+        public static final String VAT_TU = "VatTu";
         public static final String TRANG_THAI = "TrangThai";
         public static final String OBJECT_ID = "OBJECTID";
         public static final String NGAY_XAY_RA = "NgayXayRa";
         public static final String VI_TRI = "ViTri";
+        public static final String NGUYEN_NHAN = "NguyenNhan";
+        public static final String VAT_LIEU = "VatLieu";
+        public static final String DUONG_KINH_ONG = "DuongKinhOng";
 
     }
 

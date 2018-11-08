@@ -2,14 +2,11 @@ package hcm.ditagis.com.cholon.qlsc.entities;
 
 import android.app.Application;
 
-import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.geometry.Geometry;
 
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 
 public class DApplication extends Application {
-
-    private ServiceFeatureTable serviceFeatureTable;
     private FeatureLayerDTG featureLayerDTG;
     private DiemSuCo diemSuCo;
     private Geometry geometry;
@@ -36,13 +33,5 @@ public class DApplication extends Application {
         return diemSuCo;
     }
 
-
-    public ServiceFeatureTable getServiceFeatureTable() {
-        return serviceFeatureTable;
-    }
-
-    public void setServiceFeatureTable(ServiceFeatureTable serviceFeatureTable) {
-        this.serviceFeatureTable = serviceFeatureTable;
-    }
 
 }

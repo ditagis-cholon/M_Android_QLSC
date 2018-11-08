@@ -88,15 +88,6 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                 trangThai = item.getValue();
         }
         List<FeatureType> featureTypes = mSelectedArcGISFeature.getFeatureTable().getFeatureTypes();
-        Object idFeatureTypes = getIdFeatureTypes(featureTypes, loaiSuCo);
-        if (idFeatureTypes != null) {
-
-            loaiSuCoShort = (Short.parseShort(idFeatureTypes.toString()));
-//            mSelectedArcGISFeature.getAttributes().put(mContext.getString(R.string.Field_SuCo_LoaiSuCo), loaiSuCoShort);
-        }
-//        mSelectedArcGISFeature.getAttributes().put("DuongKinhOng",Short.parseShort(("1")));
-        final String finalLoaiSuCo = loaiSuCo;
-        final short finalLoaiSuCoShort = loaiSuCoShort;
         final String finalTrangThai = trangThai;
         for (FeatureViewMoreInfoAdapter.Item item : adapter.getItems()) {
             if (item.getValue() == null || !item.isEdit() || !item.isEdited()) continue;
@@ -104,68 +95,16 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
             Object codeDomain = null;
             if (domain != null) {
                 hasDomain = true;
-                //Trường hợp nguyên nhân, không tự động lấy được domain
-                if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_NguyenNhan))) {
-                    if (finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngNganh))
-                            || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
-
-                        List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_NguyenNhan))).getCodedValues();
-                        if (codedValues != null) {
-                            for (CodedValue codedValue : codedValues) {
-                                if (codedValue.getName().equals(item.getValue())) {
-                                    codeDomain = codedValue.getCode();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                //Trường hợp vật liệu, không tự động lấy được domain
-                else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_VatLieu))) {
-                    if (finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngNganh))
-                            || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
-                        List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_VatLieu))).getCodedValues();
-                        if (codedValues != null) {
-                            for (CodedValue codedValue : codedValues) {
-                                if (codedValue.getName().equals(item.getValue())) {
-                                    codeDomain = codedValue.getCode();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_DuongKinhOng))) {
-                    if (finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngNganh))
-                            || finalLoaiSuCo.equals(mContext.getString(R.string.LoaiSuCo_OngChinh))) {
-                        List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()
-                                .get(finalLoaiSuCoShort - 1).getDomains().get(mContext.getString(R.string.Field_SuCo_DuongKinhOng))).getCodedValues();
-                        if (codedValues != null) {
-                            for (CodedValue codedValue : codedValues) {
-                                if (codedValue.getName().equals(item.getValue())) {
-                                    codeDomain = codedValue.getCode();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
-                    codeDomain = getCodeDomain(codedValues, item.getValue());
-                }
+                List<CodedValue> codedValues = ((CodedValueDomain) EditAsync.this.mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain()).getCodedValues();
+                codeDomain = getCodeDomain(codedValues, item.getValue());
             } else if (item.getFieldName().equals(mContext.getString(R.string.Field_SuCo_VatTu))) {
                 hasDomain = false;
-
                 continue;
             }
-            if (item.getFieldName().equals(mSelectedArcGISFeature.getFeatureTable().getTypeIdField())) {
-                mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), finalLoaiSuCoShort);
-            } else switch (item.getFieldType()) {
+            switch (item.getFieldType()) {
                 case DATE:
                     Date date;
                     try {
-
                         date = Constant.DATE_FORMAT_VIEW.parse(item.getValue());
                         c[0].setTime(date);
                         mSelectedArcGISFeature.getAttributes().put(item.getFieldName(), c[0]);
@@ -221,9 +160,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                     break;
             }
         }
-        if (finalTrangThai.equals(mContext.getString(R.string.SuCo_TrangThai_HoanThanh)))
-
-        {
+        if (finalTrangThai.equals(mContext.getString(R.string.SuCo_TrangThai_HoanThanh))) {
             c[0] = Calendar.getInstance();
             mSelectedArcGISFeature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayKhacPhuc), c[0]);
         }
@@ -261,8 +198,8 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
                     , Constant.HOSOVATTUSUCO_METHOD.INSERT);
         }
         boolean check;
-        do{
-            check =ListObjectDB.getInstance().getLstHoSoVatTuSuCoInsert().size() > 0;
+        do {
+            check = ListObjectDB.getInstance().getLstHoSoVatTuSuCoInsert().size() > 0;
         }
         while (check);
 

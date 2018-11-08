@@ -35,13 +35,14 @@ public class ListTaskFragment extends Fragment {
     private View mRootView;
     ListView mLstChuaXuLy;
     ListView mLstDangXuLy;
-    ListView mLstHoanThanh;
+//    ListView mLstHoanThanh;
     TextView mTxtChuaXuLy;
     TextView mTxtDangXuLy;
-    TextView mTxtHoanThanh;
+//    TextView mTxtHoanThanh;
     private ListTaskActivity mActivity;
     private DApplication mApplication;
-    TraCuuAdapter mAdapterChuaXuLy, mAdapterDangXuLy, mAdapterHoanThanh;
+    TraCuuAdapter mAdapterChuaXuLy, mAdapterDangXuLy;
+//    mAdapterHoanThanh;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("ValidFragment")
@@ -57,22 +58,22 @@ public class ListTaskFragment extends Fragment {
     private void init() {
         mLstChuaXuLy = mRootView.findViewById(R.id.lst_list_task_chua_xu_ly);
         mLstDangXuLy = mRootView.findViewById(R.id.lst_list_task_dang_xu_ly);
-        mLstHoanThanh = mRootView.findViewById(R.id.lst_list_task_da_hoan_thanh);
+//        mLstHoanThanh = mRootView.findViewById(R.id.lst_list_task_da_hoan_thanh);
 
         mTxtChuaXuLy = mRootView.findViewById(R.id.txt_list_task_chua_xu_ly);
         mTxtDangXuLy = mRootView.findViewById(R.id.txt_list_task_dang_xu_ly);
-        mTxtHoanThanh = mRootView.findViewById(R.id.txt_list_task_hoan_thanh);
+//        mTxtHoanThanh = mRootView.findViewById(R.id.txt_list_task_hoan_thanh);
         mTxtChuaXuLy.setOnClickListener(this::onClick);
         mTxtDangXuLy.setOnClickListener(this::onClick);
-        mTxtHoanThanh.setOnClickListener(this::onClick);
+//        mTxtHoanThanh.setOnClickListener(this::onClick);
 
         mAdapterChuaXuLy = new TraCuuAdapter(mActivity.getApplicationContext(), new ArrayList<>());
         mAdapterDangXuLy = new TraCuuAdapter(mActivity.getApplicationContext(), new ArrayList<>());
-        mAdapterHoanThanh = new TraCuuAdapter(mActivity.getApplicationContext(), new ArrayList<>());
+//        mAdapterHoanThanh = new TraCuuAdapter(mActivity.getApplicationContext(), new ArrayList<>());
 
         mLstChuaXuLy.setAdapter(mAdapterChuaXuLy);
         mLstDangXuLy.setAdapter(mAdapterDangXuLy);
-        mLstHoanThanh.setAdapter(mAdapterHoanThanh);
+//        mLstHoanThanh.setAdapter(mAdapterHoanThanh);
 
         mLstChuaXuLy.setOnItemClickListener((adapterView, view, i, l) -> {
             mActivity.itemClick(adapterView, i);
@@ -80,22 +81,20 @@ public class ListTaskFragment extends Fragment {
         mLstDangXuLy.setOnItemClickListener((adapterView, view, i, l) -> {
             mActivity.itemClick(adapterView, i);
         });
-        mLstHoanThanh.setOnItemClickListener((adapterView, view, i, l) -> {
-//            Toast.makeText(mActivity.getApplicationContext(), R.string.message_click_feature_complete,
-//                    Toast.LENGTH_SHORT).show();
-            mActivity.itemClick(adapterView, i);
-        });
-        new QueryServiceFeatureTableGetListAsync(mActivity, mApplication.getServiceFeatureTable(), (List<Feature> output) -> {
+//        mLstHoanThanh.setOnItemClickListener((adapterView, view, i, l) -> {
+//            mActivity.itemClick(adapterView, i);
+//        });
+        new QueryServiceFeatureTableGetListAsync(mActivity, (List<Feature> output) -> {
             if (output != null && output.size() > 0) {
                 handlingQuerySuccess(output);
             }
             mAdapterChuaXuLy.notifyDataSetChanged();
             mAdapterDangXuLy.notifyDataSetChanged();
-            mAdapterHoanThanh.notifyDataSetChanged();
+//            mAdapterHoanThanh.notifyDataSetChanged();
 
             mTxtChuaXuLy.setText(mActivity.getResources().getString(R.string.txt_list_task_chua_xu_ly, mAdapterChuaXuLy.getCount()));
             mTxtDangXuLy.setText(mActivity.getResources().getString(R.string.txt_list_task_dang_xu_ly, mAdapterDangXuLy.getCount()));
-            mTxtHoanThanh.setText(mActivity.getResources().getString(R.string.txt_list_task_hoan_thanh, mAdapterHoanThanh.getCount()));
+//            mTxtHoanThanh.setText(mActivity.getResources().getString(R.string.txt_list_task_hoan_thanh, mAdapterHoanThanh.getCount()));
         }).execute();
     }
 
@@ -105,7 +104,7 @@ public class ListTaskFragment extends Fragment {
         try {
             List<TraCuuAdapter.Item> chuaXuLyList = new ArrayList<>();
             List<TraCuuAdapter.Item> dangXuLyList = new ArrayList<>();
-            List<TraCuuAdapter.Item> hoanThanhList = new ArrayList<>();
+//            List<TraCuuAdapter.Item> hoanThanhList = new ArrayList<>();
             for (Feature feature : output) {
                 Map<String, Object> attributes = feature.getAttributes();
                 Constant.DateFormat.DATE_FORMAT_VIEW.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -126,9 +125,9 @@ public class ListTaskFragment extends Fragment {
                         case Constant.TrangThaiSuCo.DANG_XU_LY:
                             dangXuLyList.add(item);
                             break;
-                        case Constant.TrangThaiSuCo.HOAN_THANH:
-                            hoanThanhList.add(item);
-                            break;
+//                        case Constant.TrangThaiSuCo.HOAN_THANH:
+//                            hoanThanhList.add(item);
+//                            break;
                     }
                 }
             }
@@ -149,10 +148,10 @@ public class ListTaskFragment extends Fragment {
             };
             chuaXuLyList.sort(comparator);
             dangXuLyList.sort(comparator);
-            hoanThanhList.sort(comparator);
+//            hoanThanhList.sort(comparator);
             mAdapterChuaXuLy.addAll(chuaXuLyList);
             mAdapterDangXuLy.addAll(dangXuLyList);
-            mAdapterHoanThanh.addAll(hoanThanhList);
+//            mAdapterHoanThanh.addAll(hoanThanhList);
         } catch (Exception e) {
             Log.e("Lỗi lấy ds công việc", e.toString());
         }
@@ -171,11 +170,11 @@ public class ListTaskFragment extends Fragment {
                     mLstDangXuLy.setVisibility(View.GONE);
                 else mLstDangXuLy.setVisibility(View.VISIBLE);
                 break;
-            case R.id.txt_list_task_hoan_thanh:
-                if (mLstHoanThanh.getVisibility() == View.VISIBLE)
-                    mLstHoanThanh.setVisibility(View.GONE);
-                else mLstHoanThanh.setVisibility(View.VISIBLE);
-                break;
+//            case R.id.txt_list_task_hoan_thanh:
+//                if (mLstHoanThanh.getVisibility() == View.VISIBLE)
+//                    mLstHoanThanh.setVisibility(View.GONE);
+//                else mLstHoanThanh.setVisibility(View.VISIBLE);
+//                break;
         }
     }
 

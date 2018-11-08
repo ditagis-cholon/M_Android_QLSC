@@ -169,8 +169,7 @@ public class MapViewHandler extends Activity {
                                     Constant.FIELD_SUCO.ID_SUCO, item.getAttributes().get(Constant.FIELD_SUCO.ID_SUCO).toString());
                             QueryParameters queryParameters1 = new QueryParameters();
                             queryParameters1.setWhereClause(queryClause);
-                            new QueryServiceFeatureTableAsync(mActivity,
-                                    mApplication.getServiceFeatureTable(), output -> {
+                            new QueryServiceFeatureTableAsync(mActivity, output -> {
                                 if (output != null) {
                                     mApplication.getDiemSuCo().setArcGISFeature((ArcGISFeature) output);
                                     mPopUp.showPopup(false);
