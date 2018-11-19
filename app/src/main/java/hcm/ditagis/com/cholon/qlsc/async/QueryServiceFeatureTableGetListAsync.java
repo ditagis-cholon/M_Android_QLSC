@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 
 /**
@@ -44,7 +45,7 @@ public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<F
     public QueryServiceFeatureTableGetListAsync(Activity activity, AsyncResponse delegate) {
         this.mActivity = activity;
         this.mApplication = (DApplication) activity.getApplication();
-        this.mServiceFeatureTable = (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable();
+        this.mServiceFeatureTable = mApplication.getFeatureLayerDTG().getServiceFeatureTable();
         this.mDelegate = delegate;
     }
 
@@ -70,18 +71,13 @@ public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<F
             layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
             mDialog.getWindow().setAttributes(layoutParams);
         }
-//        mDialog = new ProgressDialog(mActivity);
-//        mDialog.setCancelable(false);
-//        mDialog.setTitle(R.string.message_title_list_task);
-//        mDialog.show();
-
     }
 
     @Override
     protected Void doInBackground(Void... aVoids) {
         try {
             QueryParameters queryParameters = new QueryParameters();
-            String queryClause = String.format("1 = 1");
+            String queryClause = String.format("%s = %d", Constant.FieldSuCo.TRANG_THAI, Constant.TrangThaiSuCo.CHUA_XU_LY);
             queryParameters.setWhereClause(queryClause);
 
             ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture = mServiceFeatureTable.queryFeaturesAsync(queryParameters,
@@ -111,20 +107,11 @@ public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<F
 
     @Override
     protected void onProgressUpdate(List<Feature>... values) {
-        if (values == null) {
-            mDelegate.processFinish(null);
-        } else if (values.length > 0) mDelegate.processFinish(values[0]);
+        if (values != null && values.length > 0) mDelegate.processFinish(values[0]);
         else mDelegate.processFinish(null);
 
         if (mDialog != null && mDialog.isShowing())
             mDialog.dismiss();
-    }
-
-
-    @Override
-    protected void onPostExecute(Void result) {
-
-
     }
 
 }

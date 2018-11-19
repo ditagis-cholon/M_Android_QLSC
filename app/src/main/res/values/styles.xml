@@ -110,6 +110,9 @@
         </item>
 
     </style>
+    <style name="DDialogBuilder" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
     <!--textview end-->
 
 </resources>

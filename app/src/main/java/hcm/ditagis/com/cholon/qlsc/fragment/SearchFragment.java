@@ -32,7 +32,6 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import hcm.ditagis.com.cholon.qlsc.ListTaskActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
@@ -80,7 +79,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void initSpinTrangThai() {
-        Domain domain = mApplication.getFeatureLayerDTG().getLayer().getFeatureTable().getField(Constant.FIELD_SUCO.TRANG_THAI).getDomain();
+        Domain domain = mApplication.getFeatureLayerDTG().getLayer().getFeatureTable().getField(Constant.FieldSuCo.TRANG_THAI).getDomain();
         if (domain != null) {
             mCodeValues = ((CodedValueDomain) domain).getCodedValues();
             if (mCodeValues != null) {
@@ -109,7 +108,7 @@ public class SearchFragment extends Fragment {
             Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
             String displaytime = (String) DateFormat.format((Constant.DateFormat.DATE_FORMAT_STRING), calendar.getTime());
             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormatGmt = Constant.DateFormat.DATE_FORMAT_YEAR_FIRST;
-            dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+//            dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
             mTxtThoiGian.setText(displaytime);
             alertDialog.dismiss();
         });
@@ -123,11 +122,12 @@ public class SearchFragment extends Fragment {
 //        if (!mTxtThoiGian.getText().toString().equals(mRootView.getContext().getString(R.string.txt_chon_thoi_gian_tracuusuco))) {
         mLayoutKetQua.setVisibility(View.GONE);
         short trangThai = -1;
-        for (CodedValue codedValue : mCodeValues) {
-            if (codedValue.getName().equals(mSpinTrangThai.getSelectedItem().toString())) {
-                trangThai = Short.parseShort(codedValue.getCode().toString());
+        if (mCodeValues != null)
+            for (CodedValue codedValue : mCodeValues) {
+                if (codedValue.getName().equals(mSpinTrangThai.getSelectedItem().toString())) {
+                    trangThai = Short.parseShort(codedValue.getCode().toString());
+                }
             }
-        }
         new QueryFeatureAsync(mActivity, trangThai,
                 mEtxtAddress.getText().toString(),
                 mTxtThoiGian.getText().toString(), output -> {
@@ -147,20 +147,23 @@ public class SearchFragment extends Fragment {
             Map<String, Object> attributes = feature.getAttributes();
             for (CodedValue codedValue : mCodeValues) {
                 if (Short.parseShort(codedValue.getCode().toString()) ==
-                        Short.parseShort(attributes.get(Constant.FIELD_SUCO.TRANG_THAI).toString())) {
-                    Constant.DateFormat.DATE_FORMAT_VIEW.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    items.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.FIELD_SUCO.OBJECT_ID).toString()),
-                            attributes.get(Constant.FIELD_SUCO.ID_SUCO).toString(),
-                            Integer.parseInt(attributes.get(Constant.FIELD_SUCO.TRANG_THAI).toString()),
-                            Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) attributes.get(Constant.FIELD_SUCO.NGAY_XAY_RA)).getTime()),
-                            attributes.get(Constant.FIELD_SUCO.VI_TRI).toString()));
+                        Short.parseShort(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString())) {
+                    Object idSuCo = attributes.get(Constant.FieldSuCo.ID_SUCO);
+                    Object ngayXayRa = attributes.get(Constant.FieldSuCo.TG_PHAN_ANH);
+                    Object diaChi = attributes.get(Constant.FieldSuCo.DIA_CHI);
+                    items.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
+                            idSuCo != null ? idSuCo.toString() : "",
+                            Integer.parseInt(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString()),
+                            ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
+                            diaChi != null ? diaChi.toString() : ""));
                 }
             }
+
 
         }
         Comparator<TraCuuAdapter.Item> comparator = (TraCuuAdapter.Item o1, TraCuuAdapter.Item o2) -> {
             try {
-                Constant.DateFormat.DATE_FORMAT_VIEW.setTimeZone(TimeZone.getTimeZone("UTC"));
+//                Constant.DateFormat.DATE_FORMAT_VIEW.setTimeZone(TimeZone.getTimeZone("UTC"));
                 long i = Constant.DateFormat.DATE_FORMAT_VIEW.parse(o2.getNgayThongBao()).getTime() -
                         Constant.DateFormat.DATE_FORMAT_VIEW.parse(o1.getNgayThongBao()).getTime();
                 if (i > 0)

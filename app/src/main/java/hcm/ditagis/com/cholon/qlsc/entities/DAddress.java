@@ -1,15 +1,17 @@
 package hcm.ditagis.com.cholon.qlsc.entities;
 
-public class MyAddress {
+public class DAddress {
     private double longtitude;
     private double latitude;
     private String subAdminArea;
+    private String adminArea;
     private String location;
 
-    public MyAddress(double longtitude, double latitude, String subAdminArea, String location) {
+    public DAddress(double longtitude, double latitude, String subAdminArea, String adminArea, String location) {
         this.longtitude = longtitude;
         this.latitude = latitude;
         this.subAdminArea = subAdminArea;
+        this.adminArea = adminArea;
         this.location = location;
     }
 
@@ -25,8 +27,11 @@ public class MyAddress {
         return subAdminArea;
     }
 
+    public String getAdminArea() {
+        return adminArea;
+    }
+
     public String getLocation() {
         return location;
     }
-
 }

@@ -17,7 +17,7 @@ import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
-    private ProgressDialog mDialog;
+//    private ProgressDialog mDialog;
     @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private AsyncResponse mDelegate;
@@ -34,10 +34,10 @@ public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.mDialog = new ProgressDialog(this.mContext, android.R.style.Theme_Material_Dialog_Alert);
-        this.mDialog.setMessage(mContext.getString(R.string.preparing));
-        this.mDialog.setCancelable(false);
-        this.mDialog.show();
+//        this.mDialog = new ProgressDialog(this.mContext, android.R.style.Theme_Material_Dialog_Alert);
+//        this.mDialog.setMessage(mContext.getString(R.string.preparing));
+//        this.mDialog.setCancelable(false);
+//        this.mDialog.show();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String value) {
 //        if (khachHang != null) {
-        mDialog.dismiss();
+//        mDialog.dismiss();
         this.mDelegate.processFinish(value);
 //        }
     }

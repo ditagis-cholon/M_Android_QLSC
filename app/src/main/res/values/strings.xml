@@ -234,7 +234,7 @@
     <string name="btnRightUpdateFeature">Chụp ảnh</string>
     <string name="message_error_add_feature">Không tạo được thuộc tính. Vui lòng thử lại sau</string>
 
-    <string name="arcgis_query_by_OBJECTID">OBJECTID = %d</string>
+    <string name="arcgis_query_by_OBJECTID">OBJECTID = %1$d</string>
     <string name="message_CapNhat_VatTu">Danh sách vật tư đang trống!!!</string>
     <string name="message_ChupAnh_HoanThanh">Cần chụp ảnh để hoàn thành sự cố</string>
     <string name="message_soluong_themvattu">Số lượng không được để trống</string>
@@ -264,4 +264,5 @@
     <string name="message_btn_ok">OK</string>
     <string name="message_btn_cancel">Hủy</string>
     <string name="message_select_loai_su_co">Vui lòng chọn loại sự cố!</string>
+    <string name="attachment_name">attachment_%1$s.png</string>
 </resources>

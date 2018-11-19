@@ -44,7 +44,7 @@ public class QueryFeatureAsync extends AsyncTask<Void, List<Feature>, Void> {
     public QueryFeatureAsync(Activity activity, int trangThai, String diaChi, String thoiGianPhanAnh
             , AsyncResponse delegate) {
         this.mApplication = (DApplication) activity.getApplication();
-        this.mServiceFeatureTable = (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable();
+        this.mServiceFeatureTable =  mApplication.getFeatureLayerDTG().getServiceFeatureTable();
         this.mDelegate = delegate;
         this.mTrangThai = trangThai;
         this.mDiaChi = diaChi;
@@ -77,12 +77,12 @@ public class QueryFeatureAsync extends AsyncTask<Void, List<Feature>, Void> {
 
             QueryParameters queryParameters = new QueryParameters();
             @SuppressLint("DefaultLocale") StringBuilder queryClause = new StringBuilder(String.format(" %s like N'%%%s%%'",
-                    Constant.FIELD_SUCO.VI_TRI, mDiaChi));
+                    Constant.FieldSuCo.DIA_CHI, mDiaChi));
             if (mHasTime)
-                queryClause.append(String.format(" and %s > date '%s'", Constant.FIELD_SUCO.NGAY_XAY_RA, mThoiGian));
+                queryClause.append(String.format(" and %s > date '%s'", Constant.FieldSuCo.TG_PHAN_ANH, mThoiGian));
             if (mTrangThai != -1) {
                 queryClause.append(String.format(" and %s = %d",
-                        Constant.FIELD_SUCO.TRANG_THAI, mTrangThai));
+                        Constant.FieldSuCo.TRANG_THAI, mTrangThai));
             }
             queryParameters.setWhereClause(queryClause.toString());
 

@@ -89,8 +89,8 @@ import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
+import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
@@ -135,10 +135,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ArcGISFeature mSelectedArcGISFeature;
     private List<String> mListLayerID;
     private DApplication mApplication;
+    private boolean mIsFirstLocating = true;
 
     public void setUri(Uri uri) {
         this.mUri = uri;
     }
+
+    private boolean mIsAddingFeature = false;
 
     public void setFeatureViewMoreInfoAdapter(FeatureViewMoreInfoAdapter featureViewMoreInfoAdapter) {
         this.mFeatureViewMoreInfoAdapter = featureViewMoreInfoAdapter;
@@ -159,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void prepare1() {
+//        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         mListLayerID.clear();
         hanhChinhImageLayers = taiSanImageLayers = null;
         states = new int[][]{{android.R.attr.state_checked}, {}};
@@ -213,6 +217,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final EditText edit_latitude_vido = findViewById(R.id.edit_latitude_vido);
         final EditText edit_longtitude_kinhdo = findViewById(R.id.edit_longtitude_kinhdo);
         mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                addGraphicsAddFeature(e);
+                super.onLongPress(e);
+            }
+
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 try {
@@ -331,6 +341,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void addFeature() {
+        Intent intentAdd = new Intent(MainActivity.this, AddFeatureActivity.class);
+        startActivityForResult(intentAdd, Constant.RequestCode.ADD);
+    }
+
+    public void handlingCancelAdd() {
+        if (mPopUp.getCallout() != null && mPopUp.getCallout().isShowing()) {
+            mPopUp.getCallout().dismiss();
+        }
+        mGraphicsOverlay.getGraphics().clear();
+        mIsAddingFeature = false;
+    }
+
+    private void addGraphicsAddFeature(MotionEvent... e) {
+        mIsAddingFeature = true;
+        Point center;
+        if (e.length == 0)
+            center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
+        else {
+            center = mMapView.screenToLocation(new android.graphics.Point(Math.round(e[0].getX()), Math.round(e[0].getY())));
+            mMapView.setViewpointCenterAsync(center);
+        }
+        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS, Color.YELLOW, 20);
+        Graphic graphic = new Graphic(center, symbol);
+        mGraphicsOverlay.getGraphics().clear();
+        mGraphicsOverlay.getGraphics().add(graphic);
+        mPopUp.showPopupAdd(center);
+        mPointFindLocation = center;
+    }
+
     private void setService() {
         try {
             // config feature layer service
@@ -369,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     featureLayer.addDoneLoadingListener(() -> {
                         setRendererSuCoFeatureLayer(featureLayer);
-                        mFeatureLayerDTG = new FeatureLayerDTG(featureLayer, layerInfoDTG);
+                        mFeatureLayerDTG = new FeatureLayerDTG(serviceFeatureTable, featureLayer, layerInfoDTG);
                         mApplication.setFeatureLayerDTG(mFeatureLayerDTG);
                         mFeatureLayerDTGS.add(mFeatureLayerDTG);
                         Callout callout = mMapView.getCallout();
@@ -467,16 +507,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setRendererSuCoFeatureLayer(FeatureLayer mSuCoTanHoaLayer) {
         UniqueValueRenderer uniqueValueRenderer = new UniqueValueRenderer();
-        uniqueValueRenderer.getFieldNames().add("TrangThai");
+        uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.TRANG_THAI);
         PictureMarkerSymbol chuaXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
         chuaXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol dangXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dangsuachua));
-        dangXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-        dangXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol daXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dasuachua));
-        daXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-        daXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+//        PictureMarkerSymbol dangXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dangsuachua));
+//        dangXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
+//        dangXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+//        PictureMarkerSymbol daXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dasuachua));
+//        daXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
+//        daXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
         PictureMarkerSymbol hoanThanh = new PictureMarkerSymbol(getString(R.string.url_image_symbol_hoanthanh));
         hoanThanh.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         hoanThanh.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
@@ -484,22 +524,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         uniqueValueRenderer.setDefaultLabel("Chưa xác định");
 
         List<Object> chuaXuLyValue = new ArrayList<>();
-        chuaXuLyValue.add(0);
-        List<Object> dangXuLyValue = new ArrayList<>();
-        dangXuLyValue.add(1);
-        List<Object> daXuLyValue = new ArrayList<>();
-        daXuLyValue.add(2);
-
+        chuaXuLyValue.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
+//        List<Object> dangXuLyValue = new ArrayList<>();
+//        dangXuLyValue.add(Constant.TrangThaiSuCo.DANG_XU_LY);
         List<Object> hoanThanhValue = new ArrayList<>();
-        hoanThanhValue.add(3);
+        hoanThanhValue.add(Constant.TrangThaiSuCo.HOAN_THANH);
+
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
                 "Chưa xử lý", "Chưa xử lý", chuaXuLy, chuaXuLyValue));
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Chưa xử lý", "Chưa xử lý", dangXuLy, dangXuLyValue));
-        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Chưa xử lý", "Chưa xử lý", daXuLy, daXuLyValue));
-        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Chưa xử lý", "Chưa xử lý", hoanThanh, hoanThanhValue));
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue));
         mSuCoTanHoaLayer.setRenderer(uniqueValueRenderer);
         mSuCoTanHoaLayer.loadAsync();
     }
@@ -630,25 +664,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void themDiemSuCoNoCapture() {
         FindLocationAsycn findLocationAsycn = new FindLocationAsycn(this, false,
-                mGeocoder, output -> {
-            if (output != null) {
-                String subAdminArea = output.get(0).getSubAdminArea();
-                //nếu tài khoản có quyền truy cập vào
-                if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
-                        subAdminArea.equals(getString(R.string.Quan6Name)) ||
-                        subAdminArea.equals(getString(R.string.Quan8Name)) ||
-                        subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
-                    mTxtSearchView.setQuery("", true);
-                    mMapViewHandler.addFeature(null, mPointFindLocation);
-                    deleteSearching();
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
-                }
-            } else {
-                Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
-            }
+                output -> {
+                    if (output != null) {
+                        String subAdminArea = output.get(0).getSubAdminArea();
+                        //nếu tài khoản có quyền truy cập vào
+                        if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
+                                subAdminArea.equals(getString(R.string.Quan6Name)) ||
+                                subAdminArea.equals(getString(R.string.Quan8Name)) ||
+                                subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
+                            mTxtSearchView.setQuery("", true);
+                            mMapViewHandler.addFeature(null, mPointFindLocation);
+                            deleteSearching();
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
+                    }
 
-        });
+                });
         Geometry project = GeometryEngine.project(mPointFindLocation, SpatialReferences.getWgs84());
         double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
         findLocationAsycn.setmLongtitude(location[0]);
@@ -690,12 +724,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     else if (query.length() > 0) {
                         deleteSearching();
                         FindLocationAsycn findLocationAsycn = new FindLocationAsycn(MainActivity.this,
-                                true, mGeocoder, output -> {
+                                true, output -> {
                             if (output != null) {
                                 mSearchAdapter.clear();
                                 mSearchAdapter.notifyDataSetChanged();
                                 if (output.size() > 0) {
-                                    for (MyAddress address : output) {
+                                    for (DAddress address : output) {
                                         TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", 0, "", address.getLocation());
                                         item.setLatitude(address.getLatitude());
                                         item.setLongtitude(address.getLongtitude());
@@ -781,7 +815,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case R.id.nav_thongke:
                 Intent intent = new Intent(this, ListTaskActivity.class);
-                this.startActivityForResult(intent, Constant.RequestCode.REQUEST_CODE_LIST_TASK);
+                this.startActivityForResult(intent, Constant.RequestCode.LIST_TASK);
                 break;
 //            case R.id.nav_tracuu:
 //                intent = new Intent(this, TraCuuActivity.class);
@@ -897,6 +931,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void handlingLocation() {
+        if (mIsFirstLocating) {
+            mIsFirstLocating = false;
+            mLocationDisplay.stop();
+            mLocationDisplay.startAsync();
+            setViewPointCenter(mLocationDisplay.getMapLocation());
+            mIsAddFeature = true;
+        } else {
+            if (mLocationDisplay.isStarted()) {
+                mLocationDisplay.stop();
+            }
+            if (mPopUp.getCallout() != null && mPopUp.getCallout().isShowing())
+                mPopUp.getCallout().dismiss();
+            if (!mLocationDisplay.isStarted()) {
+                mLocationDisplay.startAsync();
+                setViewPointCenter(mLocationDisplay.getMapLocation());
+                mIsAddFeature = true;
+            }
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -946,13 +1001,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.floatBtnLocation:
-                if (!checkGPSStatus())
-                    MySnackBar.make(mMapView, "Chưa bật GPS!!!", true);
-                else if (!mLocationDisplay.isStarted()) {
-                    mLocationDisplay.startAsync();
-                    setViewPointCenter(mLocationDisplay.getMapLocation());
-
-                } else mLocationDisplay.stop();
+                handlingLocation();
+//                if (!checkGPSStatus())
+//                    MySnackBar.make(mMapView, "Chưa bật GPS!!!", true);
+//                else if (!mLocationDisplay.isStarted()) {
+//                    mLocationDisplay.startAsync();
+//                    setViewPointCenter(mLocationDisplay.getMapLocation());
+//
+//                } else mLocationDisplay.stop();
                 break;
             case R.id.imgBtn_timkiemdiachi_themdiemsuco:
 //                themDiemSuCo();
@@ -1027,7 +1083,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mIsAddFeature = false;
         //query sự cố theo idsuco, lấy objectid
         String selectedIDSuCo = mApplication.getDiemSuCo().getIdSuCo();
-        mMapViewHandler.query(String.format("%s = '%s'", Constant.FIELD_SUCO.ID_SUCO, selectedIDSuCo));
+        mMapViewHandler.query(String.format("%s = '%s'", Constant.FieldSuCo.ID_SUCO, selectedIDSuCo));
     }
 
     @SuppressLint("ResourceAsColor")
@@ -1068,7 +1124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (resultCode == Activity.RESULT_OK && mMapViewHandler != null) {
                     mMapViewHandler.queryByObjectID(objectid);
                 }
-            } else if (requestCode == Constant.RequestCode.REQUEST_CODE_LIST_TASK) {
+            } else if (requestCode == Constant.RequestCode.LIST_TASK) {
                 if (resultCode == Activity.RESULT_OK)
                     handlingListTaskActivityResult();
             }

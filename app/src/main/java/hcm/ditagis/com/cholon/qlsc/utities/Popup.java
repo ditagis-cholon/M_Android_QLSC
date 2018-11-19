@@ -55,19 +55,21 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.adapter.VatTuAdapter;
+import hcm.ditagis.com.cholon.qlsc.async.CheckExistFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.NotifyDataSetChangeAsync;
 import hcm.ditagis.com.cholon.qlsc.async.ViewAttachmentAsync;
+import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
-import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
 
@@ -133,7 +135,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         String typeIdField = arcGISFeature.getFeatureTable().getTypeIdField();
         String[] noDisplayFields = mMainActivity.getResources().getStringArray(R.array.no_display_fields_arrays);
         boolean isFoundField = false;
-        mIDSuCo = attributes.get(Constant.FIELD_SUCO.ID_SUCO).toString();
+        mIDSuCo = attributes.get(Constant.FieldSuCo.ID_SUCO) != null ? attributes.get(Constant.FieldSuCo.ID_SUCO).toString() : "";
 
 
         for (Field field : arcGISFeature.getFeatureTable().getFields()) {
@@ -332,9 +334,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                         List<CodedValue> codedValues = new ArrayList<>();
                         try {
 //                            switch (field.getName()) {
-//                                case Constant.FIELD_SUCO.NGUYEN_NHAN:
-//                                case Constant.FIELD_SUCO.VAT_LIEU:
-//                                case Constant.FIELD_SUCO.DUONG_KINH_ONG:
+//                                case Constant.FieldSuCo.NGUYEN_NHAN:
+//                                case Constant.FieldSuCo.VAT_LIEU:
+//                                case Constant.FieldSuCo.DUONG_KINH_ONG:
 //                                    for (FeatureType featureType : mSelectedArcGISFeature.getFeatureTable().getFeatureTypes()) {
 //                                        if (featureType.getId().equals(mLoaiSuCoID)) {
 //                                            codedValues = ((CodedValueDomain) featureType.getDomains()
@@ -459,16 +461,16 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     private void loadDataEdit(FeatureViewMoreInfoAdapter.Item item, LinearLayout layout) {
         switch (item.getFieldName()) {
-//            case Constant.FIELD_SUCO.DMA:
-//            case Constant.FIELD_SUCO.VI_TRI:
-//            case Constant.FIELD_SUCO.NGUYEN_NHAN:
-//            case Constant.FIELD_SUCO.VAT_LIEU:
-//            case Constant.FIELD_SUCO.DUONG_KINH_ONG:
+//            case Constant.FieldSuCo.DMA:
+//            case Constant.FieldSuCo.VI_TRI:
+//            case Constant.FieldSuCo.NGUYEN_NHAN:
+//            case Constant.FieldSuCo.VAT_LIEU:
+//            case Constant.FieldSuCo.DUONG_KINH_ONG:
 //                loadDataEdit_Domain(item, layout, mSelectedArcGISFeature);
 //                break;
-            case Constant.FIELD_SUCO.VAT_TU:
-                loadDataEdit_VatTu(layout);
-                break;
+//            case Constant.FieldSuCo.VAT_TU:
+//                loadDataEdit_VatTu(layout);
+//                break;
             default:
                 loadDataEdit_Another(item, layout);
                 break;
@@ -685,10 +687,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         final ListView listViewVatTu = layout.findViewById(R.id.lstview_viewmoreinfo_autoCompleteTV);
 
         final Domain domain = mSelectedArcGISFeature.getFeatureTable().getField(item.getFieldName()).getDomain();
-        if (item.getFieldName().equals(Constant.FIELD_SUCO.DMA) ||
-                item.getFieldName().equals(Constant.FIELD_SUCO.NGUYEN_NHAN) ||
-                item.getFieldName().equals(Constant.FIELD_SUCO.VAT_LIEU) ||
-                item.getFieldName().equals(Constant.FIELD_SUCO.DUONG_KINH_ONG)) {
+        if (item.getFieldName().equals(Constant.FieldSuCo.NGUYEN_NHAN) ||
+                item.getFieldName().equals(Constant.FieldSuCo.VAT_LIEU) ||
+                item.getFieldName().equals(Constant.FieldSuCo.DUONG_KINH_ONG)) {
             item.setValue(spin.getSelectedItem().toString());
         } else if (item.getFieldName().equals(mMainActivity.getString(R.string.Field_SuCo_ViTri))) {
             item.setValue(spin.getSelectedItem().toString());
@@ -827,6 +828,86 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+    public void showPopupAdd(final Point position) {
+        try {
+            if (position == null)
+                return;
+            AtomicReference<Double> longtitude = new AtomicReference<>(0.0);
+            AtomicReference<Double> latitdue = new AtomicReference<>(0.0);
+            AtomicReference<String> address = new AtomicReference<>("");
+            linearLayout = (LinearLayout) mMainActivity.getLayoutInflater().inflate(R.layout.layout_dialog_search_address, null);
+            TextView txtTitle = linearLayout.findViewById(R.id.txt_dialog_search_address_title);
+            txtTitle.setText("ĐỊA CHỈ");
+            TextView txtAddress = linearLayout.findViewById(R.id.txt_dialog_search_address_address);
+            linearLayout.findViewById(R.id.txt_dialog_search_address_add).setOnClickListener(view -> {
+                Point pointLongLat = new Point(longtitude.get(), latitdue.get());
+                Geometry geometry = GeometryEngine.project(pointLongLat, SpatialReferences.getWgs84());
+                Geometry geometry1 = GeometryEngine.project(geometry, SpatialReferences.getWebMercator());
+                Point point = geometry1.getExtent().getCenter();
+                mApplication.getDiemSuCo().setVitri(address.get());
+                mApplication.setAddFeaturePoint(point);
+                //Kiểm tra cùng ngày, cùng vị trí đã có sự cố nào chưa, nếu có thì cảnh báo, chưa thì thêm bình thường
+                new CheckExistFeatureAsync(mMainActivity, mMapView, mApplication.getFeatureLayerDTG().getServiceFeatureTable(), idSuCo -> {
+                    if (idSuCo != null && idSuCo.length() > 0)
+                        showDialogAddDuplicateGeometry(idSuCo);
+                    else {
+
+                        mMainActivity.addFeature();
+                    }
+                }).execute();
+            });
+            linearLayout.findViewById(R.id.imgBtn_dialog_search_address_cancel).setOnClickListener(view -> {
+                mMainActivity.handlingCancelAdd();
+            });
+            linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            @SuppressLint("InflateParams") FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mMainActivity, false,
+                    output -> {
+                        if (output != null && output.size() > 0) {
+//                    clearSelection();
+//                        dimissCallout();
+                            DAddress dAddress = output.get(0);
+                            String addressLine = dAddress.getLocation();
+                            txtAddress.setText(addressLine);
+                            address.set(addressLine);
+                            longtitude.set(dAddress.getLongtitude());
+                            latitdue.set(dAddress.getLatitude());
+                            mCallout.setLocation(position);
+                            mCallout.setContent(linearLayout);
+                            Popup.this.runOnUiThread(() -> {
+                                mCallout.refresh();
+                                mCallout.show();
+                            });
+                            // show CallOut
+                        }
+                    });
+            Geometry project = GeometryEngine.project(position, SpatialReferences.getWgs84());
+            double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
+            findLocationAsycn.setmLongtitude(location[0]);
+            findLocationAsycn.setmLatitude(location[1]);
+            findLocationAsycn.execute();
+
+
+        } catch (Exception e) {
+            Log.e("Popup tìm kiếm", e.toString());
+        }
+
+    }
+
+    private void showDialogAddDuplicateGeometry(String idSuCo) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mMapView.getContext(), R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+        builder.setCancelable(true)
+                .setNegativeButton("HỦY", ((dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                }))
+                .setPositiveButton("TIẾP TỤC", (dialogInterface, i) -> {
+                    mMainActivity.addFeature();
+                }).setTitle("CẢNH BÁO")
+                .setMessage(String.format("Đã tồn tại sự cố mã ID là %s. Bạn có muốn tiếp tục phản ánh sự cố?", idSuCo));
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     public void capture(boolean isAddFeature) {
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI.getPath());
@@ -945,27 +1026,27 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 return;
 
             @SuppressLint("InflateParams") FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mMainActivity, false,
-                    mGeocoder, output -> {
-                if (output != null && output.size() > 0) {
-                    clearSelection();
-                    dimissCallout();
-                    MyAddress address = output.get(0);
-                    String addressLine = address.getLocation();
-                    LayoutInflater inflater = LayoutInflater.from(mMainActivity.getApplicationContext());
-                    linearLayout = (LinearLayout) inflater.inflate(R.layout.layout_timkiemdiachi, null);
-                    ((TextView) linearLayout.findViewById(R.id.txt_timkiemdiachi)).setText(addressLine);
-                    linearLayout.findViewById(R.id.imgBtn_timkiemdiachi_themdiemsuco).setOnClickListener(Popup.this);
-                    linearLayout.findViewById(R.id.imgBtn_timkiemdiachi).setOnClickListener(Popup.this);
-                    linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    // show CallOut
-                    mCallout.setLocation(position);
-                    mCallout.setContent(linearLayout);
-                    Popup.this.runOnUiThread(() -> {
-                        mCallout.refresh();
-                        mCallout.show();
+                    output -> {
+                        if (output != null && output.size() > 0) {
+                            clearSelection();
+                            dimissCallout();
+                            DAddress address = output.get(0);
+                            String addressLine = address.getLocation();
+                            LayoutInflater inflater = LayoutInflater.from(mMainActivity.getApplicationContext());
+                            linearLayout = (LinearLayout) inflater.inflate(R.layout.layout_timkiemdiachi, null);
+                            ((TextView) linearLayout.findViewById(R.id.txt_timkiemdiachi)).setText(addressLine);
+                            linearLayout.findViewById(R.id.imgBtn_timkiemdiachi_themdiemsuco).setOnClickListener(Popup.this);
+                            linearLayout.findViewById(R.id.imgBtn_timkiemdiachi).setOnClickListener(Popup.this);
+                            linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                            // show CallOut
+                            mCallout.setLocation(position);
+                            mCallout.setContent(linearLayout);
+                            Popup.this.runOnUiThread(() -> {
+                                mCallout.refresh();
+                                mCallout.show();
+                            });
+                        }
                     });
-                }
-            });
             Geometry project = GeometryEngine.project(position, SpatialReferences.getWgs84());
             double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
             findLocationAsycn.setmLongtitude(location[0]);

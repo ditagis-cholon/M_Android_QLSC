@@ -84,7 +84,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
             feature = mServiceFeatureTable.createFeature();
             feature.setGeometry(clickPoint);
             FindLocationAsycn findLocationAsycn = new FindLocationAsycn(mContext, false,
-                    mGeocoder, output -> {
+                    output -> {
                 if (output != null) {
 
                     feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DiaChi), output.get(0).getLocation());
@@ -178,7 +178,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                         if (featureEditResults.size() > 0) {
                             long objectId = featureEditResults.get(0).getObjectId();
                             final QueryParameters queryParameters = new QueryParameters();
-                            final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId);
+                            final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId+"");
                             queryParameters.setWhereClause(query);
                             final ListenableFuture<FeatureQueryResult> featuresAsync = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
                             featuresAsync.addDoneListener(() -> {

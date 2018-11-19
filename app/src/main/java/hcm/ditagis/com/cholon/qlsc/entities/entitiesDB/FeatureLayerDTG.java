@@ -1,6 +1,7 @@
 package hcm.ditagis.com.cholon.qlsc.entities.entitiesDB;
 
 
+import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 
 /**
@@ -9,26 +10,25 @@ import com.esri.arcgisruntime.layers.FeatureLayer;
 
 public class FeatureLayerDTG {
 
-
+    private ServiceFeatureTable serviceFeatureTable;
     private FeatureLayer layer;
-
     private LayerInfoDTG layerInfoDTG;
 
-    public FeatureLayerDTG(FeatureLayer layer, LayerInfoDTG layerInfoDTG) {
+    public FeatureLayerDTG(ServiceFeatureTable serviceFeatureTable, FeatureLayer layer, LayerInfoDTG layerInfoDTG) {
+        this.serviceFeatureTable = serviceFeatureTable;
         this.layer = layer;
         this.layerInfoDTG = layerInfoDTG;
+    }
+
+    public ServiceFeatureTable getServiceFeatureTable() {
+        return serviceFeatureTable;
     }
 
     public FeatureLayer getLayer() {
         return layer;
     }
 
-    public void setLayer(FeatureLayer layer) {
-        this.layer = layer;
-    }
-
     public LayerInfoDTG getLayerInfoDTG() {
         return layerInfoDTG;
     }
-
 }

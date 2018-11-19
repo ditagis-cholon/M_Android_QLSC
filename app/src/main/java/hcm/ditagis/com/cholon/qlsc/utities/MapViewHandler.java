@@ -166,7 +166,7 @@ public class MapViewHandler extends Activity {
                         if (suCoTanHoaLayer != null) {
                             suCoTanHoaLayer.selectFeature(item);
                             String queryClause = String.format("%s = '%s' ",
-                                    Constant.FIELD_SUCO.ID_SUCO, item.getAttributes().get(Constant.FIELD_SUCO.ID_SUCO).toString());
+                                    Constant.FieldSuCo.ID_SUCO, item.getAttributes().get(Constant.FieldSuCo.ID_SUCO).toString());
                             QueryParameters queryParameters1 = new QueryParameters();
                             queryParameters1.setWhereClause(queryClause);
                             new QueryServiceFeatureTableAsync(mActivity, output -> {

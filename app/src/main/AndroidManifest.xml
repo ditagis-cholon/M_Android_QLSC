@@ -30,7 +30,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ThongKeActivity"
             android:label="Thống kê"
@@ -61,6 +61,7 @@
         <activity
             android:name=".ListTaskActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".AddFeatureActivity" android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

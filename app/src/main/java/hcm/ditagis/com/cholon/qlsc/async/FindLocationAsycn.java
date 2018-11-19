@@ -11,11 +11,12 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.MyAddress;
+import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 
-public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> {
+public class FindLocationAsycn extends AsyncTask<String, Void, List<DAddress>> {
     private Geocoder mGeocoder;
     private boolean mIsFromLocationName;
     @SuppressLint("StaticFieldLeak")
@@ -24,7 +25,7 @@ public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> 
     private double mLongtitude, mLatitude;
 
     public interface AsyncResponse {
-        void processFinish(List<MyAddress> output);
+        void processFinish(List<DAddress> output);
     }
 
     public void setmLongtitude(double mLongtitude) {
@@ -35,12 +36,12 @@ public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> 
         this.mLatitude = mLatitude;
     }
 
-    public FindLocationAsycn(Context context, boolean isFromLocationName, Geocoder geocoder,
+    public FindLocationAsycn(Context context, boolean isFromLocationName,
                              AsyncResponse delegate) {
         this.mDelegate = delegate;
         this.mContext = context;
         this.mIsFromLocationName = isFromLocationName;
-        this.mGeocoder = geocoder;
+        this.mGeocoder = new Geocoder(context, Locale.getDefault());
     }
 
     @Override
@@ -49,17 +50,18 @@ public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> 
     }
 
     @Override
-    protected List<MyAddress> doInBackground(String... params) {
+    protected List<DAddress> doInBackground(String... params) {
         if (!Geocoder.isPresent())
             return null;
-        final List<MyAddress> lstLocation = new ArrayList<>();
+        final List<DAddress> lstLocation = new ArrayList<>();
         if (mIsFromLocationName) {
             final String text = params[0];
             try {
                 List<Address> addressList = mGeocoder.getFromLocationName(text, 5);
+
                 for (Address address : addressList)
-                    lstLocation.add(new MyAddress(address.getLongitude(), address.getLatitude(),
-                            address.getSubAdminArea(), address.getAddressLine(0)));
+                        lstLocation.add(new DAddress(address.getLongitude(), address.getLatitude(),
+                                address.getSubAdminArea(), address.getAdminArea(), address.getAddressLine(0)));
             } catch (IOException ignored) {
                 //todo grpc failed
                 Log.e("error", ignored.toString());
@@ -69,8 +71,8 @@ public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> 
             try {
                 List<Address> addressList = mGeocoder.getFromLocation(mLatitude, mLongtitude, 1);
                 for (Address address : addressList)
-                    lstLocation.add(new MyAddress(address.getLongitude(), address.getLatitude(),
-                            address.getSubAdminArea(), address.getAddressLine(0)));
+                        lstLocation.add(new DAddress(address.getLongitude(), address.getLatitude(),
+                                address.getSubAdminArea(), address.getAdminArea(), address.getAddressLine(0)));
             } catch (IOException ignored) {
                 Log.e("error", ignored.toString());
             }
@@ -80,9 +82,19 @@ public class FindLocationAsycn extends AsyncTask<String, Void, List<MyAddress>> 
         return lstLocation;
     }
 
+//    private List<Address> simplyAddressList(List<Address> addresses) {
+//        List<Address> res = new ArrayList<>();
+//        for (Address address : addresses) {
+//            for (Address newAddress : res) {
+//
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
-    protected void onPostExecute(List<MyAddress> addressList) {
+    protected void onPostExecute(List<DAddress> addressList) {
         super.onPostExecute(addressList);
         if (addressList == null)
             Toast.makeText(mContext, R.string.message_no_geocoder_available, Toast.LENGTH_LONG).show();

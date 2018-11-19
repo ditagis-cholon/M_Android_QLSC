@@ -8,6 +8,7 @@ import java.util.Date;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 public class DiemSuCo {
+    private long objectID;
     public String idSuCo;
     public String vitri;
     public Date ngayPhanAnh;
@@ -40,7 +41,16 @@ public class DiemSuCo {
     public DiemSuCo() {
     }
 
+    public long getObjectID() {
+        return objectID;
+    }
+
+    public void setObjectID(long objectID) {
+        this.objectID = objectID;
+    }
+
     public void clear() {
+        objectID = -1;
         idSuCo = null;
         vitri = null;
         ngayPhanAnh = null;
