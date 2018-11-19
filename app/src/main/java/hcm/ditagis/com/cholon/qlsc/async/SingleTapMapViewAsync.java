@@ -105,8 +105,7 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
         if (values != null && values.length > 0 && mSelectedArcGISFeature != null) {
             HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mActivity, object -> {
                 if (object != null) {
-
-                    mApplication.getDiemSuCo().setArcGISFeature(mSelectedArcGISFeature);
+                    mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
                     mPopUp.showPopup(false);
                 }
                 if (mDialog != null && mDialog.isShowing()) {

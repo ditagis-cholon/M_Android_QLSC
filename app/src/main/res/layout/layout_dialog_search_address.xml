@@ -44,14 +44,13 @@
         tools:ignore="RtlHardcoded">
 
         <TextView
-            android:id="@+id/txt_dialog_search_address_add"
+            android:id="@+id/txt_dialog_search_address_utity"
             style="@style/MyTextAppearance.Blue.Big.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/padding_title_popup"
             android:background="@drawable/layout_border_bottom_thin"
             android:clickable="true"
-            android:text="PHẢN ÁNH"
             tools:ignore="KeyboardInaccessibleWidget,RtlSymmetry" />
     </LinearLayout>
 

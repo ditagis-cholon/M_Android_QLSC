@@ -266,16 +266,16 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
                         tableResult.addDoneListener(() -> {
                             final ListenableFuture<List<FeatureEditResult>> updatedServerResult = mServiceFeatureTable.applyEditsAsync();
                             updatedServerResult.addDoneListener(() -> {
-                                List<FeatureEditResult> edits;
                                 try {
-                                    edits = updatedServerResult.get();
+                                    List<FeatureEditResult> edits = updatedServerResult.get();
                                     if (edits.size() > 0) {
                                         if (!edits.get(0).hasCompletedWithErrors()) {
                                             current.incrementAndGet();
                                             if (current.get() == size.get())
                                                 publishProgress(feature);
-                                        }
-                                    }
+                                            else publishProgress();
+                                        } else publishProgress();
+                                    } else publishProgress();
                                 } catch (InterruptedException | ExecutionException e) {
                                     publishProgress();
                                     e.printStackTrace();
@@ -291,6 +291,7 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
             });
         }
     }
+
 
     @Override
     protected void onProgressUpdate(Feature... values) {

@@ -140,6 +140,17 @@ public class SearchFragment extends Fragment {
 //            Toast.makeText(mRootView.getContext(), "Vui lòng chọn thời gian", Toast.LENGTH_SHORT).show();
     }
 
+    private Object getValueDomain(List<CodedValue> codedValues, Object code) {
+        Object value = null;
+        for (CodedValue codedValue : codedValues) {
+            if (codedValue.getCode().equals(code)) {
+                value = codedValue.getName();
+                break;
+            }
+        }
+        return value;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void handlingTraCuuHoanTat() {
         List<TraCuuAdapter.Item> items = new ArrayList<>();
@@ -150,12 +161,14 @@ public class SearchFragment extends Fragment {
                         Short.parseShort(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString())) {
                     Object idSuCo = attributes.get(Constant.FieldSuCo.ID_SUCO);
                     Object ngayXayRa = attributes.get(Constant.FieldSuCo.TG_PHAN_ANH);
-                    Object diaChi = attributes.get(Constant.FieldSuCo.DIA_CHI);
+                    Object thongTinPhanAnhCode = attributes.get(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
+                    List<CodedValue> codedValues = ((CodedValueDomain) feature.getFeatureTable().getField(Constant.FieldSuCo.THONG_TIN_PHAN_ANH).getDomain()).getCodedValues();
+                    Object thongTinPhanAnhValue = thongTinPhanAnhCode == null ? null : getValueDomain(codedValues, thongTinPhanAnhCode);
                     items.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                             idSuCo != null ? idSuCo.toString() : "",
                             Integer.parseInt(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString()),
                             ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                            diaChi != null ? diaChi.toString() : ""));
+                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : ""));
                 }
             }
 

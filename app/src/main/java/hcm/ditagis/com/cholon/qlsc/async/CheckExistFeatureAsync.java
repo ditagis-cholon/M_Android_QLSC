@@ -11,6 +11,7 @@ import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -67,9 +68,14 @@ public class CheckExistFeatureAsync extends AsyncTask<Void, String, Void> {
                                 ArcGISFeature feature = (ArcGISFeature) elements.get(0);
                                 Object ngayPhanAnh = feature.getAttributes().get(Constant.FieldSuCo.TG_PHAN_ANH);
 
-                                if (ngayPhanAnh != null)
-                                    publishProgress(feature.getAttributes().get(Constant.FieldSuCo.ID_SUCO).toString());
-                                else publishProgress();
+                                if (ngayPhanAnh != null) {
+                                    Calendar c1 = (Calendar) ngayPhanAnh;
+                                    Calendar c2 = Calendar.getInstance();
+                                    if (c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR) &&
+                                            c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR))
+                                        publishProgress(feature.getAttributes().get(Constant.FieldSuCo.ID_SUCO).toString());
+                                    else publishProgress();
+                                } else publishProgress();
                             } else publishProgress();
                         }
                     }

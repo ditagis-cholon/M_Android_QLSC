@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.esri.arcgisruntime.data.CodedValue;
+import com.esri.arcgisruntime.data.CodedValueDomain;
 import com.esri.arcgisruntime.data.Feature;
 
 import java.text.ParseException;
@@ -98,6 +100,17 @@ public class ListTaskFragment extends Fragment {
         }).execute();
     }
 
+    private Object getValueDomain(List<CodedValue> codedValues, Object code) {
+        Object value = null;
+        for (CodedValue codedValue : codedValues) {
+            if (codedValue.getCode().equals(code)) {
+                value = codedValue.getName();
+                break;
+            }
+        }
+        return value;
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void handlingQuerySuccess(List<Feature> output) {
@@ -109,12 +122,14 @@ public class ListTaskFragment extends Fragment {
                 Map<String, Object> attributes = feature.getAttributes();
                 Object idSuCo = attributes.get(Constant.FieldSuCo.ID_SUCO);
                 Object ngayXayRa = attributes.get(Constant.FieldSuCo.TG_PHAN_ANH);
-                Object diaChi = attributes.get(Constant.FieldSuCo.DIA_CHI);
+                Object thongTinPhanAnhCode = attributes.get(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
+                List<CodedValue> codedValues = ((CodedValueDomain) feature.getFeatureTable().getField(Constant.FieldSuCo.THONG_TIN_PHAN_ANH).getDomain()).getCodedValues();
+                Object thongTinPhanAnhValue = thongTinPhanAnhCode == null ? null : getValueDomain(codedValues, thongTinPhanAnhCode);
                 TraCuuAdapter.Item item = new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                         idSuCo != null ? idSuCo.toString() : "",
                         Integer.parseInt(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString()),
                         ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                        diaChi != null ? diaChi.toString() : "");
+                        thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "");
                 Object value = feature.getAttributes().get(Constant.FieldSuCo.TRANG_THAI);
                 if (value == null) {
                     chuaXuLyList.add(item);

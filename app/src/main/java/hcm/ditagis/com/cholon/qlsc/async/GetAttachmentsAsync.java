@@ -1,14 +1,9 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.widget.ListView;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
@@ -21,56 +16,44 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAttachmentsAdapter;
-import hcm.ditagis.com.cholon.qlsc.R;
 
 /**
  * Created by ThanLe on 4/16/2018.
  */
 
-public class ViewAttachmentAsync extends AsyncTask<Void, Integer, Void> {
-    private ProgressDialog mDialog;
+public class GetAttachmentsAsync extends AsyncTask<Void, List<FeatureViewMoreInfoAttachmentsAdapter.Item>, Void> {
     @SuppressLint("StaticFieldLeak")
-    private MainActivity mMainActivity;
     private ArcGISFeature mSelectedArcGISFeature;
-    private AlertDialog.Builder builder;
     @SuppressLint("StaticFieldLeak")
     private View layout;
-    public ViewAttachmentAsync(MainActivity context, ArcGISFeature selectedArcGISFeature) {
-        mMainActivity = context;
+    private AsyncResponse mDelegate;
+
+    public interface AsyncResponse {
+        void processFinish(List<FeatureViewMoreInfoAttachmentsAdapter.Item> feature);
+    }
+
+    public GetAttachmentsAsync(ArcGISFeature selectedArcGISFeature, AsyncResponse delete) {
+        mDelegate = delete;
         mSelectedArcGISFeature = selectedArcGISFeature;
-        mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mDialog.setMessage(mMainActivity.getString(R.string.async_dang_lay_hinh_anh_dinh_kem));
-        mDialog.setCancelable(false);
-
-        mDialog.show();
-
     }
 
     @SuppressLint("InflateParams")
     @Override
     protected Void doInBackground(Void... params) {
-        builder = new AlertDialog.Builder(mMainActivity, android.R.style.Theme_Material_Light_NoActionBar_Fullscreen);
-        LayoutInflater layoutInflater = LayoutInflater.from(mMainActivity);
-        layout = layoutInflater.inflate(R.layout.layout_viewmoreinfo_feature_attachment, null);
-        ListView lstViewAttachment = layout.findViewById(R.id.lstView_alertdialog_attachments);
-
-        final FeatureViewMoreInfoAttachmentsAdapter attachmentsAdapter =
-                new FeatureViewMoreInfoAttachmentsAdapter(mMainActivity, new ArrayList<>());
-        lstViewAttachment.setAdapter(attachmentsAdapter);
         final ListenableFuture<List<Attachment>> attachmentResults = mSelectedArcGISFeature.fetchAttachmentsAsync();
         attachmentResults.addDoneListener(() -> {
             try {
-
+                List<FeatureViewMoreInfoAttachmentsAdapter.Item> items = new ArrayList<>();
                 final List<Attachment> attachments = attachmentResults.get();
-                final int[] size = {attachments.size()};
+                AtomicInteger size = new AtomicInteger(attachments.size());
                 // if selected feature has attachments, display them in a list fashion
                 if (!attachments.isEmpty()) {
                     //
@@ -81,15 +64,14 @@ public class ViewAttachmentAsync extends AsyncTask<Void, Integer, Void> {
                             final ListenableFuture<InputStream> inputStreamListenableFuture = attachment.fetchDataAsync();
                             inputStreamListenableFuture.addDoneListener(() -> {
                                 try {
-                                        InputStream inputStream = inputStreamListenableFuture.get();
-                                        item.setImg(IOUtils.toByteArray(inputStream));
-                                        attachmentsAdapter.add(item);
-                                        attachmentsAdapter.notifyDataSetChanged();
-                                        size[0]--;
-                                        //Kiểm tra nếu adapter có phần tử và attachment là phần tử cuối cùng thì show dialog
+                                    InputStream inputStream = inputStreamListenableFuture.get();
+                                    item.setImg(IOUtils.toByteArray(inputStream));
+                                    items.add(item);
+                                    size.decrementAndGet();
+                                    //Kiểm tra nếu adapter có phần tử và attachment là phần tử cuối cùng thì show dialog
 
-
-                                        publishProgress(size[0]);
+                                    if (size.get() == 0)
+                                        publishProgress(items);
 
                                 } catch (InterruptedException | ExecutionException | IOException e) {
                                     e.printStackTrace();
@@ -100,7 +82,7 @@ public class ViewAttachmentAsync extends AsyncTask<Void, Integer, Void> {
                     }
 
                 } else {
-                    publishProgress(0);
+                    publishProgress();
 //                        MySnackBar.make(mCallout, "Không có file hình ảnh đính kèm", true);
                 }
 
@@ -113,21 +95,11 @@ public class ViewAttachmentAsync extends AsyncTask<Void, Integer, Void> {
 
 
     @Override
-    protected void onProgressUpdate(Integer... values) {
-        if (values[0] == 0) {
-            if (mDialog != null && mDialog.isShowing()) {
-                mDialog.dismiss();
+    protected void onProgressUpdate(List<FeatureViewMoreInfoAttachmentsAdapter.Item>... values) {
+        if (values != null && values.length > 0) {
+            mDelegate.processFinish(values[0]);
 
-                builder.setView(layout);
-                builder.setCancelable(false);
-                builder.setPositiveButton("Thoát", (dialog, which) -> dialog.dismiss());
-                AlertDialog dialog = builder.create();
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-                dialog.show();
-            }
-        }
-        super.onProgressUpdate(values);
+        } else mDelegate.processFinish(null);
 
     }
 

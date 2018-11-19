@@ -86,7 +86,7 @@ public class MapViewHandler extends Activity {
         SingleTapAddFeatureAsync singleTapAdddFeatureAsync = new SingleTapAddFeatureAsync(mClickPoint, mContext,
                 image, mServiceFeatureTable, mMapView, mGeocoder, output -> {
             if (output != null && MainActivity.FeatureLayerDTGDiemSuCo != null) {
-                mApplication.getDiemSuCo().setArcGISFeature((ArcGISFeature) output);
+                mApplication.setSelectedArcGISFeature((ArcGISFeature) output);
                 mPopUp.showPopup(true);
             }
         });
@@ -116,9 +116,9 @@ public class MapViewHandler extends Activity {
         }
     }
 
-    public void queryByObjectID(int objectID) {
+    public void queryByObjectID(long objectID) {
         final QueryParameters queryParameters = new QueryParameters();
-        final String query = "OBJECT_ID = " + objectID;
+        final String query = mActivity.getString(R.string.arcgis_query_by_OBJECTID, objectID);
         queryParameters.setWhereClause(query);
         final ListenableFuture<FeatureQueryResult> feature =
                 mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
@@ -134,7 +134,7 @@ public class MapViewHandler extends Activity {
                     if (MainActivity.FeatureLayerDTGDiemSuCo != null) {
                         mSelectedArcGISFeature = (ArcGISFeature) item;
                         if (mSelectedArcGISFeature != null) {
-                            mApplication.getDiemSuCo().setArcGISFeature(mSelectedArcGISFeature);
+                            mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
                             mPopUp.showPopup(false);
                         }
                     }
@@ -171,7 +171,7 @@ public class MapViewHandler extends Activity {
                             queryParameters1.setWhereClause(queryClause);
                             new QueryServiceFeatureTableAsync(mActivity, output -> {
                                 if (output != null) {
-                                    mApplication.getDiemSuCo().setArcGISFeature((ArcGISFeature) output);
+                                    mApplication.setSelectedArcGISFeature((ArcGISFeature) output);
                                     mPopUp.showPopup(false);
                                 }
                             }).execute(queryParameters1);

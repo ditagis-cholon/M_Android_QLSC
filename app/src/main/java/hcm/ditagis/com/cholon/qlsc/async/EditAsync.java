@@ -49,11 +49,10 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, Void, Void>
         void processFinish(ArcGISFeature feature);
     }
 
-    public EditAsync(List<HoSoVatTuSuCo> hoSoVatTuSuCos, Context context, ServiceFeatureTable serviceFeatureTable,
+    public EditAsync(Context context, ServiceFeatureTable serviceFeatureTable,
                      ArcGISFeature selectedArcGISFeature, boolean isUpdateAttachment, byte[] image,
                      AsyncResponse delegate) {
         mContext = context;
-        mHoSoVatTuSuCos = hoSoVatTuSuCos;
         this.mDelegate = delegate;
         mServiceFeatureTable = serviceFeatureTable;
         mSelectedArcGISFeature = selectedArcGISFeature;

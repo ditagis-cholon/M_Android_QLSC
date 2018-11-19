@@ -2,6 +2,7 @@ package hcm.ditagis.com.cholon.qlsc.entities;
 
 import android.app.Application;
 
+import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.Point;
 
@@ -21,6 +22,16 @@ public class DApplication extends Application {
 
     public void setFeatureLayerDTG(FeatureLayerDTG featureLayerDTG) {
         this.featureLayerDTG = featureLayerDTG;
+    }
+
+    private ArcGISFeature selectedArcGISFeature;
+
+    public ArcGISFeature getSelectedArcGISFeature() {
+        return selectedArcGISFeature;
+    }
+
+    public void setSelectedArcGISFeature(ArcGISFeature selectedArcGISFeature) {
+        this.selectedArcGISFeature = selectedArcGISFeature;
     }
 
     public Geometry getGeometry() {

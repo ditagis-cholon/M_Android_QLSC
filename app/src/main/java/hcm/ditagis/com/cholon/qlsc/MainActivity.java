@@ -10,7 +10,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -50,7 +49,6 @@ import android.widget.Toast;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.ArcGISRuntimeException;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
-import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
@@ -75,7 +73,6 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.symbology.UniqueValueRenderer;
 import com.esri.arcgisruntime.util.ListenableList;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,9 +81,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
-import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
@@ -104,7 +99,6 @@ import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
     public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
     String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    private Uri mUri;
     private Popup mPopUp;
     private MapView mMapView;
     private FeatureLayerDTG mFeatureLayerDTG;
@@ -122,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<FeatureLayerDTG> mFeatureLayerDTGS;
     private Point mPointFindLocation;
     private Geocoder mGeocoder;
-    private boolean mIsAddFeature;
     private ImageView mImageOpenStreetMap, mImageStreetMap, mImageImageWithLabel;
     private TextView mTxtOpenStreetMap, mTxtStreetMap, mTxtImageWithLabel;
     private SearchView mTxtSearchView;
@@ -131,24 +124,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ArcGISMapImageLayer hanhChinhImageLayers, taiSanImageLayers;
     private LinearLayout mLayoutDisplayLayerThematic, mLayoutDisplayLayerAdministration;
     private SeekBar mSeekBarAdministrator, mSeekBarThematic;
-    private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
-    private ArcGISFeature mSelectedArcGISFeature;
     private List<String> mListLayerID;
     private DApplication mApplication;
     private boolean mIsFirstLocating = true;
+    private boolean isChangingGeometry = false;
 
-    public void setUri(Uri uri) {
-        this.mUri = uri;
-    }
-
-    private boolean mIsAddingFeature = false;
-
-    public void setFeatureViewMoreInfoAdapter(FeatureViewMoreInfoAdapter featureViewMoreInfoAdapter) {
-        this.mFeatureViewMoreInfoAdapter = featureViewMoreInfoAdapter;
-    }
-
-    public void setSelectedArcGISFeature(ArcGISFeature selectedArcGISFeature) {
-        this.mSelectedArcGISFeature = selectedArcGISFeature;
+    public void setChangingGeometry(boolean changingGeometry) {
+        isChangingGeometry = changingGeometry;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -237,26 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @SuppressLint("SetTextI18n")
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                if (mIsAddFeature && mMapViewHandler != null) {
-                    //center is x, y
-                    Point center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
-
-                    //project is long, lat
-//                    Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
-
-                    //geometry is x,y
-//                    Geometry geometry = GeometryEngine.project(project, SpatialReferences.getWebMercator());
-                    SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS, Color.RED, 20);
-                    Graphic graphic = new Graphic(center, symbol);
-                    mGraphicsOverlay.getGraphics().clear();
-                    mGraphicsOverlay.getGraphics().add(graphic);
-                    double[] location = mMapViewHandler.onScroll(e2);
-                    edit_longtitude_kinhdo.setText(location[0] + "");
-                    edit_latitude_vido.setText(location[1] + "");
-
-                    mPopUp.getCallout().setLocation(center);
-                    mPointFindLocation = center;
-                }
+                mGraphicsOverlay.getGraphics().clear();
                 return super.onScroll(e1, e2, distanceX, distanceY);
             }
 
@@ -346,16 +309,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(intentAdd, Constant.RequestCode.ADD);
     }
 
+    public void handlingAddFeatureSuccess() {
+        handlingCancelAdd();
+        mMapViewHandler.queryByObjectID(mApplication.getDiemSuCo().getObjectID());
+
+        mApplication.getDiemSuCo().clear();
+    }
+
     public void handlingCancelAdd() {
         if (mPopUp.getCallout() != null && mPopUp.getCallout().isShowing()) {
             mPopUp.getCallout().dismiss();
         }
         mGraphicsOverlay.getGraphics().clear();
-        mIsAddingFeature = false;
     }
 
+
     private void addGraphicsAddFeature(MotionEvent... e) {
-        mIsAddingFeature = true;
         Point center;
         if (e.length == 0)
             center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
@@ -367,8 +336,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Graphic graphic = new Graphic(center, symbol);
         mGraphicsOverlay.getGraphics().clear();
         mGraphicsOverlay.getGraphics().add(graphic);
-        mPopUp.showPopupAdd(center);
+        mPopUp.showPopupAdd(center, isChangingGeometry);
         mPointFindLocation = center;
+    }
+
+    public void findRoute() {
+        String uri = String.format("google.navigation:q=%s", Uri.encode(mApplication.getSelectedArcGISFeature().getAttributes().get(
+                Constant.FieldSuCo.DIA_CHI
+        ).toString()));
+        Uri gmmIntentUri = Uri.parse(uri);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 
     private void setService() {
@@ -575,7 +554,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (booleanListenableFuture.get()) {
                         MainActivity.this.mPointFindLocation = position;
                     }
-                    mPopUp.showPopupFindLocation(position);
+//                    mPopUp.showPopupFindLocation(position);
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -598,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mGraphicsOverlay.getGraphics().add(graphic);
 
             mMapView.setViewpointCenterAsync(point, getResources().getInteger(R.integer.SCALE_IMAGE_WITH_LABLES));
-            mPopUp.showPopupFindLocation(point, location);
+//            mPopUp.showPopupFindLocation(point, location);
             this.mPointFindLocation = point;
         }
 
@@ -754,9 +733,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.trim().length() > 0 && !mIsSearchingFeature) {
-                    mIsAddFeature = true;
                 } else {
-                    mIsAddFeature = false;
                     mSearchAdapter.clear();
                     mSearchAdapter.notifyDataSetChanged();
                     mGraphicsOverlay.getGraphics().clear();
@@ -937,7 +914,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mLocationDisplay.stop();
             mLocationDisplay.startAsync();
             setViewPointCenter(mLocationDisplay.getMapLocation());
-            mIsAddFeature = true;
         } else {
             if (mLocationDisplay.isStarted()) {
                 mLocationDisplay.stop();
@@ -947,7 +923,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (!mLocationDisplay.isStarted()) {
                 mLocationDisplay.startAsync();
                 setViewPointCenter(mLocationDisplay.getMapLocation());
-                mIsAddFeature = true;
             }
         }
     }
@@ -1080,7 +1055,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handlingListTaskActivityResult() {
-        mIsAddFeature = false;
         //query sự cố theo idsuco, lấy objectid
         String selectedIDSuCo = mApplication.getDiemSuCo().getIdSuCo();
         mMapViewHandler.query(String.format("%s = '%s'", Constant.FieldSuCo.ID_SUCO, selectedIDSuCo));
@@ -1120,88 +1094,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             final int objectid = data.getIntExtra(getString(R.string.ket_qua_objectid), 1);
-            if (requestCode == 1) {
-                if (resultCode == Activity.RESULT_OK && mMapViewHandler != null) {
-                    mMapViewHandler.queryByObjectID(objectid);
-                }
-            } else if (requestCode == Constant.RequestCode.LIST_TASK) {
-                if (resultCode == Activity.RESULT_OK)
-                    handlingListTaskActivityResult();
+            switch (requestCode) {
+                case 1:
+                    if (resultCode == Activity.RESULT_OK && mMapViewHandler != null) {
+                        mMapViewHandler.queryByObjectID(objectid);
+                    }
+                    break;
+                case Constant.RequestCode.LIST_TASK:
+                    if (resultCode == Activity.RESULT_OK)
+                        handlingListTaskActivityResult();
+                    break;
+                case Constant.RequestCode.ADD:
+                    if (resultCode == RESULT_OK) {
+                        handlingAddFeatureSuccess();
+                    } else {
+                        handlingCancelAdd();
+                    }
+                    break;
             }
         } catch (Exception ignored) {
-        }
-
-        if (requestCode == getResources().getInteger(R.integer.REQUEST_ID_IMAGE_CAPTURE_ADD_FEATURE)) {
-            if (resultCode == RESULT_OK) {
-//                this.mUri= data.getData();
-                if (this.mUri != null) {
-//                    Uri selectedImage = this.mUri;
-//                    getContentResolver().notifyChange(selectedImage, null);
-                    Bitmap bitmap = getBitmap(mUri.getPath());
-                    try {
-                        if (bitmap != null) {
-                            Matrix matrix = new Matrix();
-                            matrix.postRotate(90);
-                            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                            byte[] image = outputStream.toByteArray();
-                            Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
-//                            mMapViewHandler.addFeature(image);
-
-                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(), this, (ServiceFeatureTable)
-                                    mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, arcGISFeature -> {
-                                //                                    mPopUp.getDialog().dismiss();
-                                mPopUp.getCallout().dismiss();
-                                if (!arcGISFeature.canEditAttachments())
-                                    MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
-                            });
-                            editAsync.execute(mFeatureViewMoreInfoAdapter);
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                MySnackBar.make(mMapView, "Hủy chụp ảnh", false);
-            } else {
-                MySnackBar.make(mMapView, "Lỗi khi chụp ảnh", false);
-            }
-        } else if (requestCode == getResources().getInteger(R.integer.REQUEST_ID_IMAGE_CAPTURE_POPUP)) {
-            if (resultCode == RESULT_OK) {
-//                this.mUri= data.getData();
-                if (this.mUri != null) {
-//                    Uri selectedImage = this.mUri;
-//                    getContentResolver().notifyChange(selectedImage, null);
-                    Bitmap bitmap = getBitmap(mUri.getPath());
-                    try {
-                        if (bitmap != null) {
-                            Matrix matrix = new Matrix();
-                            matrix.postRotate(90);
-                            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                            byte[] image = outputStream.toByteArray();
-                            Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
-//                            mMapViewHandler.addFeature(image);
-//                            mPopUp.getDialog().dismiss();
-                            EditAsync editAsync = new EditAsync(mPopUp.getListHoSoVatTuSuCo(), this, (ServiceFeatureTable)
-                                    mFeatureLayerDTG.getLayer().getFeatureTable(), mSelectedArcGISFeature,
-                                    true, image, arcGISFeature -> {
-                                mPopUp.getCallout().dismiss();
-                                if (!arcGISFeature.canEditAttachments())
-                                    MySnackBar.make(mPopUp.getmBtnLeft(), "Điểm sự cố này không thể thêm ảnh", true);
-                            });
-                            editAsync.execute(mFeatureViewMoreInfoAdapter);
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                MySnackBar.make(mMapView, "Hủy chụp ảnh", false);
-            } else {
-                MySnackBar.make(mMapView, "Lỗi khi chụp ảnh", false);
-            }
         }
     }
 

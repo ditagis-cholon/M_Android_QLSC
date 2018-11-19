@@ -28,16 +28,6 @@ public class DiemSuCo {
     private Double phuiDaoRong;
     private Double phuiDaoSau;
 
-    public ArcGISFeature getArcGISFeature() {
-        return arcGISFeature;
-    }
-
-    public void setArcGISFeature(ArcGISFeature arcGISFeature) {
-        this.arcGISFeature = arcGISFeature;
-    }
-
-    private ArcGISFeature arcGISFeature;
-
     public DiemSuCo() {
     }
 
