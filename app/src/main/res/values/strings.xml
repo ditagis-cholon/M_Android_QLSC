@@ -82,6 +82,7 @@
 
     <!--navigation-->
     <string name="nav_refresh">Tải lại bản đồ</string>
+    <string name="nav_refresh_layer">Tải lại lớp sự cố</string>
     <string name="nav_showHideComplete">Ẩn/hiện sự cố hoàn thành</string>
     <string name="nav_tra_cuu">Tra cứu</string>
     <string name="nav_find_route">Tìm đường đi</string>

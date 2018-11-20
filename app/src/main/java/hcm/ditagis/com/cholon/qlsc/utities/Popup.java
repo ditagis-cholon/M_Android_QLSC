@@ -107,19 +107,20 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         ListView listView = linearLayout.findViewById(R.id.lstview_thongtinsuco);
         FeatureViewInfoAdapter featureViewInfoAdapter = new FeatureViewInfoAdapter(mMainActivity, new ArrayList<>());
         listView.setAdapter(featureViewInfoAdapter);
-        String[] noDisplayFields = mMainActivity.getResources().getStringArray(R.array.no_display_fields_arrays);
+        String[] outFields = mApplication.getFeatureLayerDTG().getLayerInfoDTG().getOutFields().split(",");
         boolean isFoundField = false;
 
 
         for (Field field : arcGISFeature.getFeatureTable().getFields()) {
-            for (String noDisplayField : noDisplayFields)
-                if (noDisplayField.equals(field.getName())) {
-                    isFoundField = true;
-                    break;
-                }
-            if (isFoundField) {
-                isFoundField = false;
-                continue;
+            if (outFields.length > 0 && !outFields[0].equals("*")) {
+                for (String s : outFields)
+                    if (s.equals(field.getName())) {
+                        isFoundField = true;
+                        break;
+                    }
+                if (isFoundField) {
+                    isFoundField = false;
+                } else continue;
             }
             Object value = attributes.get(field.getName());
             if (value != null) {
@@ -308,7 +309,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                             } else {
                                 Toast.makeText(mMapView.getContext(), String.format("%s không thuộc địa bàn quản lý", addressLine), Toast.LENGTH_LONG).show();
                             }
-                            // show CallOut
+                            // show CallOutfre
                         }
                     });
             Geometry project = GeometryEngine.project(position, SpatialReferences.getWgs84());

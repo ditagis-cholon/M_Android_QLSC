@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DApplication mApplication;
     private boolean mIsFirstLocating = true;
     private boolean isChangingGeometry = false;
+    private FeatureLayer mFeatureLayer;
 
     public void setChangingGeometry(boolean changingGeometry) {
         isChangingGeometry = changingGeometry;
@@ -378,16 +379,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     hanhChinhImageLayers.loadAsync();
                 } else if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
-                    final FeatureLayer featureLayer = new FeatureLayer(serviceFeatureTable);
-                    featureLayer.setDefinitionExpression(layerInfoDTG.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
-                    featureLayer.setId(layerInfoDTG.getId());
-                    featureLayer.setName(layerInfoDTG.getTitleLayer());
-                    featureLayer.setId(layerInfoDTG.getId());
-                    featureLayer.setPopupEnabled(true);
+                    mFeatureLayer = new FeatureLayer(serviceFeatureTable);
+                    mFeatureLayer.setDefinitionExpression(layerInfoDTG.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                    mFeatureLayer.setId(layerInfoDTG.getId());
+                    mFeatureLayer.setName(layerInfoDTG.getTitleLayer());
+                    mFeatureLayer.setId(layerInfoDTG.getId());
+                    mFeatureLayer.setPopupEnabled(true);
 
-                    featureLayer.addDoneLoadingListener(() -> {
-                        setRendererSuCoFeatureLayer(featureLayer);
-                        mFeatureLayerDTG = new FeatureLayerDTG(serviceFeatureTable, featureLayer, layerInfoDTG);
+                    mFeatureLayer.addDoneLoadingListener(() -> {
+                        setRendererSuCoFeatureLayer(mFeatureLayer);
+                        mFeatureLayerDTG = new FeatureLayerDTG(serviceFeatureTable, mFeatureLayer, layerInfoDTG);
                         mApplication.setFeatureLayerDTG(mFeatureLayerDTG);
                         mFeatureLayerDTGS.add(mFeatureLayerDTG);
                         Callout callout = mMapView.getCallout();
@@ -401,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
 
                     });
-                    mMapView.getMap().getOperationalLayers().add(featureLayer);
+                    mMapView.getMap().getOperationalLayers().add(mFeatureLayer);
 
                 } else if (taiSanImageLayers == null) {
 
@@ -831,6 +832,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_reload:
                 if (CheckConnectInternet.isOnline(this))
                     prepare1();
+                break;
+            case R.id.nav_reload_layer:
+                if (CheckConnectInternet.isOnline(this)) {
+                    if (mPopUp != null && mPopUp.getCallout() != null && mPopUp.getCallout().isShowing())
+                        mPopUp.getCallout().dismiss();
+                    mFeatureLayer.loadAsync();
+                    mFeatureLayer.setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                }
                 break;
             case R.id.nav_show_hide_complete:
                 showHideComplete();

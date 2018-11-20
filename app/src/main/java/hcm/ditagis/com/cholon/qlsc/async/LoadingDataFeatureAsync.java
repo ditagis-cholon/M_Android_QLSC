@@ -62,6 +62,8 @@ public class LoadingDataFeatureAsync extends AsyncTask<Boolean, Boolean, Void> {
         List<View> views = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        String[] outFields = mApplication.getFeatureLayerDTG().getLayerInfoDTG().getOutFields().split(",");
+        boolean isFoundField = false;
         for (Field field : mFields) {
             String name = field.getName();
             if (isAdd) {
@@ -74,6 +76,16 @@ public class LoadingDataFeatureAsync extends AsyncTask<Boolean, Boolean, Void> {
                     views.add(getView(field));
 
             } else {
+                if (outFields.length > 0 && !outFields[0].equals("*")) {
+                    for (String s : outFields)
+                        if (s.equals(field.getName())) {
+                            isFoundField = true;
+                            break;
+                        }
+                    if (isFoundField) {
+                        isFoundField = false;
+                    } else continue;
+                }
                 if (name.equals(Constant.FieldSuCo.ID_SUCO)
                         || name.equals(Constant.Field.OBJECTID)
                         || name.equals(Constant.FieldSuCo.MA_DMA)

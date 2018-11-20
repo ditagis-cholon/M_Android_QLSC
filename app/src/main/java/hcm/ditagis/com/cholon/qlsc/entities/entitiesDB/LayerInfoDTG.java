@@ -16,8 +16,9 @@ public class LayerInfoDTG {
     private boolean isEdit;
     private boolean isView;
     private String definition;
+    private String outFields;
 
-    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete, boolean isEdit, boolean isView, String definition) {
+    public LayerInfoDTG(String id, String titleLayer, String url, boolean isCreate, boolean isDelete, boolean isEdit, boolean isView, String definition, String outFields) {
         this.id = id;
         this.titleLayer = titleLayer;
         this.url = url;
@@ -26,6 +27,7 @@ public class LayerInfoDTG {
         this.isEdit = isEdit;
         this.isView = isView;
         this.definition = definition;
+        this.outFields = outFields;
     }
 
     public String getId() {
@@ -58,5 +60,9 @@ public class LayerInfoDTG {
 
     public String getDefinition() {
         return definition;
+    }
+
+    public String getOutFields() {
+        return outFields;
     }
 }

@@ -26,6 +26,10 @@
             android:icon="@drawable/ic_refresh"
             android:title="@string/nav_refresh" />
         <item
+            android:id="@+id/nav_reload_layer"
+            android:icon="@drawable/ic_refresh"
+            android:title="@string/nav_refresh_layer" />
+        <item
             android:id="@+id/nav_show_hide_complete"
             android:icon="@drawable/ic_complete_gray_32dp"
             android:title="@string/nav_showHideComplete"
