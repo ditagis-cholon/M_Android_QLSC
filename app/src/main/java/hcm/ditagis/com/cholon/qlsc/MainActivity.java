@@ -1,9 +1,7 @@
 package hcm.ditagis.com.cholon.qlsc;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -11,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Geocoder;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -98,7 +95,7 @@ import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
     public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
-    String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
     private Popup mPopUp;
     private MapView mMapView;
     private FeatureLayerDTG mFeatureLayerDTG;
@@ -151,13 +148,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         colors = new int[]{R.color.colorTextColor_1, R.color.colorTextColor_1};
         findViewById(R.id.layout_layer).setVisibility(View.INVISIBLE);
         requestPermisson();
-        mApplication = (DApplication) getApplication();
 //        prepare1();
-        final PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
 
-
-        if (CheckConnectInternet.isOnline(this))
-            preparingAsycn.execute();
     }
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
@@ -194,8 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mMapView = findViewById(R.id.mapView);
         mMapView.setMap(new ArcGISMap(Basemap.Type.OPEN_STREET_MAP, 10.7554041, 106.6546293, 12));
 
-        mMapView.getMap().addDoneLoadingListener(this::setService);
-        changeStatusOfLocationDataSource();
+        mMapView.getMap().addDoneLoadingListener(this::handlingMapViewDoneLoading);
         final EditText edit_latitude_vido = findViewById(R.id.edit_latitude_vido);
         final EditText edit_longtitude_kinhdo = findViewById(R.id.edit_longtitude_kinhdo);
         mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
@@ -227,12 +218,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onScale(ScaleGestureDetector detector) {
                 return super.onScale(detector);
             }
-        });
-        mLocationDisplay.addLocationChangedListener(locationChangedEvent -> {
-            Point position = locationChangedEvent.getLocation().getPosition();
-            edit_longtitude_kinhdo.setText(position.getX() + "");
-            edit_latitude_vido.setText(position.getY() + "");
-            setViewPointCenter(position);
         });
         mGraphicsOverlay = new GraphicsOverlay();
         mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
@@ -350,7 +335,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(mapIntent);
     }
 
-    private void setService() {
+    @SuppressLint("ClickableViewAccessibility")
+    private void handlingMapViewDoneLoading() {
+        mLocationDisplay = mMapView.getLocationDisplay();
+        mLocationDisplay.startAsync();
+        mApplication = (DApplication) getApplication();
+//        loginWithPortal1();
+        setServices();
+    }
+
+    private void setServices() {
         try {
             // config feature layer service
             mFeatureLayerDTGS = new ArrayList<>();
@@ -487,60 +481,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setRendererSuCoFeatureLayer(FeatureLayer mSuCoTanHoaLayer) {
         UniqueValueRenderer uniqueValueRenderer = new UniqueValueRenderer();
         uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.TRANG_THAI);
-        PictureMarkerSymbol chuaXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
-        chuaXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-        chuaXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-//        PictureMarkerSymbol dangXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dangsuachua));
-//        dangXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-//        dangXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-//        PictureMarkerSymbol daXuLy = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dasuachua));
-//        daXuLy.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-//        daXuLy.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol hoanThanh = new PictureMarkerSymbol(getString(R.string.url_image_symbol_hoanthanh));
-        hoanThanh.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
-        hoanThanh.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        uniqueValueRenderer.setDefaultSymbol(chuaXuLy);
+        uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
+        PictureMarkerSymbol chuaXuLyDacBiet = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
+        chuaXuLyDacBiet.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
+        chuaXuLyDacBiet.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+        PictureMarkerSymbol chuaXuLyBinhThuong = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dangsuachua));
+        chuaXuLyBinhThuong.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
+        chuaXuLyBinhThuong.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+        uniqueValueRenderer.setDefaultSymbol(chuaXuLyBinhThuong);
         uniqueValueRenderer.setDefaultLabel("Chưa xác định");
 
-        List<Object> chuaXuLyValue = new ArrayList<>();
-        chuaXuLyValue.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
-//        List<Object> dangXuLyValue = new ArrayList<>();
-//        dangXuLyValue.add(Constant.TrangThaiSuCo.DANG_XU_LY);
-        List<Object> hoanThanhValue = new ArrayList<>();
-        hoanThanhValue.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        List<Object> dacBietValue1 = new ArrayList<>();
+        dacBietValue1.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
+        dacBietValue1.add(Constant.ThongTinPhanAnh.KHONG_NUOC);
+        List<Object> dacBietValue2 = new ArrayList<>();
+        dacBietValue2.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
+        dacBietValue2.add(Constant.ThongTinPhanAnh.XI_DHN);
+        List<Object> dacBietValue3 = new ArrayList<>();
+        dacBietValue3.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
+        dacBietValue3.add(Constant.ThongTinPhanAnh.ONG_BE);
+        List<Object> binhThuongValue = new ArrayList<>();
+        binhThuongValue.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
 
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Chưa xử lý", "Chưa xử lý", chuaXuLy, chuaXuLyValue));
+                "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue1));
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue));
+                "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue2));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue3));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", chuaXuLyBinhThuong, binhThuongValue));
         mSuCoTanHoaLayer.setRenderer(uniqueValueRenderer);
         mSuCoTanHoaLayer.loadAsync();
-    }
-
-    private void changeStatusOfLocationDataSource() {
-        mLocationDisplay = mMapView.getLocationDisplay();
-//        changeStatusOfLocationDataSource();
-        mLocationDisplay.addDataSourceStatusChangedListener(dataSourceStatusChangedEvent -> {
-
-            // If LocationDisplay started OK, then continue.
-            if (dataSourceStatusChangedEvent.isStarted()) return;
-
-            // No error is reported, then continue.
-            if (dataSourceStatusChangedEvent.getError() == null) return;
-
-            // If an error is found, handle the failure to start.
-            // Check permissions to see if failure may be due to lack of permissions.
-            boolean permissionCheck1 = ContextCompat.checkSelfPermission(MainActivity.this,
-                    reqPermissions[0]) == PackageManager.PERMISSION_GRANTED;
-            boolean permissionCheck2 = ContextCompat.checkSelfPermission(MainActivity.this,
-                    reqPermissions[1]) == PackageManager.PERMISSION_GRANTED;
-
-            if (!(permissionCheck1 && permissionCheck2)) {
-                // If permissions are not already granted, request permission from the user.
-                ActivityCompat.requestPermissions(MainActivity.this, reqPermissions, requestCode);
-            }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-
-        });
     }
 
     private void setViewPointCenter(final Point position) {
@@ -585,41 +557,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     public void requestPermisson() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                        != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE,
-                    Manifest.permission.READ_PHONE_STATE}, getResources().getInteger(R.integer.REQUEST_ID_IMAGE_CAPTURE_ADD_FEATURE));
+        boolean permissionCheck1 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[0]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck2 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[1]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck3 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[2]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck4 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[3]) == PackageManager.PERMISSION_GRANTED;
+
+        if (!(permissionCheck1 && permissionCheck2 && permissionCheck3 && permissionCheck4)) {
+            // If permissions are not already granted, request permission from the user.
+            ActivityCompat.requestPermissions(this, Constant.REQUEST_PERMISSIONS, Constant.RequestCode.PERMISSION);
+        }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(QuanLySuCo.this, message, Toast.LENGTH_LONG).show();
+        else {
+            PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
+            if (CheckConnectInternet.isOnline(this))
+                preparingAsycn.execute();
         }
-//        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
-//                android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-//                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                        != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-//                this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mLocationDisplay.startAsync();
-
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        int expected = grantResults.length;
+        int sum = 0;
+        for (int i : grantResults)
+            if (i == PackageManager.PERMISSION_GRANTED)
+                sum += i;
+        if (sum == expected) {
+            PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
+            if (CheckConnectInternet.isOnline(this))
+                preparingAsycn.execute();
         } else {
-            Toast.makeText(MainActivity.this, getResources().getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Vui lòng cho phép ứng dụng truy cập các quyền trên", Toast.LENGTH_LONG).show();
+            MainActivity.this.finish();
         }
-    }
-
-    public boolean checkGPSStatus() {
-
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        assert locationManager != null;
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     private void optionSearchFeature() {
@@ -912,19 +885,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mIsFirstLocating) {
             mIsFirstLocating = false;
             mLocationDisplay.stop();
-            mLocationDisplay.startAsync();
-            setViewPointCenter(mLocationDisplay.getMapLocation());
+            enableLocation();
         } else {
             if (mLocationDisplay.isStarted()) {
-                mLocationDisplay.stop();
-            }
-            if (mPopUp.getCallout() != null && mPopUp.getCallout().isShowing())
-                mPopUp.getCallout().dismiss();
-            if (!mLocationDisplay.isStarted()) {
-                mLocationDisplay.startAsync();
-                setViewPointCenter(mLocationDisplay.getMapLocation());
+                disableLocation();
+            } else if (!mLocationDisplay.isStarted()) {
+                enableLocation();
             }
         }
+    }
+
+    private void disableLocation() {
+        mLocationDisplay.stop();
+    }
+
+    private void enableLocation() {
+        mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+        mLocationDisplay.startAsync();
     }
 
     @Override
@@ -977,13 +954,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.floatBtnLocation:
                 handlingLocation();
-//                if (!checkGPSStatus())
-//                    MySnackBar.make(mMapView, "Chưa bật GPS!!!", true);
-//                else if (!mLocationDisplay.isStarted()) {
-//                    mLocationDisplay.startAsync();
-//                    setViewPointCenter(mLocationDisplay.getMapLocation());
-//
-//                } else mLocationDisplay.stop();
                 break;
             case R.id.imgBtn_timkiemdiachi_themdiemsuco:
 //                themDiemSuCo();

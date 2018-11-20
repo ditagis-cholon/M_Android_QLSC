@@ -182,7 +182,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, ArcGISFeatu
     }
 
     private void addAttachment() {
-        final String attachmentName = "attachment_" + System.currentTimeMillis() + ".png";
+        final String attachmentName = "attachment_update_" + System.currentTimeMillis() + ".png";
         final ListenableFuture<Attachment> addResult = mSelectedArcGISFeature.addAttachmentAsync(mImage, Bitmap.CompressFormat.PNG.toString(), attachmentName);
         addResult.addDoneListener(() -> {
             try {

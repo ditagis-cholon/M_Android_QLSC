@@ -1,5 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.utities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 
 import java.text.SimpleDateFormat;
@@ -27,6 +28,7 @@ public class Constant {
         public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 
     }
+
     public class FileType {
 
         public static final String VIDEO = "video/quicktime";
@@ -35,6 +37,7 @@ public class Constant {
         public static final String PDF = "application/pdf";
         public static final String DOC = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     }
+
     public class HTTPRequest {
         public static final String GET_METHOD = "GET";
         public static final String POST_METHOD = "POST";
@@ -52,7 +55,7 @@ public class Constant {
         public static final int RLAYER = 6;
         public static final int ADD_FEATURE_ATTACHMENT = 8;
         public static final int LIST_TASK = 9;
-        public static final int UPDATE= 10;
+        public static final int UPDATE = 10;
         public static final int UPDATE_ATTACHMENT = 11;
         public static final int NOTIFICATION = 100;
 
@@ -88,11 +91,24 @@ public class Constant {
         public static final String GHI_CHU = "GhiChu";
 
     }
+    public static final String[] REQUEST_PERMISSIONS = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    public static final double MAX_SCALE_IMAGE_WITH_LABLES = 18000;
 
     public class TrangThaiSuCo {
         public static final short CHUA_XU_LY = 0;
         public static final short DANG_XU_LY = 1;
         public static final short HOAN_THANH = 3;
+
+    }
+
+    public class ThongTinPhanAnh {
+        public static final short KHONG_NUOC = 1;
+        public static final short XI_DHN = 4;
+        public static final short ONG_BE = 6;
 
     }
 
