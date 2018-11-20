@@ -6,10 +6,13 @@
     <string name="vitrisuco_field">Vị trí sự cố</string>
 
     <!--URL START-->
-    <string name="url_image_symbol_chuasuachua">http://gis.capnuoccholon.com.vn/images/map/0.png</string>
-    <string name="url_image_symbol_dangsuachua">http://gis.capnuoccholon.com.vn/images/map/1.png</string>
-    <string name="url_image_symbol_dasuachua">http://sawagis.vn/tanhoa/Content/images/map/2.png</string>
-    <string name="url_image_symbol_hoanthanh">http://gis.capnuoccholon.com.vn/images/map/3.png</string>
+    <!--<string name="url_image_symbol_chuasuachua">http://gis.capnuoccholon.com.vn/images/map/0.png</string>-->
+    <!--<string name="url_image_symbol_dangsuachua">http://gis.capnuoccholon.com.vn/images/map/1.png</string>-->
+    <!--<string name="url_image_symbol_dasuachua">http://sawagis.vn/tanhoa/Content/images/map/2.png</string>-->
+    <!--<string name="url_image_symbol_hoanthanh">http://gis.capnuoccholon.com.vn/images/map/3.png</string>-->
+    <string name="url_image_symbol_chuasuachuadacbiet">http://cholon.sawagis.vn/images/map/-1.png</string>
+    <string name="url_image_symbol_chuasuachua">http://cholon.sawagis.vn/images/map/0.png</string>
+    <string name="url_image_symbol_hoanthanh">http://cholon.sawagis.vn/images/map/3.png</string>
     <!--URL END-->
     <string name="path_saveImage">.qlsc</string>
     <string name="attachment">attachment</string>

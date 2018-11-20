@@ -120,10 +120,10 @@ public class UpdateFeature extends Fragment {
                             mLLayoutProgress.setVisibility(View.GONE);
                             mLLayoutMain.setVisibility(View.VISIBLE);
                             if (arcGISFeature != null) {
-                                Toast.makeText(mRootView.getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mBtnUpdate.getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
 //                                mActivity.goHome();
                             } else
-                                Toast.makeText(mRootView.getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mBtnUpdate.getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                         });
                 updateAsync.execute();
                 break;

@@ -3,6 +3,8 @@ package hcm.ditagis.com.cholon.qlsc.utities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 
+import com.esri.arcgisruntime.geometry.SpatialReference;
+
 import java.text.SimpleDateFormat;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
@@ -18,7 +20,8 @@ public class Constant {
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     public static final String DEFINITION_HIDE_COMPLETE = " and TrangThai <> 3";
     //        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
-    public static final String SERVER_API = "http://sawagis.vn/cholon/api";
+    public static final String SERVER = "http://sawagis.vn/cholon";
+    public static final String SERVER_API = SERVER + "/api";
     public static final String NULL = "";
 
     public static class DateFormat {
@@ -91,6 +94,8 @@ public class Constant {
         public static final String GHI_CHU = "GhiChu";
 
     }
+
+    public static final SpatialReference SPATIAL_REFERENCE_VN2000 = SpatialReference.create("PROJCS[\"TPHCM_VN2000\",GEOGCS[\"GCS_VN_2000\",DATUM[\"D_Vietnam_2000\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",105.75],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]");
     public static final String[] REQUEST_PERMISSIONS = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -105,9 +110,21 @@ public class Constant {
 
     }
 
+    public class DiaBan {
+        public static final String QUAN_5 = "Quận 5";
+        public static final String QUAN_6 = "Quận 6";
+        public static final String QUAN_8 = "Quận 8";
+        public static final String QUAN_BINH_TAN = "Bình Tân";
+
+    }
+
     public class ThongTinPhanAnh {
+        public static final short KHAC = 0;
         public static final short KHONG_NUOC = 1;
+        public static final short NUOC_DUC = 2;
+        public static final short NUOC_YEU = 3;
         public static final short XI_DHN = 4;
+        public static final short HU_VAN = 5;
         public static final short ONG_BE = 6;
 
     }
@@ -123,6 +140,7 @@ public class Constant {
         public static final String COMPLETE = SERVER_API + "/quanlysuco/xacnhanhoanthanhnhanvien?id=%s";
         public static final String IS_ACCESS = SERVER_API + "/Account/IsAccess/m_qlsc";
         public static final String GENERATE_ID_SUCOTHONGTIN = SERVER_API + "/QuanLySuCo/GenerateIDSuCoThongTin/";
+        public static final String QUERY_HANH_CHINH = SERVER + "/hanhchinh/getbypoint";
 
 
     }

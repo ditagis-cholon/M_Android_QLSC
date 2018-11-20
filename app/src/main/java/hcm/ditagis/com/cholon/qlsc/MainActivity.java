@@ -99,6 +99,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Popup mPopUp;
     private MapView mMapView;
     private FeatureLayerDTG mFeatureLayerDTG;
+
+    public MapViewHandler getMapViewHandler() {
+        return mMapViewHandler;
+    }
+
     private MapViewHandler mMapViewHandler;
     private TraCuuAdapter mSearchAdapter;
     private LocationDisplay mLocationDisplay;
@@ -482,12 +487,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         UniqueValueRenderer uniqueValueRenderer = new UniqueValueRenderer();
         uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.TRANG_THAI);
         uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
-        PictureMarkerSymbol chuaXuLyDacBiet = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
+        PictureMarkerSymbol chuaXuLyDacBiet = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachuadacbiet));
         chuaXuLyDacBiet.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLyDacBiet.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol chuaXuLyBinhThuong = new PictureMarkerSymbol(getString(R.string.url_image_symbol_dangsuachua));
+        PictureMarkerSymbol chuaXuLyBinhThuong = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
         chuaXuLyBinhThuong.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLyBinhThuong.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+        PictureMarkerSymbol hoanThanh = new PictureMarkerSymbol(getString(R.string.url_image_symbol_hoanthanh));
+        chuaXuLyBinhThuong.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
+        chuaXuLyBinhThuong.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
+
         uniqueValueRenderer.setDefaultSymbol(chuaXuLyBinhThuong);
         uniqueValueRenderer.setDefaultLabel("Chưa xác định");
 
@@ -500,8 +509,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<Object> dacBietValue3 = new ArrayList<>();
         dacBietValue3.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
         dacBietValue3.add(Constant.ThongTinPhanAnh.ONG_BE);
+
         List<Object> binhThuongValue = new ArrayList<>();
         binhThuongValue.add(Constant.TrangThaiSuCo.CHUA_XU_LY);
+
+        List<Object> hoanThanhValueNull = new ArrayList<>();
+        hoanThanhValueNull.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValueNull.add(null);
+        List<Object> hoanThanhValue0 = new ArrayList<>();
+        hoanThanhValue0.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue0.add(Constant.ThongTinPhanAnh.KHAC);
+        List<Object> hoanThanhValue1 = new ArrayList<>();
+        hoanThanhValue1.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue1.add(Constant.ThongTinPhanAnh.KHONG_NUOC);
+        List<Object> hoanThanhValue2 = new ArrayList<>();
+        hoanThanhValue2.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue2.add(Constant.ThongTinPhanAnh.NUOC_DUC);
+        List<Object> hoanThanhValue3 = new ArrayList<>();
+        hoanThanhValue3.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue3.add(Constant.ThongTinPhanAnh.NUOC_YEU);
+        List<Object> hoanThanhValue4 = new ArrayList<>();
+        hoanThanhValue4.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue4.add(Constant.ThongTinPhanAnh.XI_DHN);
+        List<Object> hoanThanhValue5 = new ArrayList<>();
+        hoanThanhValue5.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue5.add(Constant.ThongTinPhanAnh.HU_VAN);
+        List<Object> hoanThanhValue6 = new ArrayList<>();
+        hoanThanhValue6.add(Constant.TrangThaiSuCo.HOAN_THANH);
+        hoanThanhValue6.add(Constant.ThongTinPhanAnh.ONG_BE);
 
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
                 "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue1));
@@ -509,8 +544,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue2));
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
                 "Chưa xử lý", "Chưa xử lý", chuaXuLyDacBiet, dacBietValue3));
+
         uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
-                "Hoàn thành", "Hoàn thành", chuaXuLyBinhThuong, binhThuongValue));
+                "Chưa xử lý", "Chưa xử lý", chuaXuLyBinhThuong, binhThuongValue));
+
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValueNull));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue0));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue1));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue2));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue3));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue4));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue5));
+        uniqueValueRenderer.getUniqueValues().add(new UniqueValueRenderer.UniqueValue(
+                "Hoàn thành", "Hoàn thành", hoanThanh, hoanThanhValue6));
         mSuCoTanHoaLayer.setRenderer(uniqueValueRenderer);
         mSuCoTanHoaLayer.loadAsync();
     }

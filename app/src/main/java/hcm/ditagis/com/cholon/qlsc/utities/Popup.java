@@ -3,6 +3,8 @@ package hcm.ditagis.com.cholon.qlsc.utities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Geocoder;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,6 +24,7 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
 import com.esri.arcgisruntime.data.CodedValue;
 import com.esri.arcgisruntime.data.CodedValueDomain;
+import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.data.FeatureEditResult;
 import com.esri.arcgisruntime.data.Field;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
@@ -37,6 +40,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +54,7 @@ import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.CheckExistFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.EditGeometryAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
+import hcm.ditagis.com.cholon.qlsc.async.QueryFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
@@ -286,16 +291,23 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 //                        dimissCallout();
                             DAddress dAddress = output.get(0);
                             String addressLine = dAddress.getLocation();
-                            txtAddress.setText(addressLine);
-                            address.set(addressLine);
-                            longtitude.set(dAddress.getLongtitude());
-                            latitdue.set(dAddress.getLatitude());
-                            mCallout.setLocation(position);
-                            mCallout.setContent(linearLayout);
-                            Popup.this.runOnUiThread(() -> {
-                                mCallout.refresh();
-                                mCallout.show();
-                            });
+                            if ((addressLine.toLowerCase().contains(Constant.DiaBan.QUAN_5.toLowerCase()) ||
+                                    addressLine.toLowerCase().contains(Constant.DiaBan.QUAN_6.toLowerCase()) ||
+                                    addressLine.toLowerCase().contains(Constant.DiaBan.QUAN_8.toLowerCase()) ||
+                                    addressLine.toLowerCase().contains(Constant.DiaBan.QUAN_BINH_TAN.toLowerCase()))) {
+                                txtAddress.setText(addressLine);
+                                address.set(addressLine);
+                                longtitude.set(dAddress.getLongtitude());
+                                latitdue.set(dAddress.getLatitude());
+                                mCallout.setLocation(position);
+                                mCallout.setContent(linearLayout);
+                                Popup.this.runOnUiThread(() -> {
+                                    mCallout.refresh();
+                                    mCallout.show();
+                                });
+                            } else {
+                                Toast.makeText(mMapView.getContext(), String.format("%s không thuộc địa bàn quản lý", addressLine), Toast.LENGTH_LONG).show();
+                            }
                             // show CallOut
                         }
                     });
@@ -357,6 +369,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         refreshPopup(mSelectedArcGISFeature);
         ((TextView) linearLayout.findViewById(R.id.txt_thongtin_ten)).setText(featureLayer.getName());
         linearLayout.findViewById(R.id.imgBtn_layout_thongtinsuco).setOnClickListener(this);
+        linearLayout.findViewById(R.id.txt_thongtinsuco_prev).setOnClickListener(this::onClick);
+        linearLayout.findViewById(R.id.txt_thongtinsuco_next).setOnClickListener(this::onClick);
+        TextView txtNumber = linearLayout.findViewById(R.id.txt_thongtinsuco_number);
         if (featureLayer.getName().equals(mMainActivity.getString(R.string.ALIAS_DIEM_SU_CO))) {
             //user admin mới có quyền xóa
             if (mApplication.getFeatureLayerDTG().getLayerInfoDTG().isDelete()) {
@@ -453,6 +468,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -494,6 +510,49 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             case R.id.imgBtn_timkiemdiachi_themdiemsuco:
                 mMainActivity.onClick(view);
                 break;
+            case R.id.txt_thongtinsuco_prev:
+                new QueryFeatureAsync(mMainActivity, Constant.TrangThaiSuCo.CHUA_XU_LY, "", "", output -> {
+                    if (output != null && output.size() > 0) {
+                        long objectID = getObjectID(output, comparator, true);
+                        mMainActivity.getMapViewHandler().queryByObjectID(objectID);
+                    }
+                }).execute();
+                break;
+            case R.id.txt_thongtinsuco_next:
+                new QueryFeatureAsync(mMainActivity, Constant.TrangThaiSuCo.CHUA_XU_LY, "", "", output -> {
+                    if (output != null && output.size() > 0) {
+                        long objectID = getObjectID(output, comparator, false);
+                        mMainActivity.getMapViewHandler().queryByObjectID(objectID);
+                    }
+                }).execute();
+                break;
         }
+    }
+
+    Comparator<Long> comparator = (Long o1, Long o2) -> {
+        long i = o1 - o2;
+        if (i > 0)
+            return 1;
+        else if (i == 0)
+            return 0;
+        else return -1;
+    };
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private long getObjectID(List<Feature> output, Comparator<Long> comparator, boolean isPrev) {
+        List<Long> list = new ArrayList<>();
+        for (Feature feature : output) {
+            list.add(Long.parseLong(feature.getAttributes().get(Constant.Field.OBJECTID).toString()));
+        }
+        list.sort(comparator);
+        long currentObjectID = Long.parseLong(mApplication.getSelectedArcGISFeature().getAttributes().get(Constant.Field.OBJECTID).toString());
+        int i = 0;
+        for (; i < list.size(); i++) {
+            if (list.get(i) >= currentObjectID)
+                break;
+        }
+        if (isPrev)
+            return i > 0 ? list.get(i - 1) : currentObjectID;
+        else return i < list.size() ? list.get(i + 1) : currentObjectID;
     }
 }

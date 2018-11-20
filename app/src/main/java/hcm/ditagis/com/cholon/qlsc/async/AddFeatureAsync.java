@@ -251,44 +251,43 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
 
     private void addAttachment(ArcGISFeature arcGISFeature, final Feature feature) {
         AtomicInteger size = new AtomicInteger();
-        AtomicInteger current = new AtomicInteger();
         size.set(mApplication.getImages().size());
         for (byte[] image : mApplication.getImages()) {
             @SuppressLint("StringFormatMatches") String attachmentName = mActivity.getApplicationContext()
                     .getString(R.string.attachment_name, System.currentTimeMillis() + "");
             final ListenableFuture<Attachment> addResult = arcGISFeature.addAttachmentAsync(
                     image, Bitmap.CompressFormat.PNG.toString(), attachmentName);
-            addResult.addDoneListener(() -> {
+//            addResult.addDoneListener(() -> {
+//                try {
+//                    Attachment attachment = addResult.get();
+//                    if (attachment.getSize() > 0) {
+            final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(arcGISFeature);
+//            tableResult.addDoneListener(() -> {
+            final ListenableFuture<List<FeatureEditResult>> updatedServerResult = mServiceFeatureTable.applyEditsAsync();
+            updatedServerResult.addDoneListener(() -> {
                 try {
-                    Attachment attachment = addResult.get();
-                    if (attachment.getSize() > 0) {
-                        final ListenableFuture<Void> tableResult = mServiceFeatureTable.updateFeatureAsync(arcGISFeature);
-                        tableResult.addDoneListener(() -> {
-                            final ListenableFuture<List<FeatureEditResult>> updatedServerResult = mServiceFeatureTable.applyEditsAsync();
-                            updatedServerResult.addDoneListener(() -> {
-                                try {
-                                    List<FeatureEditResult> edits = updatedServerResult.get();
-                                    if (edits.size() > 0) {
-                                        if (!edits.get(0).hasCompletedWithErrors()) {
-                                            current.incrementAndGet();
-                                            if (current.get() == size.get())
-                                                publishProgress(feature);
-                                            else publishProgress();
-                                        } else publishProgress();
-                                    } else publishProgress();
-                                } catch (InterruptedException | ExecutionException e) {
-                                    publishProgress();
-                                    e.printStackTrace();
-                                }
-
-                            });
-                        });
-                    }
+                    List<FeatureEditResult> edits = updatedServerResult.get();
+                    if (edits.size() > 0) {
+                        if (!edits.get(0).hasCompletedWithErrors()) {
+                            size.decrementAndGet();
+                            if (0 == size.get())
+                                publishProgress(feature);
+                            else publishProgress();
+                        } else publishProgress();
+                    } else publishProgress();
                 } catch (InterruptedException | ExecutionException e) {
                     publishProgress();
                     e.printStackTrace();
                 }
+
             });
+//            });
+//                    }
+//                } catch (InterruptedException | ExecutionException e) {
+//                    publishProgress();
+//                    e.printStackTrace();
+//                }
+//            });
         }
     }
 

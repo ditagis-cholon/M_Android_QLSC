@@ -2,19 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <item android:title="Chức năng"
+    <item
+        android:title="Chức năng"
         tools:ignore="HardcodedText">
         <menu>
             <group android:checkableBehavior="single">
                 <item
-                    
+
                     android:id="@+id/nav_thongke"
                     android:icon="@drawable/ic_thongke"
                     android:title="@string/nav_thong_ke" />
                 <!--<item-->
-                    <!--android:id="@+id/nav_tracuu"-->
-                    <!--android:icon="@drawable/ic_search"-->
-                    <!--android:title="@string/nav_tra_cuu" />-->
+                <!--android:id="@+id/nav_tracuu"-->
+                <!--android:icon="@drawable/ic_search"-->
+                <!--android:title="@string/nav_tra_cuu" />-->
             </group>
         </menu>
     </item>
@@ -27,7 +28,8 @@
         <item
             android:id="@+id/nav_show_hide_complete"
             android:icon="@drawable/ic_complete_gray_32dp"
-            android:title="@string/nav_showHideComplete" />
+            android:title="@string/nav_showHideComplete"
+            android:visible="false" />
         <item
             android:id="@+id/nav_delete_searching"
             android:icon="@drawable/ic_delete"
