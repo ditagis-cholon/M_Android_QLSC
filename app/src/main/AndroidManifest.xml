@@ -68,10 +68,6 @@
             android:name=".UpdateActivity"
             android:label="Cập nhật thuộc tính"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".AttachmentActivity"
-            android:label="Tệp đính kèm"
-            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

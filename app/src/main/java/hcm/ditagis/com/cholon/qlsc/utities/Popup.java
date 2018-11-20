@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import hcm.ditagis.com.cholon.qlsc.AttachmentActivity;
 import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.UpdateActivity;
@@ -471,13 +470,9 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                         case R.id.item_popup_find_route:
                             mMainActivity.findRoute();
                             return true;
-                        case R.id.item_popup_view_attachment:
-                            Intent attachmentIntent = new Intent(mMainActivity, AttachmentActivity.class);
-                            mMainActivity.startActivity(attachmentIntent);
-                            return true;
                         case R.id.item_popup_edit:
                             Intent updateIntent = new Intent(mMainActivity, UpdateActivity.class);
-                            mMainActivity.startActivity(updateIntent);
+                            mMainActivity.startActivityForResult(updateIntent, Constant.RequestCode.UPDATE);
                             return true;
                         case R.id.item_popup_change_geometry:
                             mMainActivity.setChangingGeometry(true);

@@ -19,8 +19,8 @@ import java.util.Objects;
 
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.fragment.ListTaskFragment;
-import hcm.ditagis.com.cholon.qlsc.fragment.SearchFragment;
+import hcm.ditagis.com.cholon.qlsc.fragment.task.ListTaskFragment;
+import hcm.ditagis.com.cholon.qlsc.fragment.task.SearchFragment;
 
 public class ListTaskActivity extends AppCompatActivity {
 

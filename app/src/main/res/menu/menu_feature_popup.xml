@@ -7,10 +7,6 @@
         android:title="Tìm đường đi"
         app:showAsAction="withText" />
     <item
-        android:id="@+id/item_popup_view_attachment"
-        android:title="Xem tệp đính kèm"
-        app:showAsAction="withText" />
-    <item
         android:id="@+id/item_popup_edit"
         android:title="Cập nhật thông tin"
         app:showAsAction="withText" />

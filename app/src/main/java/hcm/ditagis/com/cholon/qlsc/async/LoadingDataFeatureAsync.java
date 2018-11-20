@@ -24,7 +24,7 @@ import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
-public class LoadingDataFeatureAsync extends AsyncTask<Void, Void, Void> {
+public class LoadingDataFeatureAsync extends AsyncTask<Boolean, Boolean, Void> {
     private AsyncResponse mDelegate;
     private Activity mActivity;
     private Context mContext;
@@ -47,30 +47,45 @@ public class LoadingDataFeatureAsync extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
-        publishProgress();
+    protected Void doInBackground(Boolean... params) {
+        if (params != null && params.length > 0)
+            publishProgress(params[0]);
         return null;
     }
 
     @Override
-    protected void onProgressUpdate(Void... values) {
-        mDelegate.processFinish(loadDataToAdd());
+    protected void onProgressUpdate(Boolean... values) {
+        mDelegate.processFinish(loadDataToAdd(values[0]));
     }
 
-    private List<View> loadDataToAdd() {
+    private List<View> loadDataToAdd(Boolean isAdd) {
         List<View> views = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         for (Field field : mFields) {
             String name = field.getName();
-            if (name.equals(Constant.FieldSuCo.DIA_CHI)
-                    || name.equals(Constant.FieldSuCo.NGUOI_PHAN_ANH)
-                    || name.equals(Constant.FieldSuCo.SDT_PHAN_ANH)
-                    || name.equals(Constant.FieldSuCo.THONG_TIN_PHAN_ANH)
-                    || name.equals(Constant.FieldSuCo.GHI_CHU)
-                    )
-                views.add(getView(field));
+            if (isAdd) {
+                if (name.equals(Constant.FieldSuCo.DIA_CHI)
+                        || name.equals(Constant.FieldSuCo.NGUOI_PHAN_ANH)
+                        || name.equals(Constant.FieldSuCo.SDT_PHAN_ANH)
+                        || name.equals(Constant.FieldSuCo.THONG_TIN_PHAN_ANH)
+                        || name.equals(Constant.FieldSuCo.GHI_CHU)
+                        )
+                    views.add(getView(field));
 
+            } else {
+                if (name.equals(Constant.FieldSuCo.ID_SUCO)
+                        || name.equals(Constant.Field.OBJECTID)
+                        || name.equals(Constant.FieldSuCo.MA_DMA)
+                        || name.equals(Constant.FieldSuCo.MA_DUONG)
+                        || name.equals(Constant.FieldSuCo.MA_PHUONG)
+                        || name.equals(Constant.FieldSuCo.MA_QUAN)
+                        || name.equals(Constant.FieldSuCo.SDT_PHAN_ANH)
+                        || name.equals(Constant.FieldSuCo.NGUOI_PHAN_ANH)
+                        )
+                    continue;
+                views.add(getView(field));
+            }
         }
         return views;
     }

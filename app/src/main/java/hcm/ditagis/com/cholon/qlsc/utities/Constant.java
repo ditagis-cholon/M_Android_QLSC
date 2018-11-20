@@ -27,7 +27,14 @@ public class Constant {
         public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 
     }
+    public class FileType {
 
+        public static final String VIDEO = "video/quicktime";
+        public static final String PNG = "PNG";
+        public static final String JPEG = "image/jpeg";
+        public static final String PDF = "application/pdf";
+        public static final String DOC = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    }
     public class HTTPRequest {
         public static final String GET_METHOD = "GET";
         public static final String POST_METHOD = "POST";
@@ -45,6 +52,8 @@ public class Constant {
         public static final int RLAYER = 6;
         public static final int ADD_FEATURE_ATTACHMENT = 8;
         public static final int LIST_TASK = 9;
+        public static final int UPDATE= 10;
+        public static final int UPDATE_ATTACHMENT = 11;
         public static final int NOTIFICATION = 100;
 
     }

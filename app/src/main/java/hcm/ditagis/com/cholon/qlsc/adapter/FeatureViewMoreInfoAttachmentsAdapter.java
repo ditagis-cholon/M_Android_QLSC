@@ -3,7 +3,6 @@ package hcm.ditagis.com.cholon.qlsc.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
+
 
 /**
  * Created by ThanLe on 04/10/2017.
@@ -61,38 +61,31 @@ public class FeatureViewMoreInfoAttachmentsAdapter extends ArrayAdapter<FeatureV
 
         TextView txtValue = convertView.findViewById(R.id.txt_viewmoreinfo_attachment_name);
         txtValue.setText(item.getName());
+        if (item.getBitmap() != null) {
+            ImageView imageView = convertView.findViewById(R.id.img_viewmoreinfo_attachment);
 
-        ImageView imageView = convertView.findViewById(R.id.img_viewmoreinfo_attachment);
-        Bitmap bmp = BitmapFactory.decodeByteArray(item.getImg(), 0, item.getImg().length);
+            imageView.setImageBitmap(item.getBitmap());
+        }
 
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(bmp, bmp.getWidth(),
-                bmp.getHeight(), false));
         return convertView;
     }
 
 
     public static class Item {
         private String name;
-        private byte[] img;
+        private Bitmap bitmap;
 
-        public Item() {
+        public Item(String name, Bitmap bitmap) {
+            this.name = name;
+            this.bitmap = bitmap;
         }
-
 
         public String getName() {
             return name;
         }
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        byte[] getImg() {
-            return img;
-        }
-
-        public void setImg(byte[] img) {
-            this.img = img;
+        public Bitmap getBitmap() {
+            return bitmap;
         }
     }
 }

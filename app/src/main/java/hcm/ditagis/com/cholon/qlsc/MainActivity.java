@@ -1111,6 +1111,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         handlingCancelAdd();
                     }
                     break;
+                case Constant.RequestCode.UPDATE:
+                    mPopUp.refreshPopup(mApplication.getSelectedArcGISFeature());
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
         }

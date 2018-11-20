@@ -88,7 +88,7 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
                 }
             mLLayoutProgress.setVisibility(View.GONE);
             mLLayoutMain.setVisibility(View.VISIBLE);
-        }).execute();
+        }).execute(true);
     }
 
 

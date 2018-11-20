@@ -1,4 +1,4 @@
-package hcm.ditagis.com.cholon.qlsc.fragment;
+package hcm.ditagis.com.cholon.qlsc.fragment.task;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
