@@ -38,8 +38,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mTxtUsername = findViewById(R.id.txtUsername);
         mTxtPassword = findViewById(R.id.txtPassword);
-        mTxtUsername.setText("qlcn1");
-        mTxtPassword.setText("qlcn1@2018");
+//        mTxtUsername.setText("qlcn1");
+//        mTxtPassword.setText("qlcn1@2018");
         mTxtValidation = findViewById(R.id.txt_login_validation);
 
         ((TextView) findViewById(R.id.txt_login_version)).setText("Phiên bản " + BuildConfig.VERSION_NAME);

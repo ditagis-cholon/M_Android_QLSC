@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mFeatureLayer.setName(layerInfoDTG.getTitleLayer());
                     mFeatureLayer.setId(layerInfoDTG.getId());
                     mFeatureLayer.setPopupEnabled(true);
-
+mFeatureLayer.setMinScale(0);
                     mFeatureLayer.addDoneLoadingListener(() -> {
                         setRendererSuCoFeatureLayer(mFeatureLayer);
                         mFeatureLayerDTG = new FeatureLayerDTG(serviceFeatureTable, mFeatureLayer, layerInfoDTG);
@@ -488,13 +488,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         UniqueValueRenderer uniqueValueRenderer = new UniqueValueRenderer();
         uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.TRANG_THAI);
         uniqueValueRenderer.getFieldNames().add(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
-        PictureMarkerSymbol chuaXuLyDacBiet = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachuadacbiet));
+        PictureMarkerSymbol chuaXuLyDacBiet = new PictureMarkerSymbol(Constant.URLImage.CHUA_SUA_CHUA_BAT_THUONG);
         chuaXuLyDacBiet.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLyDacBiet.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol chuaXuLyBinhThuong = new PictureMarkerSymbol(getString(R.string.url_image_symbol_chuasuachua));
+        PictureMarkerSymbol chuaXuLyBinhThuong = new PictureMarkerSymbol(Constant.URLImage.CHUA_SUA_CHUA);
         chuaXuLyBinhThuong.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLyBinhThuong.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
-        PictureMarkerSymbol hoanThanh = new PictureMarkerSymbol(getString(R.string.url_image_symbol_hoanthanh));
+        PictureMarkerSymbol hoanThanh = new PictureMarkerSymbol(Constant.URLImage.HOAN_THANH);
         chuaXuLyBinhThuong.setHeight(getResources().getInteger(R.integer.size_feature_renderer));
         chuaXuLyBinhThuong.setWidth(getResources().getInteger(R.integer.size_feature_renderer));
 

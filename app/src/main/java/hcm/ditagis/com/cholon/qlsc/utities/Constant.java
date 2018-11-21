@@ -19,9 +19,10 @@ public class Constant {
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     public static final String DEFINITION_HIDE_COMPLETE = " and TrangThai <> 3";
-    //        public static final String SERVER_API = "http://gis.capnuoccholon.com.vn/cholon/api";
-    public static final String SERVER = "http://sawagis.vn/cholon";
-    public static final String SERVER_API = SERVER + "/api";
+    public static final String SERVER = "http://gis.capnuoccholon.com.vn";
+    public static final String SERVER_FOR_API = SERVER + "/cholon";
+    //    public static final String SERVER_FOR_API = "http://sawagis.vn";
+    public static final String SERVER_API = SERVER_FOR_API + "/api";
     public static final String NULL = "";
 
     public static class DateFormat {
@@ -32,10 +33,16 @@ public class Constant {
 
     }
 
+    public class URLImage {
+        public static final String CHUA_SUA_CHUA_BAT_THUONG = SERVER + "/images/map/-1.png";
+        public static final String CHUA_SUA_CHUA = SERVER + "/images/map/0.png";
+        public static final String HOAN_THANH = SERVER + "/images/map/3.png";
+    }
+
     public class FileType {
 
         public static final String VIDEO = "video/quicktime";
-        public static final String PNG = "PNG";
+        public static final String PNG = "image/png";
         public static final String JPEG = "image/jpeg";
         public static final String PDF = "application/pdf";
         public static final String DOC = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -130,7 +137,7 @@ public class Constant {
     }
 
     public class URL_API {
-        public static final String CHECK_VERSION = "http://cholon.sawagis.vn/cholon/versioning/QLSC?version=%s";
+        public static final String CHECK_VERSION = SERVER_FOR_API + "/versioning/QLSC?version=%s";
         public static final String ADD_FEATURE = SERVER_API + "/QuanLySuCo/TiepNhanSuCo/%s";
         public static final String LOGIN = SERVER_API + "/Login";
         public static final String PROFILE = SERVER_API + "/Account/Profile";
@@ -140,7 +147,7 @@ public class Constant {
         public static final String COMPLETE = SERVER_API + "/quanlysuco/xacnhanhoanthanhnhanvien?id=%s";
         public static final String IS_ACCESS = SERVER_API + "/Account/IsAccess/m_qlsc";
         public static final String GENERATE_ID_SUCOTHONGTIN = SERVER_API + "/QuanLySuCo/GenerateIDSuCoThongTin/";
-        public static final String QUERY_HANH_CHINH = SERVER + "/hanhchinh/getbypoint";
+        public static final String QUERY_HANH_CHINH = SERVER_FOR_API + "/hanhchinh/getbypoint";
 
 
     }
