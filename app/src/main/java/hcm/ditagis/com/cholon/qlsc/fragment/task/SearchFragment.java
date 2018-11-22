@@ -166,9 +166,9 @@ public class SearchFragment extends Fragment {
                     Object thongTinPhanAnhValue = thongTinPhanAnhCode == null ? null : getValueDomain(codedValues, thongTinPhanAnhCode);
                     items.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                             idSuCo != null ? idSuCo.toString() : "",
-                            Integer.parseInt(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString()),
                             ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : ""));
+                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "",
+                            thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC));
                 }
             }
 

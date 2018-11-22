@@ -15,7 +15,6 @@ public class DiemSuCo {
     private String nguoiPhanAnh;
     public String sdtPhanAnh;
     public String emailPhanAnh;
-    public short trangThai;
     public String quan;
     public String phuong;
     public String ghiChu;
@@ -47,7 +46,6 @@ public class DiemSuCo {
         nguoiPhanAnh = null;
         sdtPhanAnh = null;
         emailPhanAnh = null;
-        trangThai = Constant.TrangThaiSuCo.CHUA_XU_LY;
         quan = null;
         phuong = null;
         ghiChu = null;
@@ -110,13 +108,6 @@ public class DiemSuCo {
         this.sdtPhanAnh = sdtPhanAnh;
     }
 
-    public short getTrangThai() {
-        return trangThai;
-    }
-
-    public void setTrangThai(short trangThai) {
-        this.trangThai = trangThai;
-    }
 
 
     public String getQuan() {

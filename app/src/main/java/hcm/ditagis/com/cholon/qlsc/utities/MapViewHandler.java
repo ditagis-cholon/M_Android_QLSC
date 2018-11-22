@@ -248,8 +248,7 @@ public class MapViewHandler extends Activity {
 
                     }
                     adapter.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(mContext.getString(R.string.Field_OBJECTID)).toString()),
-                            attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString(),
-                            Integer.parseInt(attributes.get(mContext.getString(R.string.Field_SuCo_TrangThai)).toString()), format_date, viTri));
+                            attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString(), format_date, viTri,Constant.ThongTinPhanAnh.KHAC));
                     adapter.notifyDataSetChanged();
 
 //                        queryByObjectID(Integer.parseInt(attributes.get(Constant.OBJECT_ID).toString()));

@@ -736,7 +736,7 @@ mFeatureLayer.setMinScale(0);
                                 mSearchAdapter.notifyDataSetChanged();
                                 if (output.size() > 0) {
                                     for (DAddress address : output) {
-                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", 0, "", address.getLocation());
+                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", "", address.getLocation(), Constant.ThongTinPhanAnh.KHAC);
                                         item.setLatitude(address.getLatitude());
                                         item.setLongtitude(address.getLongtitude());
                                         mSearchAdapter.add(item);

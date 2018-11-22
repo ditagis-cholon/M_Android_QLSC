@@ -33,16 +33,16 @@ import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 @SuppressLint("ValidFragment")
 public class ListTaskFragment extends Fragment {
-    private View mRootView;
     ListView mLstChuaXuLy;
     //    ListView mLstDangXuLy;
 //    ListView mLstHoanThanh;
     TextView mTxtChuaXuLy;
+    TraCuuAdapter mAdapterChuaXuLy;
+    private View mRootView;
     //    TextView mTxtDangXuLy;
 //    TextView mTxtHoanThanh;
     private ListTaskActivity mActivity;
     private DApplication mApplication;
-    TraCuuAdapter mAdapterChuaXuLy;
 //    , mAdapterDangXuLy;
 //    mAdapterHoanThanh;
 
@@ -127,9 +127,9 @@ public class ListTaskFragment extends Fragment {
                 Object thongTinPhanAnhValue = thongTinPhanAnhCode == null ? null : getValueDomain(codedValues, thongTinPhanAnhCode);
                 TraCuuAdapter.Item item = new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                         idSuCo != null ? idSuCo.toString() : "",
-                        Integer.parseInt(attributes.get(Constant.FieldSuCo.TRANG_THAI).toString()),
                         ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                        thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "");
+                        thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "",
+                        thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC);
                 Object value = feature.getAttributes().get(Constant.FieldSuCo.TRANG_THAI);
                 if (value == null) {
                     chuaXuLyList.add(item);

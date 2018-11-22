@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 /**
  * Created by ThanLe on 04/10/2017.
@@ -57,42 +58,48 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             convertView = inflater.inflate(R.layout.item_tracuu, null);
         }
         Item item = items.get(position);
-
+        TextView txtDiaChi = convertView.findViewById(R.id.txt_bottom);
+        TextView txtID = convertView.findViewById(R.id.txt_top);
+        TextView txtNgayCapNhat = convertView.findViewById(R.id.txt_right);
         LinearLayout layout = convertView.findViewById(R.id.layout_tracuu);
-        switch (item.getTrangThai()) {
+        switch (item.getThongTinPhanAnh()) {
             //chưa sửa chữa
-            case 0:
+            case Constant.ThongTinPhanAnh.KHONG_NUOC:
+            case Constant.ThongTinPhanAnh.XI_DHN:
+            case Constant.ThongTinPhanAnh.ONG_BE:
                 layout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_chua_sua_chua));
+                txtDiaChi.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtID.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtNgayCapNhat.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 break;
             //đã sửa chữa
-            case 1:
-                layout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_da_sua_chua));
-                break;
             //đang sửa chữa
-            case 2:
+            case Constant.ThongTinPhanAnh.HU_VAN:
+            case Constant.ThongTinPhanAnh.KHAC:
+            case Constant.ThongTinPhanAnh.NUOC_DUC:
+            case Constant.ThongTinPhanAnh.NUOC_YEU:
                 layout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_dang_sua_chua));
+                txtDiaChi.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtID.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtNgayCapNhat.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 break;
-            case 3:
-                layout.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimaryLight));
-                break;
-            case 4:
-                layout.setBackgroundColor(ContextCompat.getColor(context, R.color.colorWhite));
+            default:
                 break;
         }
 
-        TextView txtID = convertView.findViewById(R.id.txt_top);
+
         if (item.getId() == null || item.getId().isEmpty())
             txtID.setVisibility(View.GONE);
         else
             txtID.setText(item.getId());
 
-        TextView txtDiaChi = convertView.findViewById(R.id.txt_bottom);
+
         if (item.getDiaChi() == null || item.getDiaChi().isEmpty())
             txtDiaChi.setVisibility(View.GONE);
         else
             txtDiaChi.setText(item.getDiaChi());
 
-        TextView txtNgayCapNhat = convertView.findViewById(R.id.txt_right);
+
         if (item.getNgayThongBao() == null || item.getNgayThongBao().isEmpty())
             txtNgayCapNhat.setVisibility(View.GONE);
         else
@@ -108,18 +115,18 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
 
         int objectID;
         String id;
-        int trangThai;
         String ngayThongBao;
         String diaChi;
         double latitude;
         double longtitude;
+        short thongTinPhanAnh;
 
-        public Item(int objectID, String id, int trangThai, String ngayCapNhat, String diaChi) {
+        public Item(int objectID, String id, String ngayCapNhat, String diaChi, short thongTinPhanAnh) {
             this.objectID = objectID;
             this.id = id;
-            this.trangThai = trangThai;
             this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
+            this.thongTinPhanAnh = thongTinPhanAnh;
         }
 
         public Item(int objectID, String id, String ngayCapNhat, String diaChi) {
@@ -127,6 +134,10 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.id = id;
             this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
+        }
+
+        public short getThongTinPhanAnh() {
+            return thongTinPhanAnh;
         }
 
         public double getLatitude() {
@@ -158,10 +169,6 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.id = id;
         }
 
-        public int getTrangThai() {
-            return trangThai;
-        }
-
 
         public String getNgayThongBao() {
             return ngayThongBao;
@@ -172,10 +179,5 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             return diaChi;
         }
 
-
-        @Override
-        public String toString() {
-            return "Item{" + "objectID=" + objectID + ", id='" + id + '\'' + ", trangThai=" + trangThai + ", ngayThongBao='" + ngayThongBao + '\'' + ", diaChi='" + diaChi + '\'' + '}';
-        }
     }
 }
