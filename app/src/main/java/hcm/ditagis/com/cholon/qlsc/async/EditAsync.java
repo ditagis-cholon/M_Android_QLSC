@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
@@ -33,7 +32,7 @@ import hcm.ditagis.com.cholon.qlsc.utities.Constant;
  * Created by ThanLe on 4/16/2018.
  */
 
-public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, ArcGISFeature, Void> {
+public class EditAsync extends AsyncTask<Void, ArcGISFeature, Void> {
     @SuppressLint("StaticFieldLeak")
     private ServiceFeatureTable mServiceFeatureTable;
     private ArcGISFeature mSelectedArcGISFeature;
@@ -123,7 +122,7 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, ArcGISFeatu
     }
 
     @Override
-    protected Void doInBackground(FeatureViewMoreInfoAdapter... params) {
+    protected Void doInBackground(Void... params) {
         if (mImage == null) {
             for (String alias : mAttributes.keySet()) {
                 for (Field field : mServiceFeatureTable.getFields()) {

@@ -17,43 +17,48 @@
             android:id="@+id/txt_list_task_chua_xu_ly"
             style="@style/MyTextAppearance.Blue.Big.Bold"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
             android:onClick="onClick"
             android:text="@string/txt_list_task_chua_xu_ly" />
 
-        <ListView
-            android:id="@+id/lst_list_task_chua_xu_ly"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_list_task"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
 
+            <ListView
+                android:id="@+id/lst_list_task_chua_xu_ly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </android.support.v4.widget.SwipeRefreshLayout>
         <!--<TextView-->
-            <!--android:id="@+id/txt_list_task_dang_xu_ly"-->
-            <!--style="@style/MyTextAppearance.Blue.Big.Bold"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_marginTop="@dimen/margin_small"-->
-            <!--android:onClick="onClick"-->
-            <!--android:text="@string/txt_list_task_dang_xu_ly" />-->
+        <!--android:id="@+id/txt_list_task_dang_xu_ly"-->
+        <!--style="@style/MyTextAppearance.Blue.Big.Bold"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginTop="@dimen/margin_small"-->
+        <!--android:onClick="onClick"-->
+        <!--android:text="@string/txt_list_task_dang_xu_ly" />-->
 
         <!--<ListView-->
-            <!--android:id="@+id/lst_list_task_dang_xu_ly"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" />-->
+        <!--android:id="@+id/lst_list_task_dang_xu_ly"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
 
         <!--<TextView-->
-            <!--android:id="@+id/txt_list_task_hoan_thanh"-->
-            <!--style="@style/MyTextAppearance.Blue.Big.Bold"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_marginTop="@dimen/margin_small"-->
-            <!--android:onClick="onClick"-->
-            <!--android:text="@string/txt_list_task_hoan_thanh" />-->
+        <!--android:id="@+id/txt_list_task_hoan_thanh"-->
+        <!--style="@style/MyTextAppearance.Blue.Big.Bold"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginTop="@dimen/margin_small"-->
+        <!--android:onClick="onClick"-->
+        <!--android:text="@string/txt_list_task_hoan_thanh" />-->
 
         <!--<ListView-->
-            <!--android:id="@+id/lst_list_task_da_hoan_thanh"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" />-->
+        <!--android:id="@+id/lst_list_task_da_hoan_thanh"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
     </LinearLayout>
     <!--</ScrollView>-->
 

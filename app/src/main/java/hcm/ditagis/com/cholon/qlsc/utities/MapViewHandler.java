@@ -33,7 +33,6 @@ import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableAsync;
-import hcm.ditagis.com.cholon.qlsc.async.SingleTapAddFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
@@ -80,19 +79,6 @@ public class MapViewHandler extends Activity {
         isClickBtnAdd = clickBtnAdd;
     }
 
-    public void addFeature(byte[] image, Point pointFindLocation) {
-        mClickPoint = mMapView.locationToScreen(pointFindLocation);
-
-        SingleTapAddFeatureAsync singleTapAdddFeatureAsync = new SingleTapAddFeatureAsync(mApplication,mClickPoint, mContext,
-                image, mServiceFeatureTable, mMapView, mGeocoder, output -> {
-            if (output != null && MainActivity.DFeatureLayerDiemSuCo != null) {
-                mApplication.setSelectedArcGISFeature((ArcGISFeature) output);
-                mPopUp.showPopup(true);
-            }
-        });
-//        Point add_point = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
-        singleTapAdddFeatureAsync.execute(pointFindLocation);
-    }
 
 
     public double[] onScroll(MotionEvent e2) {

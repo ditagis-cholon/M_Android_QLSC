@@ -41,10 +41,6 @@
             android:name=".ThongKeActivity"
             android:label="Thống kê"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".TraCuuActivity"
-            android:label="Tra cứu thông tin"
-            android:parentActivityName=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

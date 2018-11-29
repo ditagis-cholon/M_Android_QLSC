@@ -7,8 +7,6 @@ import com.esri.arcgisruntime.geometry.SpatialReference;
 
 import java.text.SimpleDateFormat;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.SettingsAdapter;
-
 /**
  * Created by ThanLe on 3/1/2018.
  */
@@ -198,7 +196,6 @@ public class Constant {
         public static final String QLCN2 = "qlcn2";
     }
 
-    private SettingsAdapter.Item[] mSettingsItems;
 
     private static Constant mInstance = null;
 
@@ -209,36 +206,8 @@ public class Constant {
     }
 
     private Constant() {
-        mSettingsItems = new SettingsAdapter.Item[]{
-                new SettingsAdapter.Item("Phương thức thêm điểm sự cố", ""),
-                new SettingsAdapter.Item("Tùy chọn tìm kiếm", ""),
-                new SettingsAdapter.Item("Bố cục giao diện", ""),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-                new SettingsAdapter.Item("Tiêu đề cài đặt", "Tiêu đề con cài đặt"),
-        };
     }
 
-    public SettingsAdapter.Item[] getSettingsItems() {
-        return mSettingsItems;
-    }
 
 
 }

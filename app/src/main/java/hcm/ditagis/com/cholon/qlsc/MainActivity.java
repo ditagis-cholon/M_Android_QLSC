@@ -679,33 +679,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    private void themDiemSuCoNoCapture() {
-        FindLocationAsycn findLocationAsycn = new FindLocationAsycn(this, false,
-                output -> {
-                    if (output != null) {
-                        String subAdminArea = output.get(0).getSubAdminArea();
-                        //nếu tài khoản có quyền truy cập vào
-                        if (subAdminArea.equals(getString(R.string.Quan5Name)) ||
-                                subAdminArea.equals(getString(R.string.Quan6Name)) ||
-                                subAdminArea.equals(getString(R.string.Quan8Name)) ||
-                                subAdminArea.equals(getString(R.string.QuanBinhTanName))) {
-                            mTxtSearchView.setQuery("", true);
-                            mMapViewHandler.addFeature(null, mPointFindLocation);
-                            deleteSearching();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this, R.string.message_not_area_management, Toast.LENGTH_LONG).show();
-                    }
-
-                });
-        Geometry project = GeometryEngine.project(mPointFindLocation, SpatialReferences.getWgs84());
-        double[] location = {project.getExtent().getCenter().getX(), project.getExtent().getCenter().getY()};
-        findLocationAsycn.setmLongtitude(location[0]);
-        findLocationAsycn.setmLatitude(location[1]);
-        findLocationAsycn.execute();
-    }
 
     private void visibleFloatActionButton() {
         if (mFloatButtonLayer.getVisibility() == View.VISIBLE) {
@@ -1015,7 +988,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.img_chonvitri_themdiemsuco:
 //                themDiemSuCo();
-                themDiemSuCoNoCapture();
                 break;
             case R.id.btn_add_feature_close:
                 if (mMapViewHandler != null) {
@@ -1029,7 +1001,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.imgBtn_timkiemdiachi_themdiemsuco:
 //                themDiemSuCo();
-                themDiemSuCoNoCapture();
                 break;
 
         }

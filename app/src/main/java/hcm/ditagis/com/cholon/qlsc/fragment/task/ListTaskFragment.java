@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,7 @@ public class ListTaskFragment extends Fragment {
 //    TextView mTxtHoanThanh;
     private ListTaskActivity mActivity;
     private DApplication mApplication;
+    private SwipeRefreshLayout mSwipe;
 //    , mAdapterDangXuLy;
 //    mAdapterHoanThanh;
 
@@ -58,6 +60,7 @@ public class ListTaskFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
+        mSwipe = mRootView.findViewById(R.id.swipe_list_task);
         mLstChuaXuLy = mRootView.findViewById(R.id.lst_list_task_chua_xu_ly);
 //        mLstDangXuLy = mRootView.findViewById(R.id.lst_list_task_dang_xu_ly);
 //        mLstHoanThanh = mRootView.findViewById(R.id.lst_list_task_da_hoan_thanh);
@@ -86,6 +89,19 @@ public class ListTaskFragment extends Fragment {
 //        mLstHoanThanh.setOnItemClickListener((adapterView, view, i, l) -> {
 //            mActivity.itemClick(adapterView, i);
 //        });
+
+
+        mSwipe.setOnRefreshListener(() -> {
+            loadTasks();
+            mSwipe.setRefreshing(false);
+        });
+        loadTasks();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void loadTasks() {
+        mAdapterChuaXuLy.clear();
+        mAdapterChuaXuLy.notifyDataSetChanged();
         new QueryServiceFeatureTableGetListAsync(mActivity, (List<Feature> output) -> {
             if (output != null && output.size() > 0) {
                 handlingQuerySuccess(output);
@@ -128,7 +144,7 @@ public class ListTaskFragment extends Fragment {
                 TraCuuAdapter.Item item = new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                         idSuCo != null ? idSuCo.toString() : "",
                         ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                        attributes.get(Constant.FieldSuCo.DIA_CHI)!= null? attributes.get(Constant.FieldSuCo.DIA_CHI).toString():"",
+                        attributes.get(Constant.FieldSuCo.DIA_CHI) != null ? attributes.get(Constant.FieldSuCo.DIA_CHI).toString() : "",
                         thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC,
                         thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "");
                 Object value = feature.getAttributes().get(Constant.FieldSuCo.TRANG_THAI);

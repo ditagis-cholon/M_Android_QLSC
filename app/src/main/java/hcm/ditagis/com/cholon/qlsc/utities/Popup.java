@@ -50,7 +50,6 @@ import hcm.ditagis.com.cholon.qlsc.MainActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.UpdateActivity;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewInfoAdapter;
-import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.CheckExistFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.EditGeometryAsync;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
@@ -69,7 +68,6 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
     private ServiceFeatureTable mServiceFeatureTable;
     private Callout mCallout;
     private List<String> lstFeatureType;
-    private FeatureViewMoreInfoAdapter mFeatureViewMoreInfoAdapter;
     private LinearLayout linearLayout;
     private MapView mMapView;
     private List<HoSoVatTuSuCo> mListHoSoVatTuSuCo;
@@ -380,13 +378,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             } else {
                 linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.GONE);
             }
-            //khi hoàn thành rồi thì không chỉnh sửa được
-            Object o = mSelectedArcGISFeature.getAttributes().get(mMainActivity.getString(R.string.Field_SuCo_TrangThai));
-            if (o != null && Integer.parseInt(o.toString())
-                    != mMainActivity.getResources().getInteger(R.integer.trang_thai_hoan_thanh) && mApplication.getDFeatureLayer().getdLayerInfo().isEdit())
-                linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setOnClickListener(this);
-            else
-                linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setVisibility(View.GONE);
+            linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setOnClickListener(this);
         } else {
             linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setVisibility(View.INVISIBLE);
             linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.INVISIBLE);
