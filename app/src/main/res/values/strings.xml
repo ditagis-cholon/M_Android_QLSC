@@ -101,18 +101,7 @@
     <string name="async_dang_cap_nhat_giao_dien">Đang cập nhật giao diện…</string>
     <!--preference begin-->
     <string name="preference_username">username</string>
-    <string name="preference_password">pasword</string>
-    <string name="preference_displayname">displayname</string>
 
-    <string name="preference_settings_phuong_thuc_them_diem_su_co">preference_settings_phuong_thuc_them_diem_su_co</string>
-    <string name="preference_settings_phuong_thuc_them_diem_su_co_cham_diem">Chấm điểm trên bản đồ</string>
-    <string name="preference_settings_phuong_thuc_them_diem_su_co_toa_do">Theo tọa độ vị trí</string>
-    <string name="preference_settings_phuong_thuc_them_diem_su_co_keo_tha">Kéo thả bản đồ</string>
-
-    <string name="preference_settings_tuy_chon_tim_kiem">preference_settings_tuy_chon_tim_kiem</string>
-    <string name="preference_settings_tuy_chon_tim_kiem_co_san">Tìm kiếm sự cố</string>
-    <string name="preference_settings_tuy_chon_tim_kiem_chua_co">Tìm vị trí</string>
-    <string name="preference_login_api">preference_login_api</string>
     <!--preference end-->
 
     <string name="format_day_yearfirst">yyyy-MM-dd HH:mm:ss</string>

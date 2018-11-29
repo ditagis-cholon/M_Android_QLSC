@@ -128,8 +128,9 @@ public class ListTaskFragment extends Fragment {
                 TraCuuAdapter.Item item = new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                         idSuCo != null ? idSuCo.toString() : "",
                         ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                        thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "",
-                        thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC);
+                        attributes.get(Constant.FieldSuCo.DIA_CHI)!= null? attributes.get(Constant.FieldSuCo.DIA_CHI).toString():"",
+                        thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC,
+                        thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "");
                 Object value = feature.getAttributes().get(Constant.FieldSuCo.TRANG_THAI);
                 if (value == null) {
                     chuaXuLyList.add(item);

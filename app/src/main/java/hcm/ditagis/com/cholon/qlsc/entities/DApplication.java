@@ -8,20 +8,20 @@ import com.esri.arcgisruntime.geometry.Point;
 
 import java.util.List;
 
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 
 public class DApplication extends Application {
-    private FeatureLayerDTG featureLayerDTG;
+    private DFeatureLayer DFeatureLayer;
     private DiemSuCo diemSuCo;
     private Geometry geometry;
 
-    public FeatureLayerDTG getFeatureLayerDTG() {
-        return featureLayerDTG;
+    public DFeatureLayer getDFeatureLayer() {
+        return DFeatureLayer;
     }
 
-    public void setFeatureLayerDTG(FeatureLayerDTG featureLayerDTG) {
-        this.featureLayerDTG = featureLayerDTG;
+    public void setDFeatureLayer(DFeatureLayer DFeatureLayer) {
+        this.DFeatureLayer = DFeatureLayer;
     }
 
     private ArcGISFeature selectedArcGISFeature;
@@ -66,6 +66,16 @@ public class DApplication extends Application {
 
     public void setAddFeaturePoint(Point addFeaturePoint) {
         this.addFeaturePoint = addFeaturePoint;
+    }
+
+    private List<DFeatureLayer> dFeatureLayers;
+
+    public List<DFeatureLayer> getdFeatureLayers() {
+        return dFeatureLayers;
+    }
+
+    public void setdFeatureLayers(List<DFeatureLayer> dFeatureLayers) {
+        this.dFeatureLayers = dFeatureLayers;
     }
 
     private List<DLayerInfo> layerInfos;

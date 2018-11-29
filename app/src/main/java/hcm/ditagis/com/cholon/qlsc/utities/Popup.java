@@ -107,7 +107,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         ListView listView = linearLayout.findViewById(R.id.lstview_thongtinsuco);
         FeatureViewInfoAdapter featureViewInfoAdapter = new FeatureViewInfoAdapter(mMainActivity, new ArrayList<>());
         listView.setAdapter(featureViewInfoAdapter);
-        String[] outFields = mApplication.getFeatureLayerDTG().getLayerInfoDTG().getOutFields().split(",");
+        String[] outFields = mApplication.getDFeatureLayer().getdLayerInfo().getOutFieldsArr();
         boolean isFoundField = false;
 
 
@@ -250,7 +250,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     mApplication.getDiemSuCo().setVitri(address.get());
                     mApplication.setAddFeaturePoint(point);
                     //Kiểm tra cùng ngày, cùng vị trí đã có sự cố nào chưa, nếu có thì cảnh báo, chưa thì thêm bình thường
-                    new EditGeometryAsync(mMapView.getContext(), mApplication.getFeatureLayerDTG()
+                    new EditGeometryAsync(mMapView.getContext(), mApplication.getDFeatureLayer()
                             .getServiceFeatureTable(), mApplication.getSelectedArcGISFeature(), aBoolean -> {
                         mMainActivity.setChangingGeometry(false);
                         if (aBoolean != null && aBoolean)
@@ -270,7 +270,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                     mApplication.getDiemSuCo().setVitri(address.get());
                     mApplication.setAddFeaturePoint(point);
                     //Kiểm tra cùng ngày, cùng vị trí đã có sự cố nào chưa, nếu có thì cảnh báo, chưa thì thêm bình thường
-                    new CheckExistFeatureAsync(mMainActivity, mMapView, mApplication.getFeatureLayerDTG().getServiceFeatureTable(), idSuCo -> {
+                    new CheckExistFeatureAsync(mMainActivity, mMapView, mApplication.getDFeatureLayer().getServiceFeatureTable(), idSuCo -> {
                         if (idSuCo != null && idSuCo.length() > 0)
                             showDialogAddDuplicateGeometry(idSuCo);
                         else {
@@ -341,7 +341,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
 
 
     private void clearSelection() {
-        FeatureLayer featureLayer = mApplication.getFeatureLayerDTG().getLayer();
+        FeatureLayer featureLayer = mApplication.getDFeatureLayer().getLayer();
         featureLayer.clearSelection();
 
     }
@@ -359,7 +359,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         dimissCallout();
         this.mSelectedArcGISFeature = mApplication.getSelectedArcGISFeature();
 
-        FeatureLayer featureLayer = mApplication.getFeatureLayerDTG().getLayer();
+        FeatureLayer featureLayer = mApplication.getDFeatureLayer().getLayer();
         featureLayer.selectFeature(mSelectedArcGISFeature);
         lstFeatureType = new ArrayList<>();
         for (int i = 0; i < mSelectedArcGISFeature.getFeatureTable().getFeatureTypes().size(); i++) {
@@ -375,7 +375,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
         TextView txtNumber = linearLayout.findViewById(R.id.txt_thongtinsuco_number);
         if (featureLayer.getName().equals(mMainActivity.getString(R.string.ALIAS_DIEM_SU_CO))) {
             //user admin mới có quyền xóa
-            if (mApplication.getFeatureLayerDTG().getLayerInfoDTG().isDelete()) {
+            if (mApplication.getDFeatureLayer().getdLayerInfo().isDelete()) {
                 linearLayout.findViewById(R.id.imgBtn_delete).setOnClickListener(this);
             } else {
                 linearLayout.findViewById(R.id.imgBtn_delete).setVisibility(View.GONE);
@@ -383,7 +383,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
             //khi hoàn thành rồi thì không chỉnh sửa được
             Object o = mSelectedArcGISFeature.getAttributes().get(mMainActivity.getString(R.string.Field_SuCo_TrangThai));
             if (o != null && Integer.parseInt(o.toString())
-                    != mMainActivity.getResources().getInteger(R.integer.trang_thai_hoan_thanh) && mApplication.getFeatureLayerDTG().getLayerInfoDTG().isEdit())
+                    != mMainActivity.getResources().getInteger(R.integer.trang_thai_hoan_thanh) && mApplication.getDFeatureLayer().getdLayerInfo().isEdit())
                 linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setOnClickListener(this);
             else
                 linearLayout.findViewById(R.id.imgBtn_ViewMoreInfo).setVisibility(View.GONE);

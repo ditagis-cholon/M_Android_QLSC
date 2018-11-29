@@ -41,7 +41,7 @@ public class UpdateAttachment extends Fragment {
     private DApplication mApplication;
     private Uri mUri;
 
-    Button mBtnCapture;
+    Button mBtnCapture, mBtnPickPhoto;
     LinearLayout mLLayoutMain;
     ListView mListView;
     LinearLayout mLLayoutProgress;
@@ -60,11 +60,14 @@ public class UpdateAttachment extends Fragment {
     }
 
     private void initViews() {
+        mBtnPickPhoto = mRootView.findViewById(R.id.btn_update_attachment_pick_photo);
         mBtnCapture = mRootView.findViewById(R.id.btn_update_attachment_capture);
         mLLayoutMain = mRootView.findViewById(R.id.llayout_update_attachment_main);
         mListView = mRootView.findViewById(R.id.list_update_attachment);
         mLLayoutProgress = mRootView.findViewById(R.id.llayout_update_attachment_progress);
         mTxtProgress = mRootView.findViewById(R.id.txt_update_attachment_progress);
+
+        mBtnPickPhoto.setOnClickListener(this::onClick);
         mBtnCapture.setOnClickListener(this::onClick);
         mmSwipe = mRootView.findViewById(R.id.swipe_udpate_attachment);
         mAdapter = new FeatureViewMoreInfoAttachmentsAdapter(mRootView.getContext(), new ArrayList<>());
@@ -105,27 +108,34 @@ public class UpdateAttachment extends Fragment {
         loadImages();
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private void loadImages() {
+    public void startProgress() {
         mAdapter.clear();
         mLLayoutProgress.setVisibility(View.VISIBLE);
         mLLayoutMain.setVisibility(View.GONE);
+    }
+
+    public void stopProgress() {
+        mAdapter.notifyDataSetChanged();
+        mLLayoutProgress.setVisibility(View.GONE);
+        mLLayoutMain.setVisibility(View.VISIBLE);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void loadImages() {
+        startProgress();
         new GetAttachmentsAsync(attachments -> {
             if (attachments != null) {
                 mAttachments = attachments;
                 AtomicInteger size = new AtomicInteger(attachments.size());
                 if (size.get() == 0) {
-                    mLLayoutProgress.setVisibility(View.GONE);
-                    mLLayoutMain.setVisibility(View.VISIBLE);
+                    stopProgress();
 
                 } else
                     for (Attachment attachment : attachments) {
                         new FetchAttachmentAsync(bitmap -> {
                             size.decrementAndGet();
                             if (size.get() == 0) {
-                                mAdapter.notifyDataSetChanged();
-                                mLLayoutProgress.setVisibility(View.GONE);
-                                mLLayoutMain.setVisibility(View.VISIBLE);
+                                stopProgress();
                             }
                             if (bitmap != null) {
                                 mAdapter.add(new FeatureViewMoreInfoAttachmentsAdapter.Item(attachment.getName(), bitmap));
@@ -151,12 +161,16 @@ public class UpdateAttachment extends Fragment {
             Toast.makeText(mRootView.getContext(), "Thêm ảnh thất bại", Toast.LENGTH_SHORT).show();
     }
 
+
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_update_attachment_capture:
                 mLLayoutProgress.setVisibility(View.VISIBLE);
                 mLLayoutMain.setVisibility(View.GONE);
                 mActivity.capture();
+                break;
+            case R.id.btn_update_attachment_pick_photo:
+                mActivity.pickPhoto();
                 break;
         }
 

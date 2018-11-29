@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -44,7 +45,14 @@ public class Preference {
         editor.apply();
     }
 
-    public void deletePreferences(String key) {
+    public void deletePreferences() {
+        Map<String, ?> all = getPreferences().getAll();
+        SharedPreferences.Editor editor = getPreferences().edit();
+        for (String key : all.keySet())
+            editor.remove(key).apply();
+    }
+
+    public void deletePreference(String key) {
         SharedPreferences.Editor editor = getPreferences().edit();
         editor.remove(key).apply();
     }

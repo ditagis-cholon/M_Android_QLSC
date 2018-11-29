@@ -56,17 +56,18 @@ public class Constant {
 
     public static class RequestCode {
         public static final int LOGIN = 0;
-        public static final int ADD = 7;
         public static final int CAPTURE = 1;
         public static final int SHOW_CAPTURE = 2;
         public static final int PERMISSION = 3;
         public static final int SEARCH = 4;
         public static final int BASEMAP = 5;
         public static final int RLAYER = 6;
+        public static final int ADD = 7;
         public static final int ADD_FEATURE_ATTACHMENT = 8;
         public static final int LIST_TASK = 9;
         public static final int UPDATE = 10;
         public static final int UPDATE_ATTACHMENT = 11;
+        public static final int PICK_PHOTO = 12;
         public static final int NOTIFICATION = 100;
 
     }

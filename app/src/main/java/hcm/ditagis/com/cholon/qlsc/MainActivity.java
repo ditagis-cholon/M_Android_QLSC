@@ -83,22 +83,20 @@ import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
+import hcm.ditagis.com.cholon.qlsc.entities.DLayerInfo;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.MapViewHandler;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
-import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
-    public static FeatureLayerDTG FeatureLayerDTGDiemSuCo;
+    public static DFeatureLayer DFeatureLayerDiemSuCo;
 
     private Popup mPopUp;
     private MapView mMapView;
-    private FeatureLayerDTG mFeatureLayerDTG;
+    private DFeatureLayer mDFeatureLayer;
 
     public MapViewHandler getMapViewHandler() {
         return mMapViewHandler;
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LinearLayout mLayoutTimKiem;
     private FloatingActionButton mFloatButtonLayer;
     private FloatingActionButton mFloatButtonLocation;
-    private List<FeatureLayerDTG> mFeatureLayerDTGS;
+    private List<DFeatureLayer> mDFeatureLayers;
     private Point mPointFindLocation;
     private Geocoder mGeocoder;
     private ImageView mImageOpenStreetMap, mImageStreetMap, mImageImageWithLabel;
@@ -143,24 +141,78 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_su_co);
         mListLayerID = new ArrayList<>();
-        prepare1();
+        mApplication = (DApplication) getApplication();
+        startSignIn();
     }
 
-    private void prepare1() {
-//        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+    private void startSignIn() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        MainActivity.this.startActivityForResult(intent, Constant.RequestCode.LOGIN);
+    }
+
+    public void requestPermisson() {
+        boolean permissionCheck1 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[0]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck2 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[1]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck3 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[2]) == PackageManager.PERMISSION_GRANTED;
+        boolean permissionCheck4 = ContextCompat.checkSelfPermission(this,
+                Constant.REQUEST_PERMISSIONS[3]) == PackageManager.PERMISSION_GRANTED;
+
+        if (!(permissionCheck1 && permissionCheck2 && permissionCheck3 && permissionCheck4)) {
+            // If permissions are not already granted, request permission from the user.
+            ActivityCompat.requestPermissions(this, Constant.REQUEST_PERMISSIONS, Constant.RequestCode.PERMISSION);
+        }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(QuanLySuCo.this, message, Toast.LENGTH_LONG).show();
+        else {
+            PreparingAsycn preparingAsycn = new PreparingAsycn(this, mApplication, output -> {
+                if (output != null && output.size() > 0) {
+                    mApplication.setLayerInfos(output);
+                    startMain();
+                } else {
+                    Toast.makeText(MainActivity.this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                    startSignIn();
+                }
+            });
+            if (CheckConnectInternet.isOnline(this))
+                preparingAsycn.execute();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        int expected = grantResults.length;
+        int sum = 0;
+        for (int i : grantResults)
+            if (i == PackageManager.PERMISSION_GRANTED)
+                sum++;
+        if (sum == expected) {
+            PreparingAsycn preparingAsycn = new PreparingAsycn(this, mApplication, output -> {
+                if (output != null && output.size() > 0) {
+                    mApplication.setLayerInfos(output);
+                    startMain();
+                } else {
+                    Toast.makeText(MainActivity.this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                    startSignIn();
+                }
+            });
+            if (CheckConnectInternet.isOnline(this))
+                preparingAsycn.execute();
+        } else {
+//            Toast.makeText(MainActivity.this, "Vui lòng cho phép ứng dụng truy cập các quyền trên", Toast.LENGTH_LONG).show();
+            requestPermisson();
+        }
+    }
+
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
+    private void startMain() {
+        // create an empty map instance
         mListLayerID.clear();
         hanhChinhImageLayers = taiSanImageLayers = null;
         states = new int[][]{{android.R.attr.state_checked}, {}};
         colors = new int[]{R.color.colorTextColor_1, R.color.colorTextColor_1};
         findViewById(R.id.layout_layer).setVisibility(View.INVISIBLE);
-        requestPermisson();
-//        prepare1();
-
-    }
-
-    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
-    private void prepare2() {
-        // create an empty map instance
         setLicense();
         mGeocoder = new Geocoder(this.getApplicationContext(), Locale.getDefault());
         mLayoutDisplayLayerThematic = findViewById(R.id.linearDisplayLayerFeature);
@@ -287,10 +339,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mLayoutTimDiaChi = findViewById(R.id.layout_tim_dia_chi);
         mLayoutTimDiaChi.setOnClickListener(this);
         mLayoutTimKiem = findViewById(R.id.layout_tim_kiem);
-        ((TextView) findViewById(R.id.txt_nav_header_tenNV)).setText(Preference.getInstance()
-                .loadPreference(getString(R.string.preference_username)));
-        ((TextView) findViewById(R.id.txt_nav_header_displayname)).setText(Preference.getInstance()
-                .loadPreference(getString(R.string.preference_displayname)));
+        ((TextView) findViewById(R.id.txt_nav_header_tenNV)).setText(mApplication.getUserDangNhap().getUserName());
+        ((TextView) findViewById(R.id.txt_nav_header_displayname)).setText(mApplication.getUserDangNhap().getDisplayName());
         optionSearchFeature();
 
     }
@@ -345,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void handlingMapViewDoneLoading() {
         mLocationDisplay = mMapView.getLocationDisplay();
         mLocationDisplay.startAsync();
-        mApplication = (DApplication) getApplication();
+
 //        loginWithPortal1();
         setServices();
     }
@@ -353,18 +403,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setServices() {
         try {
             // config feature layer service
-            mFeatureLayerDTGS = new ArrayList<>();
-            for (final LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
-                if (layerInfoDTG.getId().substring(layerInfoDTG.getId().length() - 3).equals("TBL") || !layerInfoDTG.isView())
+            mDFeatureLayers = new ArrayList<>();
+            for (final DLayerInfo dLayerInfo : mApplication.getLayerInfos()) {
+                if (dLayerInfo.getId().substring(dLayerInfo.getId().length() - 3).equals("TBL") || !dLayerInfo.isView())
                     continue;
-                String url = layerInfoDTG.getUrl();
-                if (!layerInfoDTG.getUrl().startsWith("http"))
-                    url = "http:" + layerInfoDTG.getUrl();
+                String url = dLayerInfo.getUrl();
+                if (!dLayerInfo.getUrl().startsWith("http"))
+                    url = "http:" + dLayerInfo.getUrl();
                 if (url == null)
                     continue;
-                if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_Basemap)) && hanhChinhImageLayers == null) {
+                if (dLayerInfo.getId().equals(getString(R.string.IDLayer_Basemap)) && hanhChinhImageLayers == null) {
                     hanhChinhImageLayers = new ArcGISMapImageLayer(url);
-                    hanhChinhImageLayers.setId(layerInfoDTG.getId());
+                    hanhChinhImageLayers.setId(dLayerInfo.getId());
                     mMapView.getMap().getOperationalLayers().add(hanhChinhImageLayers);
                     hanhChinhImageLayers.addDoneLoadingListener(() -> {
                         if (hanhChinhImageLayers.getLoadStatus() == LoadStatus.LOADED) {
@@ -377,29 +427,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
                     hanhChinhImageLayers.loadAsync();
-                } else if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+                } else if (dLayerInfo.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     mFeatureLayer = new FeatureLayer(serviceFeatureTable);
-                    mFeatureLayer.setDefinitionExpression(layerInfoDTG.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
-                    mFeatureLayer.setId(layerInfoDTG.getId());
-                    mFeatureLayer.setName(layerInfoDTG.getTitleLayer());
-                    mFeatureLayer.setId(layerInfoDTG.getId());
+                    mFeatureLayer.setDefinitionExpression(dLayerInfo.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                    mFeatureLayer.setId(dLayerInfo.getId());
+                    mFeatureLayer.setName(dLayerInfo.getTitleLayer());
+                    mFeatureLayer.setId(dLayerInfo.getId());
                     mFeatureLayer.setPopupEnabled(true);
-mFeatureLayer.setMinScale(0);
+                    mFeatureLayer.setMinScale(0);
                     mFeatureLayer.addDoneLoadingListener(() -> {
                         setRendererSuCoFeatureLayer(mFeatureLayer);
-                        mFeatureLayerDTG = new FeatureLayerDTG(serviceFeatureTable, mFeatureLayer, layerInfoDTG);
-                        mApplication.setFeatureLayerDTG(mFeatureLayerDTG);
-                        mFeatureLayerDTGS.add(mFeatureLayerDTG);
+                        mDFeatureLayer = new DFeatureLayer(serviceFeatureTable, mFeatureLayer, dLayerInfo);
+                        mApplication.setDFeatureLayer(mDFeatureLayer);
+                        mDFeatureLayers.add(mDFeatureLayer);
                         Callout callout = mMapView.getCallout();
                         mPopUp = new Popup(MainActivity.this, mMapView, serviceFeatureTable, callout, mGeocoder);
 
 
-                        FeatureLayerDTGDiemSuCo = mFeatureLayerDTG;
+                        DFeatureLayerDiemSuCo = mDFeatureLayer;
 
-                        mMapViewHandler = new MapViewHandler(this, mFeatureLayerDTG, callout, mMapView, mPopUp,
+                        mMapViewHandler = new MapViewHandler(this, mDFeatureLayer, callout, mMapView, mPopUp,
                                 MainActivity.this, mGeocoder);
-                        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
+                        mMapViewHandler.setFeatureLayerDTGs(mDFeatureLayers);
 
                     });
                     mMapView.getMap().getOperationalLayers().add(mFeatureLayer);
@@ -407,8 +457,8 @@ mFeatureLayer.setMinScale(0);
                 } else if (taiSanImageLayers == null) {
 
                     taiSanImageLayers = new ArcGISMapImageLayer(url.replaceFirst("FeatureServer(.*)", "MapServer"));
-                    taiSanImageLayers.setName(layerInfoDTG.getTitleLayer());
-                    taiSanImageLayers.setId(layerInfoDTG.getId());
+                    taiSanImageLayers.setName(dLayerInfo.getTitleLayer());
+                    taiSanImageLayers.setId(dLayerInfo.getId());
                     mMapView.getMap().getOperationalLayers().add(taiSanImageLayers);
                     taiSanImageLayers.addDoneLoadingListener(() -> {
                         if (taiSanImageLayers.getLoadStatus() == LoadStatus.LOADED) {
@@ -430,7 +480,7 @@ mFeatureLayer.setMinScale(0);
         } catch (Exception e) {
             Log.e("error", e.toString());
         }
-//        mMapViewHandler.setFeatureLayerDTGs(mFeatureLayerDTGS);
+//        mMapViewHandler.setFeatureLayerDTGs(mDFeatureLayers);
     }
 
     private void addCheckBox(final ArcGISMapImageSublayer layer, int[][] states, int[] colors, boolean isAdministrator) {
@@ -610,45 +660,6 @@ mFeatureLayer.setMinScale(0);
     }
 
 
-    public void requestPermisson() {
-        boolean permissionCheck1 = ContextCompat.checkSelfPermission(this,
-                Constant.REQUEST_PERMISSIONS[0]) == PackageManager.PERMISSION_GRANTED;
-        boolean permissionCheck2 = ContextCompat.checkSelfPermission(this,
-                Constant.REQUEST_PERMISSIONS[1]) == PackageManager.PERMISSION_GRANTED;
-        boolean permissionCheck3 = ContextCompat.checkSelfPermission(this,
-                Constant.REQUEST_PERMISSIONS[2]) == PackageManager.PERMISSION_GRANTED;
-        boolean permissionCheck4 = ContextCompat.checkSelfPermission(this,
-                Constant.REQUEST_PERMISSIONS[3]) == PackageManager.PERMISSION_GRANTED;
-
-        if (!(permissionCheck1 && permissionCheck2 && permissionCheck3 && permissionCheck4)) {
-            // If permissions are not already granted, request permission from the user.
-            ActivityCompat.requestPermissions(this, Constant.REQUEST_PERMISSIONS, Constant.RequestCode.PERMISSION);
-        }  // Report other unknown failure types to the user - for example, location services may not // be enabled on the device. //                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent //                            .getSource().getLocationDataSource().getError().getMessage()); //                    Toast.makeText(QuanLySuCo.this, message, Toast.LENGTH_LONG).show();
-        else {
-            PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
-            if (CheckConnectInternet.isOnline(this))
-                preparingAsycn.execute();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        int expected = grantResults.length;
-        int sum = 0;
-        for (int i : grantResults)
-            if (i == PackageManager.PERMISSION_GRANTED)
-                sum += i;
-        if (sum == expected) {
-            PreparingAsycn preparingAsycn = new PreparingAsycn(this, output -> prepare2());
-            if (CheckConnectInternet.isOnline(this))
-                preparingAsycn.execute();
-        } else {
-            Toast.makeText(MainActivity.this, "Vui lòng cho phép ứng dụng truy cập các quyền trên", Toast.LENGTH_LONG).show();
-            MainActivity.this.finish();
-        }
-    }
-
     private void optionSearchFeature() {
         this.mIsSearchingFeature = true;
         mLayoutTimSuCo.setBackgroundResource(R.drawable.layout_border_bottom);
@@ -736,7 +747,7 @@ mFeatureLayer.setMinScale(0);
                                 mSearchAdapter.notifyDataSetChanged();
                                 if (output.size() > 0) {
                                     for (DAddress address : output) {
-                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", "", address.getLocation(), Constant.ThongTinPhanAnh.KHAC);
+                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", "", address.getLocation(), Constant.ThongTinPhanAnh.KHAC, null);
                                         item.setLatitude(address.getLatitude());
                                         item.setLongtitude(address.getLongtitude());
                                         mSearchAdapter.add(item);
@@ -789,10 +800,10 @@ mFeatureLayer.setMinScale(0);
     }
 
     private void showHideComplete() {
-        if (mApplication.getFeatureLayerDTG().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
-            mApplication.getFeatureLayerDTG().getLayer().setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition());
+        if (mApplication.getDFeatureLayer().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
+            mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition());
         } else {
-            mApplication.getFeatureLayerDTG().getLayer().setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition()
+            mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition()
                     .concat(Constant.DEFINITION_HIDE_COMPLETE));
         }
     }
@@ -831,22 +842,21 @@ mFeatureLayer.setMinScale(0);
                 break;
             case R.id.nav_reload:
                 if (CheckConnectInternet.isOnline(this))
-                    prepare1();
+                    startMain();
                 break;
             case R.id.nav_reload_layer:
                 if (CheckConnectInternet.isOnline(this)) {
                     if (mPopUp != null && mPopUp.getCallout() != null && mPopUp.getCallout().isShowing())
                         mPopUp.getCallout().dismiss();
                     mFeatureLayer.loadAsync();
-                    mFeatureLayer.setDefinitionExpression(mApplication.getFeatureLayerDTG().getLayerInfoDTG().getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                    mFeatureLayer.setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
                 }
                 break;
             case R.id.nav_show_hide_complete:
                 showHideComplete();
                 break;
             case R.id.nav_logOut:
-                Preference.getInstance().deletePreferences(getString(R.string.preference_login_api));
-                this.finish();
+                startSignIn();
                 break;
             case R.id.nav_delete_searching:
                 deleteSearching();
@@ -1131,6 +1141,10 @@ mFeatureLayer.setMinScale(0);
                     if (resultCode == Activity.RESULT_OK && mMapViewHandler != null) {
                         mMapViewHandler.queryByObjectID(objectid);
                     }
+                    break;
+                case Constant.RequestCode.LOGIN:
+                    if (resultCode == RESULT_OK)
+                        requestPermisson();
                     break;
                 case Constant.RequestCode.LIST_TASK:
                     if (resultCode == Activity.RESULT_OK)

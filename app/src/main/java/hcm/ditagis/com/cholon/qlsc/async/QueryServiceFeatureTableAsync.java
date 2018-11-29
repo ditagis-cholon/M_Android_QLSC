@@ -35,7 +35,7 @@ public class QueryServiceFeatureTableAsync extends AsyncTask<QueryParameters, Fe
     public QueryServiceFeatureTableAsync(Activity activity, AsyncResponse delegate) {
         this.mActivity = activity;
         this.mApplication = (DApplication) activity.getApplication();
-        this.mServiceFeatureTable = (ServiceFeatureTable) mApplication.getFeatureLayerDTG().getLayer().getFeatureTable();
+        this.mServiceFeatureTable = (ServiceFeatureTable) mApplication.getDFeatureLayer().getLayer().getFeatureTable();
         this.mDelegate = delegate;
     }
 

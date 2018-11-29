@@ -100,31 +100,39 @@ public class UpdateActivity extends AppCompatActivity {
         }
     }
 
+    public void pickPhoto() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, Constant.RequestCode.PICK_PHOTO);
+    }
+
+    private void update(Bitmap bitmap) {
+        mUpdateAttachment.startProgress();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        byte[] image = outputStream.toByteArray();
+        EditAsync editAsync;
+        editAsync = new EditAsync(UpdateActivity.this, false,
+                mApplication.getSelectedArcGISFeature(), null, image,
+                arcGISFeature -> {
+                    mUpdateAttachment.handlingCaptureDone(arcGISFeature);
+
+                });
+        editAsync.execute();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case Constant.RequestCode.UPDATE_ATTACHMENT:
                 if (resultCode == RESULT_OK) {
-//                this.mUri= data.getData();
                     if (this.mUri != null) {
-//                    Uri selectedImage = this.mUri;
-//                    getContentResolver().notifyChange(selectedImage, null);
                         Bitmap bitmap = getBitmap(mUri.getPath());
                         try {
                             if (bitmap != null) {
                                 Matrix matrix = new Matrix();
                                 matrix.postRotate(90);
                                 Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                                rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                                byte[] image = outputStream.toByteArray();
-                                EditAsync editAsync;
-                                editAsync = new EditAsync(UpdateActivity.this,false,
-                                        mApplication.getSelectedArcGISFeature(), null, image,
-                                        arcGISFeature -> {
-                                            mUpdateAttachment.handlingCaptureDone(arcGISFeature);
-
-                                        });
-                                editAsync.execute();
+                                update(rotatedBitmap);
 
                             }
                         } catch (Exception ignored) {
@@ -134,6 +142,20 @@ public class UpdateActivity extends AppCompatActivity {
                     Toast.makeText(this, "Hủy chụp ảnh", Toast.LENGTH_SHORT);
                 } else {
                     Toast.makeText(this, "Lỗi khi chụp ảnh", Toast.LENGTH_SHORT);
+                }
+                break;
+            case Constant.RequestCode.PICK_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        Uri contentURI = data.getData();
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                            update(bitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(UpdateActivity.this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
                 break;
         }

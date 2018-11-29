@@ -1,7 +1,6 @@
 package hcm.ditagis.com.cholon.qlsc.async;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,23 +11,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
-//    private ProgressDialog mDialog;
+    //    private ProgressDialog mDialog;
     @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private AsyncResponse mDelegate;
+    private DApplication mApplication;
 
     public interface AsyncResponse {
         void processFinish(String output);
     }
 
-    GenerateIDSuCoAsycn(Context context, AsyncResponse delegate) {
+    GenerateIDSuCoAsycn(Context context,DApplication dApplication, AsyncResponse delegate) {
         this.mContext = context;
         this.mDelegate = delegate;
+        this.mApplication = dApplication;
     }
 
     @Override
@@ -45,14 +46,14 @@ public class GenerateIDSuCoAsycn extends AsyncTask<Void, Void, String> {
         //Tránh gặp lỗi networkOnMainThread nên phải dùng asyncTask
         String id = "";
         try {
-            String API_URL = Constant.getInstance().GENERATE_ID_SUCO + UserDangNhap.getInstance().getUser().getRole();
+            String API_URL = Constant.getInstance().GENERATE_ID_SUCO + mApplication.getUserDangNhap().getRole();
 
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.setRequestProperty("Authorization",mApplication.getUserDangNhap().getToken());
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));

@@ -46,7 +46,7 @@
     </style>
 
     <style name="MyTextAppearance.White.Big" parent="MyTextAppearance.White">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">17sp</item>
     </style>
 
     <style name="MyTextAppearance.White.Big.Bold" parent="MyTextAppearance.White.Big">

@@ -21,26 +21,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
-import hcm.ditagis.com.cholon.qlsc.services.GetDMA;
-import hcm.ditagis.com.cholon.qlsc.services.GetVatTu;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
+import hcm.ditagis.com.cholon.qlsc.entities.DLayerInfo;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
-import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
-public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQueryResult>, Void> {
+public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQueryResult>, List<DLayerInfo>> {
     private ProgressDialog mDialog;
     @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private AsyncResponse mDelegate;
+    private DApplication mApplication;
 
     public interface AsyncResponse {
-        void processFinish(Void output);
+        void processFinish(List<DLayerInfo> output);
     }
 
-    public PreparingAsycn(Context context, AsyncResponse delegate) {
+    public PreparingAsycn(Context context, DApplication dApplication, AsyncResponse delegate) {
         this.mContext = context;
         this.mDelegate = delegate;
+        this.mApplication = dApplication;
     }
 
     @Override
@@ -53,11 +52,11 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected List<DLayerInfo> doInBackground(Void... params) {
         try {
-            getLayerInfoAPI();
-            new GetVatTu(mContext).getVatTuFromService();
-            new GetDMA(mContext).getMaDMAFromService();
+            return getLayerInfoAPI();
+//            new GetVatTu(mContext).getVatTuFromService();
+//            new GetDMA(mContext).getMaDMAFromService();
 
         } catch (Exception e) {
             Log.e("Lỗi lấy danh sách DMA", e.toString());
@@ -74,7 +73,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
     }
 
     @Override
-    protected void onPostExecute(Void value) {
+    protected void onPostExecute(List<DLayerInfo> value) {
 //        if (khachHang != null) {
         mDialog.dismiss();
         this.mDelegate.processFinish(value);
@@ -82,7 +81,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
     }
 
 
-    private void getLayerInfoAPI() {
+    private List<DLayerInfo> getLayerInfoAPI() {
         try {
             String API_URL = Constant.getInstance().LAYER_INFO;
 
@@ -91,7 +90,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
             try {
                 conn.setDoOutput(false);
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.setRequestProperty("Authorization", mApplication.getUserDangNhap().getToken());
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -100,7 +99,7 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
                 while ((line = bufferedReader.readLine()) != null) {
                     builder.append(line);
                 }
-                pajsonRouteeJSon(builder.toString());
+                return pajsonRouteeJSon(builder.toString());
             } catch (Exception e) {
                 Log.e("error", e.toString());
             } finally {
@@ -109,29 +108,27 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
         } catch (Exception e) {
             Log.e("Lỗi lấy LayerInfo", e.toString());
         }
+        return null;
     }
 
-    private void pajsonRouteeJSon(String data) throws JSONException {
+    private List<DLayerInfo> pajsonRouteeJSon(String data) throws JSONException {
         if (data == null)
-            return;
+            return null;
         String myData = "{ \"layerInfo\": ".concat(data).concat("}");
         JSONObject jsonData = new JSONObject(myData);
         JSONArray jsonRoutes = jsonData.getJSONArray("layerInfo");
-        List<LayerInfoDTG> layerDTGS = new ArrayList<>();
+        List<DLayerInfo> layerDTGS = new ArrayList<>();
         for (int i = 0; i < jsonRoutes.length(); i++) {
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
-            layerDTGS.add(new LayerInfoDTG(jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
+            layerDTGS.add(new DLayerInfo(jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_id)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_title)),
                     jsonRoute.getString(mContext.getString(R.string.sql_coloumn_sys_url)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_iscreate)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isdelete)),
                     jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isedit)), jsonRoute.getBoolean(mContext.getString(R.string.sql_coloumn_sys_isview)),
                     jsonRoute.getString(mContext.getString(R.string.sql_column_sys_definition)),
-                    jsonRoute.getString("OutFields")));
-
-
+                    jsonRoute.getString("OutFields").split(","), null));
         }
-        ListObjectDB.getInstance().setLstFeatureLayerDTG(layerDTGS);
-
+        return layerDTGS;
     }
 
 }

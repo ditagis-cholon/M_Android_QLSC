@@ -41,6 +41,8 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
     Button mBtnAdd;
     @BindView(R.id.btn_add_feature_capture)
     Button mBtnCapture;
+    @BindView(R.id.btn_add_feature_pick_photo)
+    Button mBtnPickPhoto;
     @BindView(R.id.llayout_add_feature_main)
     LinearLayout mLLayoutMain;
     @BindView(R.id.llayout_add_feature_field)
@@ -72,13 +74,14 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
         mImages = new ArrayList<>();
         mBtnCapture.setOnClickListener(this::onClick);
         mBtnAdd.setOnClickListener(this::onClick);
+        mBtnPickPhoto.setOnClickListener(this::onClick);
         (Objects.requireNonNull(getSupportActionBar())).setDisplayHomeAsUpEnabled(true);
         (Objects.requireNonNull(getSupportActionBar())).setDisplayShowHomeEnabled(true);
         mTxtProgress.setText("Đang khởi tạo thuộc tính...");
         mLLayoutProgress.setVisibility(View.VISIBLE);
         mLLayoutMain.setVisibility(View.GONE);
 
-        mFeatureLayer = mApplication.getFeatureLayerDTG().getLayer();
+        mFeatureLayer = mApplication.getDFeatureLayer().getLayer();
         new LoadingDataFeatureAsync(AddFeatureActivity.this,
                 AddFeatureActivity.this, mFeatureLayer.getFeatureTable().getFields(), views -> {
             if (views != null)
@@ -110,14 +113,19 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
         } catch (Exception e) {
             Log.e("Lỗi chụp ảnh", e.toString());
         }
+
+    }
+
+    private void pickPhoto() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, Constant.RequestCode.PICK_PHOTO);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_add_feature_capture:
-                capture();
-                break;
+
             case R.id.btn_add_feature_add:
                 if (!hadPoint()) {
                     Toast.makeText(AddFeatureActivity.this, R.string.message_add_feature_had_not_point, Toast.LENGTH_LONG).show();
@@ -127,7 +135,7 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
                     mLLayoutProgress.setVisibility(View.VISIBLE);
                     mLLayoutMain.setVisibility(View.GONE);
                     mTxtProgress.setText("Đang lưu...");
-                    new AddFeatureAsync(AddFeatureActivity.this, mApplication.getFeatureLayerDTG().getServiceFeatureTable(), mLLayoutField, output -> {
+                    new AddFeatureAsync(AddFeatureActivity.this, mApplication.getDFeatureLayer().getServiceFeatureTable(), mLLayoutField, output -> {
                         if (output != null) {
                             mApplication.getDiemSuCo().setObjectID(Long.parseLong(output.getAttributes().get(Constant.Field.OBJECTID).toString()));
 
@@ -139,6 +147,12 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
 
 
                 }
+                break;
+            case R.id.btn_add_feature_capture:
+                capture();
+                break;
+            case R.id.btn_add_feature_pick_photo:
+                pickPhoto();
                 break;
         }
 
@@ -204,39 +218,61 @@ public class AddFeatureActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    private void handlingImage(Bitmap bitmap, boolean isFromCamera) {
+        try {
+            if (bitmap != null) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                ImageView imageView = new ImageView(mLLayoutImage.getContext());
+                imageView.setPadding(0, 0, 0, 10);
+                if (isFromCamera) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    imageView.setImageBitmap(rotatedBitmap);
+                } else {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    imageView.setImageBitmap(bitmap);
+                }
+                byte[] image = outputStream.toByteArray();
+                Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
+                mLLayoutImage.addView(imageView);
+
+                mImages.add(image);
+                mApplication.setImages(mImages);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case Constant.RequestCode.ADD_FEATURE_ATTACHMENT:
                 if (resultCode == RESULT_OK) {
-//                this.mUri= data.getData();
                     if (this.mUri != null) {
-//                    Uri selectedImage = this.mUri;
-//                    getContentResolver().notifyChange(selectedImage, null);
-                        Bitmap bitmap = getBitmap(mUri.getPath());
-                        try {
-                            if (bitmap != null) {
-                                Matrix matrix = new Matrix();
-                                matrix.postRotate(90);
-                                Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                                rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                                byte[] image = outputStream.toByteArray();
-                                Toast.makeText(this, "Đã lưu ảnh", Toast.LENGTH_SHORT).show();
-                                ImageView imageView = new ImageView(mLLayoutImage.getContext());
-                                imageView.setImageBitmap(rotatedBitmap);
-                                imageView.setPadding(0, 0, 0, 10);
-                                mLLayoutImage.addView(imageView);
-
-                                mImages.add(image);
-                                mApplication.setImages(mImages);
-                            }
-                        } catch (Exception ignored) {
-                        }
+                        Bitmap bitmap = getBitmap(this.mUri.getPath());
+                        handlingImage(bitmap, true);
                     }
+
                 } else if (resultCode == RESULT_CANCELED) {
                     Toast.makeText(this, "Hủy chụp ảnh", Toast.LENGTH_SHORT);
                 } else {
                     Toast.makeText(this, "Lỗi khi chụp ảnh", Toast.LENGTH_SHORT);
+                }
+                break;
+            case Constant.RequestCode.PICK_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        Uri contentURI = data.getData();
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                            handlingImage(bitmap, false);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(AddFeatureActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
                 break;
         }

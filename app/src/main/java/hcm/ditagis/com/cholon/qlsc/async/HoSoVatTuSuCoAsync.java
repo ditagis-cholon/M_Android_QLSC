@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
+import hcm.ditagis.com.cholon.qlsc.entities.DLayerInfo;
 import hcm.ditagis.com.cholon.qlsc.entities.HoSoVatTuSuCo;
 import hcm.ditagis.com.cholon.qlsc.entities.VatTu;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
@@ -40,15 +41,15 @@ public class HoSoVatTuSuCoAsync extends AsyncTask<Object, Object, Void> {
     public HoSoVatTuSuCoAsync(Context context, AsyncResponse response) {
         this.mContext = context;
         this.mDelegate = response;
-        for (final LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
-            if (layerInfoDTG.getId().equals(mContext.getString(R.string.IDLayer_DiemSuCo))) {
-                String url = layerInfoDTG.getUrl();
-                if (!layerInfoDTG.getUrl().startsWith("http"))
-                    url = "http:" + layerInfoDTG.getUrl();
-                url = url.replace("/0", "/1"); // hồ sơ vật tư sự cố
-                mServiceFeatureTable = new ServiceFeatureTable(url);
-            }
-        }
+//        for (final DLayerInfo layerInfoDTG : map) {
+//            if (layerInfoDTG.getId().equals(mContext.getString(R.string.IDLayer_DiemSuCo))) {
+//                String url = layerInfoDTG.getUrl();
+//                if (!layerInfoDTG.getUrl().startsWith("http"))
+//                    url = "http:" + layerInfoDTG.getUrl();
+//                url = url.replace("/0", "/1"); // hồ sơ vật tư sự cố
+//                mServiceFeatureTable = new ServiceFeatureTable(url);
+//            }
+//        }
     }
 
     private void find(String idSuCo) {

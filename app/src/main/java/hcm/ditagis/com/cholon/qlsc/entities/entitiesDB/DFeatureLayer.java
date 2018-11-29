@@ -4,20 +4,22 @@ package hcm.ditagis.com.cholon.qlsc.entities.entitiesDB;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 
+import hcm.ditagis.com.cholon.qlsc.entities.DLayerInfo;
+
 /**
  * Created by NGUYEN HONG on 3/14/2018.
  */
 
-public class FeatureLayerDTG {
+public class DFeatureLayer {
 
     private ServiceFeatureTable serviceFeatureTable;
     private FeatureLayer layer;
-    private LayerInfoDTG layerInfoDTG;
+    private DLayerInfo dLayerInfo;
 
-    public FeatureLayerDTG(ServiceFeatureTable serviceFeatureTable, FeatureLayer layer, LayerInfoDTG layerInfoDTG) {
+    public DFeatureLayer(ServiceFeatureTable serviceFeatureTable, FeatureLayer layer, DLayerInfo dLayerInfo) {
         this.serviceFeatureTable = serviceFeatureTable;
         this.layer = layer;
-        this.layerInfoDTG = layerInfoDTG;
+        this.dLayerInfo = dLayerInfo;
     }
 
     public ServiceFeatureTable getServiceFeatureTable() {
@@ -28,7 +30,7 @@ public class FeatureLayerDTG {
         return layer;
     }
 
-    public LayerInfoDTG getLayerInfoDTG() {
-        return layerInfoDTG;
+    public DLayerInfo getdLayerInfo() {
+        return dLayerInfo;
     }
 }

@@ -62,7 +62,7 @@ public class LoadingDataFeatureAsync extends AsyncTask<Boolean, Boolean, Void> {
         List<View> views = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        String[] outFields = mApplication.getFeatureLayerDTG().getLayerInfoDTG().getOutFields().split(",");
+        String[] outFields = mApplication.getDFeatureLayer().getdLayerInfo().getOutFieldsArr();
         boolean isFoundField = false;
         for (Field field : mFields) {
             String name = field.getName();

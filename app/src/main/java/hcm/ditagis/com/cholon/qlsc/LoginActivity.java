@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
         LoginAsycn loginAsycn = new LoginAsycn(this, output -> {
+            Preference.getInstance().deletePreferences();
             if (output != null)
                 handleLoginSuccess(output);
             else
@@ -147,16 +148,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void handleLoginSuccess(User user) {
-
+mApplication.setUserDangNhap(user);
 
         Preference.getInstance().savePreferences(getString(R.string.preference_username), mTxtUsername.getText().toString());
-//        Preference.getInstance().savePreferences(getString(R.string.preference_password), user.getPassWord());
-        Preference.getInstance().savePreferences(getString(R.string.preference_displayname), user.getDisplayName());
         mTxtUsername.setText("");
         mTxtPassword.setText("");
-        Intent intent = new Intent(this, MainActivity.class);
 
-        startActivity(intent);
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     private void changeAccount() {

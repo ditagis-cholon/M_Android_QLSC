@@ -136,7 +136,7 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
                     if (edits != null && edits.size() > 0) {
                         if (!edits.get(0).hasCompletedWithErrors()) {
                             long objectId = edits.get(0).getObjectId();
-                            new NotifyServerAddingFeature(mActivity.getApplicationContext(), output -> {
+                            new NotifyServerAddingFeature(mActivity.getApplicationContext(),mApplication, output -> {
                                 if (output != null && output.length() > 0) {
                                     final QueryParameters queryParameters = new QueryParameters();
                                     final String query = String.format("%s = '%s'", Constant.FieldSuCo.ID_SUCO, output);

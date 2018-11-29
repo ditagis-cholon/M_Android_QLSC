@@ -18,21 +18,19 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.MainActivity;
-import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
-import hcm.ditagis.com.cholon.qlsc.utities.Constant;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 
 /**
  * Created by ThanLe on 4/16/2018.
  */
 
-public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Void> {
+public class SingleTapMapViewAsync extends AsyncTask<Point, DFeatureLayer, Void> {
     private ProgressDialog mDialog;
     @SuppressLint("StaticFieldLeak")
     private Activity mActivity;
-    private List<FeatureLayerDTG> mFeatureLayerDTGs;
+    private List<DFeatureLayer> mDFeatureLayers;
     @SuppressLint("StaticFieldLeak")
     private MapView mMapView;
     private ArcGISFeature mSelectedArcGISFeature;
@@ -42,10 +40,10 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     private boolean isFound = false;
     private DApplication mApplication;
 
-    public SingleTapMapViewAsync(MainActivity activity, List<FeatureLayerDTG> featureLayerDTGS, Popup popup,
+    public SingleTapMapViewAsync(MainActivity activity, List<DFeatureLayer> DFeatureLayers, Popup popup,
                                  android.graphics.Point clickPoint, MapView mapview) {
         this.mMapView = mapview;
-        this.mFeatureLayerDTGs = featureLayerDTGS;
+        this.mDFeatureLayers = DFeatureLayers;
         this.mPopUp = popup;
         this.mClickPoint = clickPoint;
         this.mActivity = activity;
@@ -69,8 +67,8 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
                             mSelectedArcGISFeature = (ArcGISFeature) elements.get(0);
                             long serviceLayerId = mSelectedArcGISFeature.getFeatureTable().
                                     getServiceLayerId();
-                            FeatureLayerDTG featureLayerDTG = getmFeatureLayerDTG(serviceLayerId);
-                            publishProgress(featureLayerDTG);
+                            DFeatureLayer DFeatureLayer = getmFeatureLayerDTG(serviceLayerId);
+                            publishProgress(DFeatureLayer);
                         }
                     }
                 }
@@ -82,10 +80,10 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
         return null;
     }
 
-    private FeatureLayerDTG getmFeatureLayerDTG(long serviceLayerId) {
-        for (FeatureLayerDTG featureLayerDTG : mFeatureLayerDTGs) {
-            long serviceLayerDTGId = ((ArcGISFeatureTable) featureLayerDTG.getLayer().getFeatureTable()).getServiceLayerId();
-            if (serviceLayerDTGId == serviceLayerId) return featureLayerDTG;
+    private DFeatureLayer getmFeatureLayerDTG(long serviceLayerId) {
+        for (DFeatureLayer DFeatureLayer : mDFeatureLayers) {
+            long serviceLayerDTGId = ((ArcGISFeatureTable) DFeatureLayer.getLayer().getFeatureTable()).getServiceLayerId();
+            if (serviceLayerDTGId == serviceLayerId) return DFeatureLayer;
         }
         return null;
     }
@@ -100,23 +98,21 @@ public class SingleTapMapViewAsync extends AsyncTask<Point, FeatureLayerDTG, Voi
     }
 
     @Override
-    protected void onProgressUpdate(FeatureLayerDTG... values) {
+    protected void onProgressUpdate(DFeatureLayer... values) {
         super.onProgressUpdate(values);
         if (values != null && values.length > 0 && mSelectedArcGISFeature != null) {
-            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mActivity, object -> {
-                if (object != null) {
-                    mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
-                    mPopUp.showPopup(false);
-                }
-                if (mDialog != null && mDialog.isShowing()) {
-                    mDialog.dismiss();
-                }
-            });
-            hoSoVatTuSuCoAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Constant.HOSOVATTUSUCO_METHOD.FIND, mSelectedArcGISFeature.getAttributes()
-                    .get(mActivity.getString(R.string.Field_SuCo_IDSuCo)));
-        } else if (mDialog != null && mDialog.isShowing()) {
+//            HoSoVatTuSuCoAsync hoSoVatTuSuCoAsync = new HoSoVatTuSuCoAsync(mActivity, object -> {
+//                if (object != null) {
+            mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
+            mPopUp.showPopup(false);
+        }
+        if (mDialog != null && mDialog.isShowing()) {
             mDialog.dismiss();
         }
+//            });
+//            hoSoVatTuSuCoAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Constant.HOSOVATTUSUCO_METHOD.FIND, mSelectedArcGISFeature.getAttributes()
+//                    .get(mActivity.getString(R.string.Field_SuCo_IDSuCo)));
+
     }
 
     @Override

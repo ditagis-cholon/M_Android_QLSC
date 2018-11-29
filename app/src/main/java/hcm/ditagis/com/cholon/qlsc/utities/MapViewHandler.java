@@ -36,7 +36,7 @@ import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapAddFeatureAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.FeatureLayerDTG;
+import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
 
 /**
  * Created by ThanLe on 2/2/2018.
@@ -57,22 +57,22 @@ public class MapViewHandler extends Activity {
     private DApplication mApplication;
     private MainActivity mActivity;
 
-    public void setFeatureLayerDTGs(List<FeatureLayerDTG> mFeatureLayerDTGs) {
-        this.mFeatureLayerDTGs = mFeatureLayerDTGs;
+    public void setFeatureLayerDTGs(List<DFeatureLayer> mDFeatureLayers) {
+        this.mDFeatureLayers = mDFeatureLayers;
     }
 
-    private List<FeatureLayerDTG> mFeatureLayerDTGs;
+    private List<DFeatureLayer> mDFeatureLayers;
 
-    public MapViewHandler(MainActivity activity, FeatureLayerDTG featureLayerDTG, Callout mCallout, MapView mapView,
+    public MapViewHandler(MainActivity activity, DFeatureLayer DFeatureLayer, Callout mCallout, MapView mapView,
                           Popup popupInfos, Context mContext, Geocoder geocoder) {
         this.mActivity = activity;
         mApplication = (DApplication) activity.getApplication();
         this.mCallout = mCallout;
         this.mMapView = mapView;
-        this.mServiceFeatureTable = (ServiceFeatureTable) featureLayerDTG.getLayer().getFeatureTable();
+        this.mServiceFeatureTable = (ServiceFeatureTable) DFeatureLayer.getLayer().getFeatureTable();
         this.mPopUp = popupInfos;
         this.mContext = mContext;
-        this.suCoTanHoaLayer = featureLayerDTG.getLayer();
+        this.suCoTanHoaLayer = DFeatureLayer.getLayer();
         this.mGeocoder = geocoder;
     }
 
@@ -83,9 +83,9 @@ public class MapViewHandler extends Activity {
     public void addFeature(byte[] image, Point pointFindLocation) {
         mClickPoint = mMapView.locationToScreen(pointFindLocation);
 
-        SingleTapAddFeatureAsync singleTapAdddFeatureAsync = new SingleTapAddFeatureAsync(mClickPoint, mContext,
+        SingleTapAddFeatureAsync singleTapAdddFeatureAsync = new SingleTapAddFeatureAsync(mApplication,mClickPoint, mContext,
                 image, mServiceFeatureTable, mMapView, mGeocoder, output -> {
-            if (output != null && MainActivity.FeatureLayerDTGDiemSuCo != null) {
+            if (output != null && MainActivity.DFeatureLayerDiemSuCo != null) {
                 mApplication.setSelectedArcGISFeature((ArcGISFeature) output);
                 mPopUp.showPopup(true);
             }
@@ -111,7 +111,7 @@ public class MapViewHandler extends Activity {
             mMapView.setViewpointCenterAsync(clickPoint, 10);
         } else {
 
-            SingleTapMapViewAsync singleTapMapViewAsync = new SingleTapMapViewAsync(mActivity, mFeatureLayerDTGs, mPopUp, mClickPoint, mMapView);
+            SingleTapMapViewAsync singleTapMapViewAsync = new SingleTapMapViewAsync(mActivity, mDFeatureLayers, mPopUp, mClickPoint, mMapView);
             singleTapMapViewAsync.execute(clickPoint);
         }
     }
@@ -131,7 +131,7 @@ public class MapViewHandler extends Activity {
 
                     mMapView.setViewpointGeometryAsync(extent);
                     suCoTanHoaLayer.selectFeature(item);
-                    if (MainActivity.FeatureLayerDTGDiemSuCo != null) {
+                    if (MainActivity.DFeatureLayerDiemSuCo != null) {
                         mSelectedArcGISFeature = (ArcGISFeature) item;
                         if (mSelectedArcGISFeature != null) {
                             mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
@@ -248,7 +248,7 @@ public class MapViewHandler extends Activity {
 
                     }
                     adapter.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(mContext.getString(R.string.Field_OBJECTID)).toString()),
-                            attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString(), format_date, viTri,Constant.ThongTinPhanAnh.KHAC));
+                            attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString(), format_date, viTri,Constant.ThongTinPhanAnh.KHAC,null));
                     adapter.notifyDataSetChanged();
 
 //                        queryByObjectID(Integer.parseInt(attributes.get(Constant.OBJECT_ID).toString()));

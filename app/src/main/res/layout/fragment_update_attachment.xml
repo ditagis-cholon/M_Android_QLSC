@@ -44,8 +44,8 @@
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_udpate_attachment"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <ListView
                 android:id="@+id/list_update_attachment"
@@ -53,14 +53,32 @@
                 android:layout_height="match_parent" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <Button
-            android:id="@+id/btn_update_attachment_capture"
-            style="@style/MyTextAppearance.Blue.VeryBig"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|right"
-            android:background="@drawable/layout_border_transparent"
-            android:text="Chụp ảnh" />
+            android:layout_gravity="right"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_update_attachment_pick_photo"
+                style="@style/MyTextAppearance.Blue.Big"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|right"
+                android:background="@drawable/layout_border_transparent"
+                android:text="chọn ảnh" />
+
+            <Button
+                android:id="@+id/btn_update_attachment_capture"
+                style="@style/MyTextAppearance.Blue.Big"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|right"
+                android:layout_marginLeft="@dimen/margin_small"
+                android:background="@drawable/layout_border_transparent"
+                android:text="Chụp ảnh" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

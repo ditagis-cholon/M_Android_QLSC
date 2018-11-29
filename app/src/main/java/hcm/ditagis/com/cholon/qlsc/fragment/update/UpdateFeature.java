@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.esri.arcgisruntime.data.ArcGISFeature;
 
+import hcm.ditagis.com.cholon.qlsc.ListTaskActivity;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.UpdateActivity;
 import hcm.ditagis.com.cholon.qlsc.async.EditAsync;
@@ -94,21 +96,37 @@ public class UpdateFeature extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_update_feature_complete:
-                mLLayoutProgress.setVisibility(View.VISIBLE);
-                mLLayoutMain.setVisibility(View.GONE);
-                mTxtProgress.setText("Đang lưu...");
-                EditAsync completeAsync = new EditAsync(mActivity, true,
-                        mArcGISFeature, mLLayoutField, null,
-                        arcGISFeature -> {
-                            mLLayoutProgress.setVisibility(View.GONE);
-                            mLLayoutMain.setVisibility(View.VISIBLE);
-                            if (arcGISFeature != null) {
-                                Toast.makeText(mRootView.getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                LinearLayout layout = (LinearLayout) mActivity.getLayoutInflater().inflate(R.layout.layout_dialog, null);
+                TextView txtTitle = layout.findViewById(R.id.txt_dialog_title);
+                TextView txtMessage = layout.findViewById(R.id.txt_dialog_message);
+                txtTitle.setText(getString(R.string.message_title_confirm));
+                txtMessage.setText("Bạn có muốn hoàn thành sự cố?");
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mRootView.getContext());
+                builder.setView(layout);
+                builder.setCancelable(false)
+                        .setPositiveButton(R.string.message_btn_ok, (dialog, i) -> {
+                            mLLayoutProgress.setVisibility(View.VISIBLE);
+                            mLLayoutMain.setVisibility(View.GONE);
+                            mTxtProgress.setText("Đang lưu...");
+                            EditAsync completeAsync = new EditAsync(mActivity, true,
+                                    mArcGISFeature, mLLayoutField, null,
+                                    arcGISFeature -> {
+                                        mLLayoutProgress.setVisibility(View.GONE);
+                                        mLLayoutMain.setVisibility(View.VISIBLE);
+                                        if (arcGISFeature != null) {
+                                            Toast.makeText(mRootView.getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
 //                                mActivity.goHome();
-                            } else
-                                Toast.makeText(mRootView.getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
-                        });
-                completeAsync.execute();
+                                        } else
+                                            Toast.makeText(mRootView.getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                                    });
+                            completeAsync.execute();
+                        }).setNegativeButton(R.string.message_btn_cancel, (dialog, i) -> {
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
                 break;
             case R.id.btn_update_feature_update:
                 mLLayoutProgress.setVisibility(View.VISIBLE);

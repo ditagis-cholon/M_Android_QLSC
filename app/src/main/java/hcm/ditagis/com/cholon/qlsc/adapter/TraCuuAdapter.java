@@ -58,7 +58,8 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             convertView = inflater.inflate(R.layout.item_tracuu, null);
         }
         Item item = items.get(position);
-        TextView txtDiaChi = convertView.findViewById(R.id.txt_bottom);
+        TextView txtThongTinPhanAnh = convertView.findViewById(R.id.txt_bottom);
+        TextView txtDiaChi = convertView.findViewById(R.id.txt_bottom1);
         TextView txtID = convertView.findViewById(R.id.txt_top);
         TextView txtNgayCapNhat = convertView.findViewById(R.id.txt_right);
         LinearLayout layout = convertView.findViewById(R.id.layout_tracuu);
@@ -71,6 +72,7 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
                 txtDiaChi.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 txtID.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 txtNgayCapNhat.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtThongTinPhanAnh.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 break;
             //đã sửa chữa
             //đang sửa chữa
@@ -82,6 +84,7 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
                 txtDiaChi.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 txtID.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 txtNgayCapNhat.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+                txtThongTinPhanAnh.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
                 break;
             default:
                 break;
@@ -104,7 +107,9 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             txtNgayCapNhat.setVisibility(View.GONE);
         else
             txtNgayCapNhat.setText(item.getNgayThongBao());
-
+        if (item.getThongTinPhanAnhString() != null && item.getThongTinPhanAnhString().isEmpty()) {
+            txtThongTinPhanAnh.setVisibility(View.GONE);
+        } else txtThongTinPhanAnh.setText(item.getThongTinPhanAnhString());
 
         return convertView;
     }
@@ -119,14 +124,16 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
         String diaChi;
         double latitude;
         double longtitude;
+        String thongTinPhanAnhString;
         short thongTinPhanAnh;
 
-        public Item(int objectID, String id, String ngayCapNhat, String diaChi, short thongTinPhanAnh) {
+        public Item(int objectID, String id, String ngayCapNhat, String diaChi, short thongTinPhanAnh, String thongTinPhanAnhString) {
             this.objectID = objectID;
             this.id = id;
             this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
             this.thongTinPhanAnh = thongTinPhanAnh;
+            this.thongTinPhanAnhString = thongTinPhanAnhString;
         }
 
         public Item(int objectID, String id, String ngayCapNhat, String diaChi) {
@@ -134,6 +141,10 @@ public class TraCuuAdapter extends ArrayAdapter<TraCuuAdapter.Item> {
             this.id = id;
             this.ngayThongBao = ngayCapNhat;
             this.diaChi = diaChi;
+        }
+
+        public String getThongTinPhanAnhString() {
+            return thongTinPhanAnhString;
         }
 
         public short getThongTinPhanAnh() {

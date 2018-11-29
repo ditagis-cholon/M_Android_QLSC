@@ -50,15 +50,15 @@ public class ThongKeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thong_ke);
-        for (final LayerInfoDTG layerInfoDTG : ListObjectDB.getInstance().getLstFeatureLayerDTG()) {
-
-            if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
-                String url = layerInfoDTG.getUrl();
-                if (!layerInfoDTG.getUrl().startsWith("http"))
-                    url = "http:" + layerInfoDTG.getUrl();
-                mServiceFeatureTable = new ServiceFeatureTable(url);
-            }
-        }
+//        for (final LayerInfoDTG layerInfoDTG : map) {
+//
+//            if (layerInfoDTG.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
+//                String url = layerInfoDTG.getUrl();
+//                if (!layerInfoDTG.getUrl().startsWith("http"))
+//                    url = "http:" + layerInfoDTG.getUrl();
+//                mServiceFeatureTable = new ServiceFeatureTable(url);
+//            }
+//        }
 
         TimePeriodReport timePeriodReport = new TimePeriodReport(this);
         List<ThongKeAdapter.Item> items = timePeriodReport.getItems();

@@ -79,7 +79,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void initSpinTrangThai() {
-        Domain domain = mApplication.getFeatureLayerDTG().getLayer().getFeatureTable().getField(Constant.FieldSuCo.TRANG_THAI).getDomain();
+        Domain domain = mApplication.getDFeatureLayer().getLayer().getFeatureTable().getField(Constant.FieldSuCo.TRANG_THAI).getDomain();
         if (domain != null) {
             mCodeValues = ((CodedValueDomain) domain).getCodedValues();
             if (mCodeValues != null) {
@@ -167,8 +167,9 @@ public class SearchFragment extends Fragment {
                     items.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
                             idSuCo != null ? idSuCo.toString() : "",
                             ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
-                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : "",
-                            thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC));
+                            attributes.get(Constant.FieldSuCo.DIA_CHI)!= null? attributes.get(Constant.FieldSuCo.DIA_CHI).toString():"",
+                            thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC,
+                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : ""));
                 }
             }
 

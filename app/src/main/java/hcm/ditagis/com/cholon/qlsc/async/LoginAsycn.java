@@ -17,9 +17,7 @@ import java.net.URL;
 
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
-import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class LoginAsycn extends AsyncTask<String, Void, User> {
     private ProgressDialog mDialog;
@@ -48,7 +46,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
     protected User doInBackground(String... params) {
         String userName = params[0];
         String pin = params[1];
-        UserDangNhap.getInstance().setUser(null);
+        User user = new User();
 //        String passEncoded = (new EncodeMD5()).encode(pin + "_DITAGIS");
         // Do some validation here
         String urlParameters = String.format("Username=%s&Password=%s", userName, pin);
@@ -63,12 +61,11 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = bufferedReader.readLine();
                 if (line != null) {
-                    Preference.getInstance().savePreferences(mContext.getString(R.string.preference_login_api), line.replace("\"", ""));
+                    String token = line.replace("\"", "");
                     bufferedReader.close();
 
-                    if (checkAccess()) {
-                        UserDangNhap.getInstance().setUser(new User());
-                        UserDangNhap.getInstance().getUser().setDisplayName(getDisplayName());
+                    if (checkAccess(token)) {
+                        user = getMoreInfo(token);
                     }
                 }
             } finally {
@@ -77,7 +74,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
         } catch (Exception e) {
             Log.e("ERROR", e.getMessage(), e);
         }
-        return UserDangNhap.getInstance().getUser();
+        return user;
 
     }
 
@@ -89,7 +86,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
 //        }
     }
 
-    private Boolean checkAccess() {
+    private Boolean checkAccess(String token) {
         boolean isAccess = false;
         try {
             URL url = new URL(Constant.getInstance().IS_ACCESS);
@@ -97,7 +94,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
             try {
                 conn.setDoOutput(false);
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.setRequestProperty("Authorization", token);
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -117,21 +114,24 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
 
     }
 
-    private String getDisplayName() {
-        String displayName = "";
+    private User getMoreInfo(String token) {
+        User user = new User();
+
         try {
             URL url = new URL(Constant.getInstance().DISPLAY_NAME);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.setRequestProperty("Authorization", token);
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = bufferedReader.readLine();
-                if (line != null)
-                    pajsonRouteeJSon(line);
+                if (line != null) {
+                    user = pajsonRouteeJSon(line);
+                    user.setToken(token);
+                }
             } catch (Exception e) {
                 Log.e("error", e.toString());
             } finally {
@@ -140,11 +140,12 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
         } catch (Exception e) {
             Log.e("error", e.toString());
         }
-        return displayName;
+        return user;
 
     }
 
-    private void pajsonRouteeJSon(String data) throws JSONException {
+    private User pajsonRouteeJSon(String data) throws JSONException {
+        User user = new User();
         if (data != null) {
             String myData = "{ \"account\": [".concat(data).concat("]}");
             JSONObject jsonData = new JSONObject(myData);
@@ -154,12 +155,12 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
                 String displayName = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_displayname));
                 String username = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_username));
                 String role = jsonRoute.getString(mContext.getString(R.string.sql_coloumn_login_role));
-                UserDangNhap.getInstance().setUser(new User());
 
-                UserDangNhap.getInstance().getUser().setDisplayName(displayName);
-                UserDangNhap.getInstance().getUser().setUserName(username);
-                UserDangNhap.getInstance().getUser().setRole(role.toUpperCase());
+                user.setDisplayName(displayName);
+                user.setUserName(username);
+                user.setRole(role.toUpperCase());
             }
         }
+        return user;
     }
 }

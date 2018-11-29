@@ -5,9 +5,18 @@ public class User {
     private String displayName;
     private String role;
     private boolean isCreate;
+    private String token;
 
     public User() {
 
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getRole() {

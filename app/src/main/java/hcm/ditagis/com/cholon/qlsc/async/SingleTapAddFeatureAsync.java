@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.UserDangNhap;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 
@@ -50,12 +50,12 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
     private AsyncResponse mDelegate;
     private android.graphics.Point mClickPoint;
     private Geocoder mGeocoder;
-
+private DApplication mApplication;
     public interface AsyncResponse {
         void processFinish(Feature output);
     }
 
-    public SingleTapAddFeatureAsync(android.graphics.Point clickPoint, Context context, byte[] image,
+    public SingleTapAddFeatureAsync(DApplication dApplication,android.graphics.Point clickPoint, Context context, byte[] image,
                                     ServiceFeatureTable serviceFeatureTable, MapView mapView, Geocoder geocoder, AsyncResponse delegate) {
         this.mServiceFeatureTable = serviceFeatureTable;
         this.mMapView = mapView;
@@ -65,6 +65,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
         this.mDialog = new ProgressDialog(context, android.R.style.Theme_Material_Dialog_Alert);
         this.mDelegate = delegate;
         this.mGeocoder = geocoder;
+        this.mApplication = dApplication;
     }
 
     @Override
@@ -100,7 +101,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                     Short intObj = (short) 0;
                     feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_TrangThai), intObj);
                     feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_DoiQuanLy),
-                            UserDangNhap.getInstance().getUser().getRole());
+                          mApplication.getUserDangNhap().getRole());
 
                     String searchStr = "";
                     String timeID;
@@ -134,7 +135,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
     }
 
     private void addFeatureAsync(final Feature feature) {
-        new GenerateIDSuCoAsycn(mContext, output -> {
+        new GenerateIDSuCoAsycn(mContext,mApplication, output -> {
             if (output.isEmpty()) {
                 publishProgress();
                 return;
@@ -145,7 +146,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                 feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayXayRa), c);
                 feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NgayThongBao), c);
             }
-            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), UserDangNhap.getInstance().getUser().getUserName());
+            feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_NguoiBaoSuCo), mApplication.getUserDangNhap().getUserName());
             feature.getAttributes().put(mContext.getString(R.string.Field_SuCo_LoaiSuCo), (short) 0);
             //---get DMA begin
             final ListenableFuture<List<IdentifyLayerResult>> listListenableFuture = mMapView.identifyLayersAsync(mClickPoint, 5, false, 1);
@@ -178,7 +179,7 @@ public class SingleTapAddFeatureAsync extends AsyncTask<Point, Feature, Void> {
                         if (featureEditResults.size() > 0) {
                             long objectId = featureEditResults.get(0).getObjectId();
                             final QueryParameters queryParameters = new QueryParameters();
-                            final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId+"");
+                            final String query = String.format(mContext.getString(R.string.arcgis_query_by_OBJECTID), objectId);
                             queryParameters.setWhereClause(query);
                             final ListenableFuture<FeatureQueryResult> featuresAsync = mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
                             featuresAsync.addDoneListener(() -> {

@@ -5,36 +5,29 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.LayerInfoDTG;
-import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.ListObjectDB;
+import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
-import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
 public class NotifyServerAddingFeature extends AsyncTask<String, Void, String> {
     @SuppressLint("StaticFieldLeak")
     private Context mContext;
     private AsyncResponse mDelegate;
+    private DApplication mApplication;
 
     public interface AsyncResponse {
         void processFinish(String output);
     }
 
-    public NotifyServerAddingFeature(Context context, AsyncResponse delegate) {
+    public NotifyServerAddingFeature(Context context, DApplication dApplication, AsyncResponse delegate) {
         this.mContext = context;
         this.mDelegate = delegate;
+        this.mApplication = dApplication;
     }
 
     @Override
@@ -72,7 +65,7 @@ public class NotifyServerAddingFeature extends AsyncTask<String, Void, String> {
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod(Constant.HTTPRequest.POST_METHOD);
 
-                conn.setRequestProperty(Constant.HTTPRequest.AUTHORIZATION, Preference.getInstance().loadPreference(mContext.getString(R.string.preference_login_api)));
+                conn.setRequestProperty(Constant.HTTPRequest.AUTHORIZATION, mApplication.getUserDangNhap().getToken());
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setUseCaches(false);
