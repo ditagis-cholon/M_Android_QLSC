@@ -48,6 +48,11 @@ public class Constant {
         public static final String DOC = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     }
 
+    public class AttachmentName {
+        public static final String ADD = "img_%s_%d.png";
+        public static final String UPDATE = "img_%s_%d.png";
+    }
+
     public class HTTPRequest {
         public static final String GET_METHOD = "GET";
         public static final String POST_METHOD = "POST";

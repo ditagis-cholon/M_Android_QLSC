@@ -56,7 +56,7 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
             URL url = new URL(urlWithParam);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
-                conn.setRequestMethod("GET");
+                conn.setRequestMethod(Constant.HTTPRequest.GET_METHOD);
                 conn.connect();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = bufferedReader.readLine();
@@ -93,8 +93,8 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", token);
+                conn.setRequestMethod(Constant.HTTPRequest.GET_METHOD);
+                conn.setRequestProperty(Constant.HTTPRequest.AUTHORIZATION, token);
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -122,8 +122,8 @@ public class LoginAsycn extends AsyncTask<String, Void, User> {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", token);
+                conn.setRequestMethod(Constant.HTTPRequest.GET_METHOD);
+                conn.setRequestProperty(Constant.HTTPRequest.AUTHORIZATION, token);
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));

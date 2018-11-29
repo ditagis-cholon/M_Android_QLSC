@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
@@ -136,7 +135,7 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
                     if (edits != null && edits.size() > 0) {
                         if (!edits.get(0).hasCompletedWithErrors()) {
                             long objectId = edits.get(0).getObjectId();
-                            new NotifyServerAddingFeature(mActivity.getApplicationContext(),mApplication, output -> {
+                            new NotifyServerAddingFeature(mActivity.getApplicationContext(), mApplication, output -> {
                                 if (output != null && output.length() > 0) {
                                     final QueryParameters queryParameters = new QueryParameters();
                                     final String query = String.format("%s = '%s'", Constant.FieldSuCo.ID_SUCO, output);
@@ -249,8 +248,8 @@ public class AddFeatureAsync extends AsyncTask<Void, Feature, Void> {
 
     private void addAttachment(ArcGISFeature arcGISFeature, final Feature feature) {
         for (byte[] image : mApplication.getImages()) {
-            @SuppressLint("StringFormatMatches") String attachmentName = mActivity.getApplicationContext()
-                    .getString(R.string.attachment_name, System.currentTimeMillis() + "");
+            @SuppressLint("StringFormatMatches") String attachmentName = String.format(Constant.AttachmentName.ADD,
+                    mApplication.getUserDangNhap().getUserName(), System.currentTimeMillis());
             final ListenableFuture<Attachment> addResult = arcGISFeature.addAttachmentAsync(
                     image, Constant.FileType.PNG, attachmentName);
         }

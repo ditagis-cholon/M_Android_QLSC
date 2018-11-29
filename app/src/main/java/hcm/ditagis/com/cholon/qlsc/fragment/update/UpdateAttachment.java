@@ -73,31 +73,37 @@ public class UpdateAttachment extends Fragment {
         mAdapter = new FeatureViewMoreInfoAttachmentsAdapter(mRootView.getContext(), new ArrayList<>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mRootView.getContext(), R.style.DDialogBuilder);
-            builder.setTitle("Bạn có chắc muốn xóa tệp này?")
-                    .setPositiveButton("Xoá", (dialogInterface, i1) -> {
-                        mApplication.getSelectedArcGISFeature().deleteAttachmentAsync(mAttachments.get(i)).addDoneListener(() -> {
-                            ListenableFuture<List<FeatureEditResult>> listListenableFuture =
-                                    ((ServiceFeatureTable) mApplication.getSelectedArcGISFeature().getFeatureTable()).applyEditsAsync();
-                            listListenableFuture.addDoneListener(() -> {
-                                try {
-                                    List<FeatureEditResult> featureEditResults = listListenableFuture.get();
-                                    mAdapter.remove((FeatureViewMoreInfoAttachmentsAdapter.Item) adapterView.getItemAtPosition(i));
-                                    mAdapter.notifyDataSetChanged();
-                                    Toast.makeText(mRootView.getContext(), "Xóa thành công", Toast.LENGTH_SHORT).show();
-                                } catch (InterruptedException | ExecutionException e) {
-                                    Toast.makeText(mRootView.getContext(), "Xóa thất bại", Toast.LENGTH_SHORT).show();
-                                    e.printStackTrace();
-                                }
-                            });
+            FeatureViewMoreInfoAttachmentsAdapter.Item item = (FeatureViewMoreInfoAttachmentsAdapter.Item) adapterView.getItemAtPosition(i);
+            String[] name = item.getName().split("_");
+            if (name.length > 1 && name[1].equals(mApplication.getUserDangNhap().getUserName())) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mRootView.getContext(), R.style.DDialogBuilder);
+                builder.setTitle("Bạn có chắc muốn xóa ảnh này?")
+                        .setPositiveButton("Xoá", (dialogInterface, i1) -> {
+                            mApplication.getSelectedArcGISFeature().deleteAttachmentAsync(mAttachments.get(i)).addDoneListener(() -> {
+                                ListenableFuture<List<FeatureEditResult>> listListenableFuture =
+                                        ((ServiceFeatureTable) mApplication.getSelectedArcGISFeature().getFeatureTable()).applyEditsAsync();
+                                listListenableFuture.addDoneListener(() -> {
+                                    try {
+                                        List<FeatureEditResult> featureEditResults = listListenableFuture.get();
+                                        mAdapter.remove(item);
+                                        mAdapter.notifyDataSetChanged();
+                                        Toast.makeText(mRootView.getContext(), "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                    } catch (InterruptedException | ExecutionException e) {
+                                        Toast.makeText(mRootView.getContext(), "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                        e.printStackTrace();
+                                    }
+                                });
 
-                        });
-                        dialogInterface.dismiss();
-                    }).setNegativeButton("Hủy", (dialogInterface, i12) -> {
-                dialogInterface.dismiss();
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+                            });
+                            dialogInterface.dismiss();
+                        }).setNegativeButton("Hủy", (dialogInterface, i12) -> {
+                    dialogInterface.dismiss();
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                Toast.makeText(mRootView.getContext(), "Bạn không có quyền xóa ảnh này", Toast.LENGTH_SHORT).show();
+            }
             return false;
         });
 
@@ -115,6 +121,7 @@ public class UpdateAttachment extends Fragment {
     }
 
     public void stopProgress() {
+        Toast.makeText(mRootView.getContext(), "Nhấn và giữ ảnh cần xóa trong 2 giây để xóa", Toast.LENGTH_LONG).show();
         mAdapter.notifyDataSetChanged();
         mLLayoutProgress.setVisibility(View.GONE);
         mLLayoutMain.setVisibility(View.VISIBLE);

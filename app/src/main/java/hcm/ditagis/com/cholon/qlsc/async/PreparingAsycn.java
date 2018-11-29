@@ -89,8 +89,9 @@ public class PreparingAsycn extends AsyncTask<Void, ListenableFuture<FeatureQuer
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             try {
                 conn.setDoOutput(false);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", mApplication.getUserDangNhap().getToken());
+
+                conn.setRequestMethod(Constant.HTTPRequest.GET_METHOD);
+                conn.setRequestProperty(Constant.HTTPRequest.AUTHORIZATION, mApplication.getUserDangNhap().getToken());
                 conn.connect();
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));

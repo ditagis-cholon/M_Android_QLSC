@@ -2,7 +2,6 @@ package hcm.ditagis.com.cholon.qlsc.async;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -182,7 +181,8 @@ public class EditAsync extends AsyncTask<FeatureViewMoreInfoAdapter, ArcGISFeatu
     }
 
     private void addAttachment() {
-        final String attachmentName = "attachment_update_" + System.currentTimeMillis() + ".png";
+        final String attachmentName = String.format(Constant.AttachmentName.UPDATE,
+                mApplication.getUserDangNhap().getUserName(), System.currentTimeMillis());
         final ListenableFuture<Attachment> addResult = mSelectedArcGISFeature.addAttachmentAsync(mImage, Constant.FileType.PNG, attachmentName);
         addResult.addDoneListener(() -> {
             try {

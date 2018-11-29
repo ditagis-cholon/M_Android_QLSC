@@ -52,7 +52,7 @@ public class CheckVersionAsycn extends AsyncTask<String, Void, VersionInfo> {
                 URL url = new URL(String.format(Constant.URL_API.CHECK_VERSION, params[0]));
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 try {
-                    conn.setRequestMethod("GET");
+                    conn.setRequestMethod(Constant.HTTPRequest.GET_METHOD);
                     conn.connect();
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder stringBuilder = new StringBuilder();

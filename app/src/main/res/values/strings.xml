@@ -254,5 +254,4 @@
     <string name="message_btn_ok">OK</string>
     <string name="message_btn_cancel">Hủy</string>
     <string name="message_select_loai_su_co">Vui lòng chọn loại sự cố!</string>
-    <string name="attachment_name">attachment_%1$s.png</string>
 </resources>
