@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.ArcGISFeature;
+import com.esri.arcgisruntime.data.CodedValue;
+import com.esri.arcgisruntime.data.CodedValueDomain;
 import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.data.FeatureQueryResult;
 import com.esri.arcgisruntime.data.Field;
@@ -23,19 +25,19 @@ import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
-import java.util.GregorianCalendar;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import hcm.ditagis.com.cholon.qlsc.MainActivity;
-import hcm.ditagis.com.cholon.qlsc.R;
-import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableAsync;
+import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableGetListAsync;
 import hcm.ditagis.com.cholon.qlsc.async.SingleTapMapViewAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
+import hcm.ditagis.com.cholon.qlsc.fragment.task.HandlingSearchHasDone;
 
 /**
  * Created by ThanLe on 2/2/2018.
@@ -80,7 +82,6 @@ public class MapViewHandler extends Activity {
     }
 
 
-
     public double[] onScroll(MotionEvent e2) {
         Point center = mMapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE).getTargetGeometry().getExtent().getCenter();
         Geometry project = GeometryEngine.project(center, SpatialReferences.getWgs84());
@@ -102,35 +103,6 @@ public class MapViewHandler extends Activity {
         }
     }
 
-    public void queryByObjectID(long objectID) {
-        final QueryParameters queryParameters = new QueryParameters();
-        final String query = mActivity.getString(R.string.arcgis_query_by_OBJECTID, objectID);
-        queryParameters.setWhereClause(query);
-        final ListenableFuture<FeatureQueryResult> feature =
-                mServiceFeatureTable.queryFeaturesAsync(queryParameters, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-        feature.addDoneListener(() -> {
-            try {
-                FeatureQueryResult result = feature.get();
-                if (result.iterator().hasNext()) {
-                    Feature item = result.iterator().next();
-                    Envelope extent = item.getGeometry().getExtent();
-
-                    mMapView.setViewpointGeometryAsync(extent);
-                    suCoTanHoaLayer.selectFeature(item);
-                    if (MainActivity.DFeatureLayerDiemSuCo != null) {
-                        mSelectedArcGISFeature = (ArcGISFeature) item;
-                        if (mSelectedArcGISFeature != null) {
-                            mApplication.setSelectedArcGISFeature(mSelectedArcGISFeature);
-                            mPopUp.showPopup(false);
-                        }
-                    }
-                }
-
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     public void query(String query) {
 
@@ -171,79 +143,4 @@ public class MapViewHandler extends Activity {
             }
         });
     }
-
-    public void querySearch(String searchStr, final TraCuuAdapter adapter) {
-        adapter.clear();
-        adapter.notifyDataSetChanged();
-        mCallout.dismiss();
-
-        suCoTanHoaLayer.clearSelection();
-        QueryParameters queryParameters = new QueryParameters();
-        StringBuilder builder = new StringBuilder();
-        for (Field field : mServiceFeatureTable.getFields()) {
-            switch (field.getFieldType()) {
-                case OID:
-                case INTEGER:
-                case SHORT:
-                    try {
-                        int search = Integer.parseInt(searchStr);
-                        builder.append(String.format("%s = %s", field.getName(), search));
-                        builder.append(" or ");
-                    } catch (Exception ignored) {
-
-                    }
-                    break;
-                case FLOAT:
-                case DOUBLE:
-                    try {
-                        double search = Double.parseDouble(searchStr);
-                        builder.append(String.format("%s = %s", field.getName(), search));
-                        builder.append(" or ");
-                    } catch (Exception ignored) {
-
-                    }
-                    break;
-                case TEXT:
-                    builder.append(field.getName()).append(" like N'%").append(searchStr).append("%'");
-                    builder.append(" or ");
-                    break;
-            }
-        }
-        builder.append(" 1 = 2 ");
-        queryParameters.setWhereClause(builder.toString());
-        final ListenableFuture<FeatureQueryResult> feature = mServiceFeatureTable.queryFeaturesAsync(queryParameters);
-        feature.addDoneListener(() -> {
-            try {
-                FeatureQueryResult result = feature.get();
-                Iterator iterator = result.iterator();
-                while (iterator.hasNext()) {
-                    Feature item = (Feature) iterator.next();
-                    Map<String, Object> attributes = item.getAttributes();
-                    String format_date = "";
-                    String[] split = attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString().split("_");
-                    try {
-                        format_date = Constant.DATE_FORMAT.format((new GregorianCalendar(Integer.parseInt(split[3]),
-                                Integer.parseInt(split[2]), Integer.parseInt(split[1])).getTime()));
-                    } catch (Exception ignored) {
-
-                    }
-                    String viTri = "";
-                    try {
-                        viTri = attributes.get(mContext.getString(R.string.Field_SuCo_DiaChi)).toString();
-                    } catch (Exception ignored) {
-
-                    }
-                    adapter.add(new TraCuuAdapter.Item(Integer.parseInt(attributes.get(mContext.getString(R.string.Field_OBJECTID)).toString()),
-                            attributes.get(mContext.getString(R.string.Field_SuCo_IDSuCo)).toString(), format_date, viTri,Constant.ThongTinPhanAnh.KHAC,null));
-                    adapter.notifyDataSetChanged();
-
-//                        queryByObjectID(Integer.parseInt(attributes.get(Constant.OBJECT_ID).toString()));
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
 }

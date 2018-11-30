@@ -29,7 +29,7 @@ import hcm.ditagis.com.cholon.qlsc.utities.Constant;
  * Created by ThanLe on 4/16/2018.
  */
 
-public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<Feature>, Void> {
+public class QueryServiceFeatureTableGetListAsync extends AsyncTask<QueryParameters, List<Feature>, Void> {
     @SuppressLint("StaticFieldLeak")
     private Activity mActivity;
     @SuppressLint("StaticFieldLeak")
@@ -74,34 +74,33 @@ public class QueryServiceFeatureTableGetListAsync extends AsyncTask<Void, List<F
     }
 
     @Override
-    protected Void doInBackground(Void... aVoids) {
-        try {
-            QueryParameters queryParameters = new QueryParameters();
-            String queryClause = String.format("%s = %d", Constant.FieldSuCo.TRANG_THAI, Constant.TrangThaiSuCo.CHUA_XU_LY);
-            queryParameters.setWhereClause(queryClause);
+    protected Void doInBackground(QueryParameters... params) {
+        if (params != null && params.length > 0)
+            try {
 
-            ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture = mServiceFeatureTable.queryFeaturesAsync(queryParameters,
-                    ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-            featureQueryResultListenableFuture.addDoneListener(() -> {
-                try {
-                    FeatureQueryResult result = featureQueryResultListenableFuture.get();
-                    Iterator<Feature> iterator = result.iterator();
-                    Feature item;
-                    List<Feature> features = new ArrayList<>();
-                    while (iterator.hasNext()) {
-                        item = iterator.next();
-                        features.add(item);
+
+                ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture = mServiceFeatureTable.queryFeaturesAsync(params[0],
+                        ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
+                featureQueryResultListenableFuture.addDoneListener(() -> {
+                    try {
+                        FeatureQueryResult result = featureQueryResultListenableFuture.get();
+                        Iterator<Feature> iterator = result.iterator();
+                        Feature item;
+                        List<Feature> features = new ArrayList<>();
+                        while (iterator.hasNext()) {
+                            item = iterator.next();
+                            features.add(item);
+                        }
+                        publishProgress(features);
+
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                        publishProgress();
                     }
-                    publishProgress(features);
-
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                    publishProgress();
-                }
-            });
-        } catch (Exception e) {
-            publishProgress();
-        }
+                });
+            } catch (Exception e) {
+                publishProgress();
+            }
         return null;
     }
 

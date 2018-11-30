@@ -507,7 +507,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 new QueryFeatureAsync(mMainActivity, Constant.TrangThaiSuCo.CHUA_XU_LY, "", "", output -> {
                     if (output != null && output.size() > 0) {
                         long objectID = getObjectID(output, comparator, true);
-                        mMainActivity.getMapViewHandler().queryByObjectID(objectID);
+                        mMainActivity.getMapViewHandler().query(String.format(Constant.QUERY_BY_OBJECTID,objectID));
                     }
                 }).execute();
                 break;
@@ -515,7 +515,7 @@ public class Popup extends AppCompatActivity implements View.OnClickListener {
                 new QueryFeatureAsync(mMainActivity, Constant.TrangThaiSuCo.CHUA_XU_LY, "", "", output -> {
                     if (output != null && output.size() > 0) {
                         long objectID = getObjectID(output, comparator, false);
-                        mMainActivity.getMapViewHandler().queryByObjectID(objectID);
+                        mMainActivity.getMapViewHandler().query(String.format(Constant.QUERY_BY_OBJECTID,objectID));
                     }
                 }).execute();
                 break;

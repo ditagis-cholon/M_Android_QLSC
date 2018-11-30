@@ -33,12 +33,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +44,11 @@ import android.widget.Toast;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.ArcGISRuntimeException;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.CodedValue;
+import com.esri.arcgisruntime.data.CodedValueDomain;
+import com.esri.arcgisruntime.data.Feature;
+import com.esri.arcgisruntime.data.Field;
+import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
@@ -74,24 +77,27 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.FindLocationAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.PreparingAsycn;
+import hcm.ditagis.com.cholon.qlsc.async.QueryServiceFeatureTableGetListAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DAddress;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
 import hcm.ditagis.com.cholon.qlsc.entities.DLayerInfo;
 import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.DFeatureLayer;
+import hcm.ditagis.com.cholon.qlsc.fragment.task.HandlingSearchHasDone;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 import hcm.ditagis.com.cholon.qlsc.utities.MapViewHandler;
 import hcm.ditagis.com.cholon.qlsc.utities.MySnackBar;
 import hcm.ditagis.com.cholon.qlsc.utities.Popup;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     public static DFeatureLayer DFeatureLayerDiemSuCo;
 
     private Popup mPopUp;
@@ -103,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private MapViewHandler mMapViewHandler;
-    private TraCuuAdapter mSearchAdapter;
     private LocationDisplay mLocationDisplay;
     private int requestCode = 2;
     private GraphicsOverlay mGraphicsOverlay;
@@ -129,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean mIsFirstLocating = true;
     private boolean isChangingGeometry = false;
     private FeatureLayer mFeatureLayer;
+    private LinearLayout mLLayoutSearch;
 
     public void setChangingGeometry(boolean changingGeometry) {
         isChangingGeometry = changingGeometry;
@@ -146,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void startSignIn() {
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        Intent intent = new Intent(MainActivity.this, LogInActivity.class);
         MainActivity.this.startActivityForResult(intent, Constant.RequestCode.LOGIN);
     }
 
@@ -227,13 +233,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         //for camera end
-        ListView listViewSearch = findViewById(R.id.lstview_search);
+        mLLayoutSearch = findViewById(R.id.llayout_main_search);
         //đưa listview search ra phía sau
-        listViewSearch.invalidate();
-        List<TraCuuAdapter.Item> items = new ArrayList<>();
-        mSearchAdapter = new TraCuuAdapter(MainActivity.this, items);
-        listViewSearch.setAdapter(mSearchAdapter);
-        listViewSearch.setOnItemClickListener(MainActivity.this);
+        mLLayoutSearch.invalidate();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(MainActivity.this,
                 drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -352,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void handlingAddFeatureSuccess() {
         handlingCancelAdd();
-        mMapViewHandler.queryByObjectID(mApplication.getDiemSuCo().getObjectID());
+        mMapViewHandler.query(String.format(Constant.QUERY_BY_OBJECTID, mApplication.getDiemSuCo().getObjectID()));
 
         mApplication.getDiemSuCo().clear();
     }
@@ -674,10 +676,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void deleteSearching() {
         mGraphicsOverlay.getGraphics().clear();
-        mSearchAdapter.clear();
-        mSearchAdapter.notifyDataSetChanged();
+        mLLayoutSearch.removeAllViews();
     }
-
 
 
     private void visibleFloatActionButton() {
@@ -706,26 +706,111 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mTxtSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         mTxtSearchView.setQueryHint(getString(R.string.title_search));
         mTxtSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
-                    if (mIsSearchingFeature && mMapViewHandler != null)
-                        mMapViewHandler.querySearch(query, mSearchAdapter);
-                    else if (query.length() > 0) {
+                    mLLayoutSearch.removeAllViews();
+                    if (mIsSearchingFeature && mMapViewHandler != null) {
+                        mPopUp.getCallout().dismiss();
+
+                        mFeatureLayer.clearSelection();
+                        QueryParameters queryParameters = new QueryParameters();
+                        StringBuilder builder = new StringBuilder();
+                        for (Field field : mFeatureLayer.getFeatureTable().getFields()) {
+                            switch (field.getFieldType()) {
+                                case OID:
+                                case INTEGER:
+                                case SHORT:
+                                    try {
+                                        int search = Integer.parseInt(query);
+                                        builder.append(String.format("%s = %s", field.getName(), search));
+                                        builder.append(" or ");
+                                    } catch (Exception ignored) {
+
+                                    }
+                                    break;
+                                case FLOAT:
+                                case DOUBLE:
+                                    try {
+                                        double search = Double.parseDouble(query);
+                                        builder.append(String.format("%s = %s", field.getName(), search));
+                                        builder.append(" or ");
+                                    } catch (Exception ignored) {
+
+                                    }
+                                    break;
+                                case TEXT:
+                                    builder.append(field.getName()).append(" like N'%").append(query).append("%'");
+                                    builder.append(" or ");
+                                    break;
+                            }
+                        }
+                        builder.append(" 1 = 2 ");
+                        queryParameters.setWhereClause(builder.toString());
+
+                        new QueryServiceFeatureTableGetListAsync(MainActivity.this, output -> {
+                            if (output != null && output.size() > 0) {
+                                List<HandlingSearchHasDone.Item> items = new ArrayList<>();
+                                for (Feature feature : output) {
+                                    Map<String, Object> attributes = feature.getAttributes();
+                                    Object idSuCo = attributes.get(Constant.FieldSuCo.ID_SUCO);
+                                    Object ngayXayRa = attributes.get(Constant.FieldSuCo.TG_PHAN_ANH);
+                                    Object thongTinPhanAnhCode = attributes.get(Constant.FieldSuCo.THONG_TIN_PHAN_ANH);
+                                    List<CodedValue> codedValues = ((CodedValueDomain) feature.getFeatureTable().getField(Constant.FieldSuCo.THONG_TIN_PHAN_ANH).getDomain()).getCodedValues();
+                                    Object thongTinPhanAnhValue = thongTinPhanAnhCode == null ? null : HandlingSearchHasDone.getValueDomain(codedValues, thongTinPhanAnhCode);
+                                    items.add(new HandlingSearchHasDone.Item(Integer.parseInt(attributes.get(Constant.Field.OBJECTID).toString()),
+                                            idSuCo != null ? idSuCo.toString() : "",
+                                            ngayXayRa != null ? Constant.DateFormat.DATE_FORMAT_VIEW.format(((Calendar) ngayXayRa).getTime()) : "",
+                                            attributes.get(Constant.FieldSuCo.DIA_CHI) != null ? attributes.get(Constant.FieldSuCo.DIA_CHI).toString() : "",
+                                            thongTinPhanAnhCode != null ? Short.parseShort(thongTinPhanAnhCode.toString()) : Constant.ThongTinPhanAnh.KHAC,
+                                            thongTinPhanAnhValue != null ? thongTinPhanAnhValue.toString() : ""));
+                                }
+                                List<View> views = HandlingSearchHasDone.handleFromItems(MainActivity.this, MainActivity.this, items);
+                                for (View view : views) {
+                                    TextView txtID = view.findViewById(R.id.txt_top);
+                                    view.setOnClickListener(v -> {
+                                        if (mMapViewHandler != null) {
+                                            mMapViewHandler.query(String.format(Constant.QUERY_BY_SUCOID, txtID.getText().toString()));
+                                            mLLayoutSearch.removeAllViews();
+                                        }
+                                    });
+                                    mLLayoutSearch.addView(view);
+                                }
+                            } else {
+
+                            }
+                        }).execute(queryParameters);
+                    } else if (query.length() > 0) {
                         deleteSearching();
                         FindLocationAsycn findLocationAsycn = new FindLocationAsycn(MainActivity.this,
                                 true, output -> {
                             if (output != null) {
-                                mSearchAdapter.clear();
-                                mSearchAdapter.notifyDataSetChanged();
                                 if (output.size() > 0) {
                                     for (DAddress address : output) {
-                                        TraCuuAdapter.Item item = new TraCuuAdapter.Item(-1, "", "", address.getLocation(), Constant.ThongTinPhanAnh.KHAC, null);
+                                        HandlingSearchHasDone.Item item = new HandlingSearchHasDone.Item(-1, "", "", address.getLocation(), Constant.ThongTinPhanAnh.KHAC, null);
                                         item.setLatitude(address.getLatitude());
                                         item.setLongtitude(address.getLongtitude());
-                                        mSearchAdapter.add(item);
+
+                                        LinearLayout layout = (LinearLayout) MainActivity.this.getLayoutInflater().inflate(R.layout.item_tracuu, null);
+                                        TextView txtThongTinPhanAnh = layout.findViewById(R.id.txt_bottom);
+                                        TextView txtDiaChi = layout.findViewById(R.id.txt_bottom1);
+                                        TextView txtID = layout.findViewById(R.id.txt_top);
+                                        TextView txtNgayCapNhat = layout.findViewById(R.id.txt_right);
+
+
+                                        txtID.setVisibility(View.GONE);
+                                        txtDiaChi.setText(item.getDiaChi());
+
+                                        txtNgayCapNhat.setVisibility(View.GONE);
+                                        txtThongTinPhanAnh.setVisibility(View.GONE);
+                                        layout.setOnClickListener(v -> {
+
+                                            setViewPointCenterLongLat(new Point(item.getLongtitude(), item.getLatitude()), item.getDiaChi());
+                                            Log.d("Tọa độ tìm kiếm", String.format("[% ,.9f;% ,.9f]", item.getLongtitude(), item.getLatitude()));
+                                        });
+                                        mLLayoutSearch.addView(layout);
                                     }
-                                    mSearchAdapter.notifyDataSetChanged();
 
                                     //                                    }
                                 }
@@ -745,8 +830,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onQueryTextChange(String newText) {
                 if (newText.trim().length() > 0 && !mIsSearchingFeature) {
                 } else {
-                    mSearchAdapter.clear();
-                    mSearchAdapter.notifyDataSetChanged();
+                    mLLayoutSearch.removeAllViews();
                     mGraphicsOverlay.getGraphics().clear();
                 }
                 return false;
@@ -784,7 +868,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handleFromFeatures clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_search:
@@ -1110,7 +1194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             switch (requestCode) {
                 case 1:
                     if (resultCode == Activity.RESULT_OK && mMapViewHandler != null) {
-                        mMapViewHandler.queryByObjectID(objectid);
+                        mMapViewHandler.query(String.format(Constant.QUERY_BY_OBJECTID, objectid));
                     }
                     break;
                 case Constant.RequestCode.LOGIN:
@@ -1135,21 +1219,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
             }
         } catch (Exception ignored) {
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        TraCuuAdapter.Item item = ((TraCuuAdapter.Item) parent.getItemAtPosition(position));
-        int objectID = item.getObjectID();
-        if (objectID != -1 && mMapViewHandler != null) {
-            mMapViewHandler.queryByObjectID(objectID);
-            mSearchAdapter.clear();
-            mSearchAdapter.notifyDataSetChanged();
-        } else {
-
-            setViewPointCenterLongLat(new Point(item.getLongtitude(), item.getLatitude()), item.getDiaChi());
-            Log.d("Tọa độ tìm kiếm", String.format("[% ,.9f;% ,.9f]", item.getLongtitude(), item.getLatitude()));
         }
     }
 }

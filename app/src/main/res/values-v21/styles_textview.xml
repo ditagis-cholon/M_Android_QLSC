@@ -16,6 +16,11 @@
 
     </style>
 
+    <style name="MyTextAppearance.Black.Big.Bold" parent="MyTextAppearance.Black.Big">
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
     <style name="MyTextAppearance.Black.Small" parent="@android:style/TextAppearance">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">15sp</item>

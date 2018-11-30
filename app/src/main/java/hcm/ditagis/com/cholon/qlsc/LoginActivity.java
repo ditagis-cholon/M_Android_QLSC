@@ -21,7 +21,7 @@ import hcm.ditagis.com.cholon.qlsc.entities.entitiesDB.User;
 import hcm.ditagis.com.cholon.qlsc.utities.CheckConnectInternet;
 import hcm.ditagis.com.cholon.qlsc.utities.Preference;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LogInActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mTxtUsername;
     private TextView mTxtPassword;
     private TextView mTxtValidation;
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 mApplication.setCheckedVersion(true);
                 new CheckVersionAsycn(this, output -> {
                     if (output != null) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this, R.style.Theme_AppCompat_DayNight_Dialog_Alert);
                         builder.setCancelable(true)
                                 .setPositiveButton("CẬP NHẬT", (dialogInterface, i) -> {
                                     goURLBrowser(output.getLink());
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         dialog.show();
 
                     } else {
-                        Toast.makeText(LoginActivity.this, "Phiên bản hiện tại là mới nhất", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LogInActivity.this, "Phiên bản hiện tại là mới nhất", Toast.LENGTH_LONG).show();
                     }
 
                 }).execute(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void handleLoginSuccess(User user) {
-mApplication.setUserDangNhap(user);
+        mApplication.setUserDangNhap(user);
 
         Preference.getInstance().savePreferences(getString(R.string.preference_username), mTxtUsername.getText().toString());
         mTxtUsername.setText("");

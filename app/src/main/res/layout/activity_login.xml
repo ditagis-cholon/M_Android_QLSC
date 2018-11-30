@@ -6,7 +6,7 @@
     android:background="@color/colorWhite"
 
     android:orientation="vertical"
-    tools:context="hcm.ditagis.com.cholon.qlsc.LoginActivity">
+    tools:context="hcm.ditagis.com.cholon.qlsc.LogInActivity">
 
 
     <TextView

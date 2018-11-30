@@ -2,6 +2,7 @@ package hcm.ditagis.com.cholon.qlsc;
 
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,15 +11,14 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Objects;
 
-import hcm.ditagis.com.cholon.qlsc.adapter.TraCuuAdapter;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
+import hcm.ditagis.com.cholon.qlsc.fragment.task.HandlingSearchHasDone;
 import hcm.ditagis.com.cholon.qlsc.fragment.task.ListTaskFragment;
 import hcm.ditagis.com.cholon.qlsc.fragment.task.SearchFragment;
 
@@ -28,6 +28,7 @@ public class ListTaskActivity extends AppCompatActivity {
     private SearchFragment mSearchFragment;
 
     private DApplication mApplication;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,9 @@ public class ListTaskActivity extends AppCompatActivity {
             return 2;
         }
     }
+
     public void itemClick(AdapterView<?> adapter, int position) {
-        TraCuuAdapter.Item item = (TraCuuAdapter.Item) adapter.getItemAtPosition(position);
+        HandlingSearchHasDone.Item item = (HandlingSearchHasDone.Item) adapter.getItemAtPosition(position);
         LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_dialog, null);
         TextView txtTitle = layout.findViewById(R.id.txt_dialog_title);
         TextView txtMessage = layout.findViewById(R.id.txt_dialog_message);
@@ -91,6 +93,27 @@ public class ListTaskActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    public void itemClick(String id) {
+        LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_dialog, null);
+        TextView txtTitle = layout.findViewById(R.id.txt_dialog_title);
+        TextView txtMessage = layout.findViewById(R.id.txt_dialog_message);
+        txtTitle.setText(getString(R.string.message_title_confirm));
+        txtMessage.setText(getString(R.string.message_click_list_task, id));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListTaskActivity.this);
+        builder.setView(layout);
+        builder.setCancelable(false)
+                .setPositiveButton(R.string.message_btn_ok, (dialog, i) -> {
+                    mApplication.getDiemSuCo().setIdSuCo(id);
+                    goHome();
+                }).setNegativeButton(R.string.message_btn_cancel, (dialog, i) -> {
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {

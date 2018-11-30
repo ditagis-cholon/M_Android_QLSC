@@ -79,6 +79,9 @@ public class Constant {
         public static final String OBJECTID = "OBJECTID";
     }
 
+    public static final String QUERY_BY_OBJECTID = Field.OBJECTID + " = %d";
+    public static final String QUERY_BY_SUCOID = FieldSuCo.ID_SUCO + " = '%s'";
+
     public class FieldSuCo {
         public static final String ID_SUCO = "IDSuCo";
         public static final String NGUOI_PHAN_ANH = "NguoiPhanAnh";
@@ -141,7 +144,7 @@ public class Constant {
     }
 
     public class URL_API {
-        public static final String CHECK_VERSION = SERVER_FOR_API + "/versioning/QLSC?version=%s";
+        public static final String CHECK_VERSION = SERVER_FOR_API + "/versioning/EVN?version=%s";
         public static final String ADD_FEATURE = SERVER_API + "/QuanLySuCo/TiepNhanSuCo/%s";
         public static final String LOGIN = SERVER_API + "/Login";
         public static final String PROFILE = SERVER_API + "/Account/Profile";
@@ -207,7 +210,6 @@ public class Constant {
 
     private Constant() {
     }
-
 
 
 }
