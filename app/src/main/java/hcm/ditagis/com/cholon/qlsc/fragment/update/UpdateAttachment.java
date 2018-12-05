@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -172,17 +173,13 @@ public class UpdateAttachment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_update_attachment_capture:
-                AlertDialog.Builder builder = new AlertDialog.Builder(mRootView.getContext(), R.style.DDialogBuilder);
                 LinearLayout layout = (LinearLayout) mActivity.getLayoutInflater().inflate(R.layout.layout_list_option, null);
                 ListView listView = layout.findViewById(R.id.lst_list_option);
                 listView.setAdapter(new OptionAddImageAdapter(mRootView.getContext(), Constant.OPTION_IMAGE_LIST));
-                builder.setTitle("Chọn phương thức thêm ảnh")
-                        .setNegativeButton("Hủy", (dialogInterface, i12) -> {
-                            dialogInterface.dismiss();
-                        });
 
-                builder.setView(layout);
-                AlertDialog dialog = builder.create();
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(mRootView.getContext());
+                bottomSheetDialog.setContentView(layout);
+
                 listView.setOnItemClickListener((adapterView, view1, i, l) -> {
                     String item = (String) adapterView.getItemAtPosition(i);
                     switch (item) {
@@ -195,9 +192,9 @@ public class UpdateAttachment extends Fragment {
                             mActivity.pickPhoto();
                             break;
                     }
-                    dialog.dismiss();
+                    bottomSheetDialog.dismiss();
                 });
-                dialog.show();
+                bottomSheetDialog.show();
                 break;
         }
 
