@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ThanLe on 3/1/2018.
@@ -79,6 +81,14 @@ public class Constant {
         public static final String OBJECTID = "OBJECTID";
     }
 
+    public static final List<String> OPTION_IMAGE_LIST = new ArrayList<String>() {{
+        add(OptionAddImage.CAPTURE);
+        add(OptionAddImage.PICK);
+    }};
+    public class OptionAddImage{
+        public static final String CAPTURE = "Chụp ảnh";
+        public static final String PICK = "Chọn ảnh";
+    }
     public static final String QUERY_BY_OBJECTID = Field.OBJECTID + " = %d";
     public static final String QUERY_BY_SUCOID = FieldSuCo.ID_SUCO + " = '%s'";
 

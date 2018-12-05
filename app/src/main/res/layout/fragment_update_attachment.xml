@@ -59,14 +59,6 @@
             android:layout_gravity="right"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_update_attachment_pick_photo"
-                style="@style/MyTextAppearance.Blue.Big"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|right"
-                android:background="@drawable/layout_border_transparent"
-                android:text="chọn ảnh" />
 
             <Button
                 android:id="@+id/btn_update_attachment_capture"
@@ -76,7 +68,7 @@
                 android:layout_gravity="center_vertical|right"
                 android:layout_marginLeft="@dimen/margin_small"
                 android:background="@drawable/layout_border_transparent"
-                android:text="Chụp ảnh" />
+                android:text="Thêm ảnh" />
 
         </LinearLayout>
 

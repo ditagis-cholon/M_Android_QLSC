@@ -31,9 +31,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import hcm.ditagis.com.cholon.qlsc.R;
 import hcm.ditagis.com.cholon.qlsc.UpdateActivity;
 import hcm.ditagis.com.cholon.qlsc.adapter.FeatureViewMoreInfoAttachmentsAdapter;
+import hcm.ditagis.com.cholon.qlsc.adapter.OptionAddImageAdapter;
 import hcm.ditagis.com.cholon.qlsc.async.FetchAttachmentAsync;
 import hcm.ditagis.com.cholon.qlsc.async.GetAttachmentsAsync;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
+import hcm.ditagis.com.cholon.qlsc.utities.Constant;
 
 @SuppressLint("ValidFragment")
 public class UpdateAttachment extends Fragment {
@@ -41,7 +43,7 @@ public class UpdateAttachment extends Fragment {
     private DApplication mApplication;
     private Uri mUri;
 
-    Button mBtnCapture, mBtnPickPhoto;
+    Button mBtnAddImage;
     LinearLayout mLLayoutMain;
     ListView mListView;
     LinearLayout mLLayoutProgress;
@@ -60,15 +62,13 @@ public class UpdateAttachment extends Fragment {
     }
 
     private void initViews() {
-        mBtnPickPhoto = mRootView.findViewById(R.id.btn_update_attachment_pick_photo);
-        mBtnCapture = mRootView.findViewById(R.id.btn_update_attachment_capture);
+        mBtnAddImage = mRootView.findViewById(R.id.btn_update_attachment_capture);
         mLLayoutMain = mRootView.findViewById(R.id.llayout_update_attachment_main);
         mListView = mRootView.findViewById(R.id.list_update_attachment);
         mLLayoutProgress = mRootView.findViewById(R.id.llayout_update_attachment_progress);
         mTxtProgress = mRootView.findViewById(R.id.txt_update_attachment_progress);
 
-        mBtnPickPhoto.setOnClickListener(this::onClick);
-        mBtnCapture.setOnClickListener(this::onClick);
+        mBtnAddImage.setOnClickListener(this::onClick);
         mmSwipe = mRootView.findViewById(R.id.swipe_udpate_attachment);
         mAdapter = new FeatureViewMoreInfoAttachmentsAdapter(mRootView.getContext(), new ArrayList<>());
         mListView.setAdapter(mAdapter);
@@ -172,12 +172,32 @@ public class UpdateAttachment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_update_attachment_capture:
-                mLLayoutProgress.setVisibility(View.VISIBLE);
-                mLLayoutMain.setVisibility(View.GONE);
-                mActivity.capture();
-                break;
-            case R.id.btn_update_attachment_pick_photo:
-                mActivity.pickPhoto();
+                AlertDialog.Builder builder = new AlertDialog.Builder(mRootView.getContext(), R.style.DDialogBuilder);
+                LinearLayout layout = (LinearLayout) mActivity.getLayoutInflater().inflate(R.layout.layout_list_option, null);
+                ListView listView = layout.findViewById(R.id.lst_list_option);
+                listView.setAdapter(new OptionAddImageAdapter(mRootView.getContext(), Constant.OPTION_IMAGE_LIST));
+                builder.setTitle("Chọn phương thức thêm ảnh")
+                        .setNegativeButton("Hủy", (dialogInterface, i12) -> {
+                            dialogInterface.dismiss();
+                        });
+
+                builder.setView(layout);
+                AlertDialog dialog = builder.create();
+                listView.setOnItemClickListener((adapterView, view1, i, l) -> {
+                    String item = (String) adapterView.getItemAtPosition(i);
+                    switch (item) {
+                        case Constant.OptionAddImage.CAPTURE:
+                            mLLayoutProgress.setVisibility(View.VISIBLE);
+                            mLLayoutMain.setVisibility(View.GONE);
+                            mActivity.capture();
+                            break;
+                        case Constant.OptionAddImage.PICK:
+                            mActivity.pickPhoto();
+                            break;
+                    }
+                    dialog.dismiss();
+                });
+                dialog.show();
                 break;
         }
 

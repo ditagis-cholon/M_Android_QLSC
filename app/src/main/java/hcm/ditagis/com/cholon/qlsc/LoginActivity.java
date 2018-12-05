@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
+
 import hcm.ditagis.com.cholon.qlsc.async.CheckVersionAsycn;
 import hcm.ditagis.com.cholon.qlsc.async.LoginAsycn;
 import hcm.ditagis.com.cholon.qlsc.entities.DApplication;
@@ -59,7 +62,19 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         else {
             mTxtUsername.setText(Preference.getInstance().loadPreference(getString(R.string.preference_username)));
         }
-
+        BubbleShowCaseBuilder builderUsername = new BubbleShowCaseBuilder(LogInActivity.this)
+                .title("Nhập tên đăng nhập")
+                .targetView(findViewById(R.id.layout_login_username));
+        BubbleShowCaseBuilder builderPassword = new BubbleShowCaseBuilder(LogInActivity.this)
+                .title("Nhập mật khẩu")
+                .targetView(findViewById(R.id.layout_login_password));
+        BubbleShowCaseBuilder builderLogin = new BubbleShowCaseBuilder(LogInActivity.this)
+                .title("Nhấn nút đăng nhập")
+                .targetView(findViewById(R.id.btnLogin));
+        BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
+        bubbleShowCaseSequence.addShowCase(builderUsername);
+        bubbleShowCaseSequence.addShowCase(builderPassword);
+        bubbleShowCaseSequence.addShowCase(builderLogin);
         try {
             if (!mApplication.isCheckedVersion()) {
                 mApplication.setCheckedVersion(true);
@@ -89,6 +104,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(LogInActivity.this, "Phiên bản hiện tại là mới nhất", Toast.LENGTH_LONG).show();
                     }
 
+                    bubbleShowCaseSequence.show();
                 }).execute(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
             }
         } catch (PackageManager.NameNotFoundException e) {
