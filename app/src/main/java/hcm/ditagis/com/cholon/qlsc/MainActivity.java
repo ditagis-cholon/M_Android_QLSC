@@ -432,7 +432,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else if (dLayerInfo.getId().equals(getString(R.string.IDLayer_DiemSuCo))) {
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     mFeatureLayer = new FeatureLayer(serviceFeatureTable);
-                    mFeatureLayer.setDefinitionExpression(dLayerInfo.getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                    if (dLayerInfo.getDefinition().toLowerCase().equals("null")) {
+                        mFeatureLayer.setDefinitionExpression(Constant.DEFINITION_HIDE_COMPLETE);
+                    } else
+                        mFeatureLayer.setDefinitionExpression(dLayerInfo.getDefinition().concat(" and ").concat(Constant.DEFINITION_HIDE_COMPLETE));
                     mFeatureLayer.setId(dLayerInfo.getId());
                     mFeatureLayer.setName(dLayerInfo.getTitleLayer());
                     mFeatureLayer.setId(dLayerInfo.getId());
@@ -456,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
                     mMapView.getMap().getOperationalLayers().add(mFeatureLayer);
 
-                } else if (taiSanImageLayers == null) {
+                } else if (!dLayerInfo.getId().equals("diemdanhgiaLYR") && taiSanImageLayers == null) {
 
                     taiSanImageLayers = new ArcGISMapImageLayer(url.replaceFirst("FeatureServer(.*)", "MapServer"));
                     taiSanImageLayers.setName(dLayerInfo.getTitleLayer());
@@ -857,11 +860,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showHideComplete() {
-        if (mApplication.getDFeatureLayer().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
-            mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition());
+        if (mApplication.getDFeatureLayer().getdLayerInfo().getDefinition().toLowerCase().equals("null")) {
+            if (mApplication.getDFeatureLayer().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
+                mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(null);
+            } else {
+                mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition()
+                        .concat(" and ").concat(Constant.DEFINITION_HIDE_COMPLETE));
+            }
         } else {
-            mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition()
-                    .concat(Constant.DEFINITION_HIDE_COMPLETE));
+            if (mApplication.getDFeatureLayer().getLayer().getDefinitionExpression().contains(Constant.DEFINITION_HIDE_COMPLETE)) {
+                mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition());
+            } else {
+                mApplication.getDFeatureLayer().getLayer().setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition()
+                        .concat(Constant.DEFINITION_HIDE_COMPLETE));
+            }
         }
     }
 
@@ -906,7 +918,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (mPopUp != null && mPopUp.getCallout() != null && mPopUp.getCallout().isShowing())
                         mPopUp.getCallout().dismiss();
                     mFeatureLayer.loadAsync();
-                    mFeatureLayer.setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition().concat(Constant.DEFINITION_HIDE_COMPLETE));
+                    if (mApplication.getDFeatureLayer().getdLayerInfo().getDefinition().toLowerCase().equals("null")) {
+                        mFeatureLayer.setDefinitionExpression(Constant.DEFINITION_HIDE_COMPLETE);
+                    } else
+                        mFeatureLayer.setDefinitionExpression(mApplication.getDFeatureLayer().getdLayerInfo().getDefinition().concat(" and ").concat(Constant.DEFINITION_HIDE_COMPLETE));
                 }
                 break;
             case R.id.nav_show_hide_complete:

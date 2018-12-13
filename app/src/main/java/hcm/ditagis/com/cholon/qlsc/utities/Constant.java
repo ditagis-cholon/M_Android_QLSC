@@ -18,7 +18,7 @@ public class Constant {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd_MM_yyyy");
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-    public static final String DEFINITION_HIDE_COMPLETE = " and TrangThai <> 3";
+    public static final String DEFINITION_HIDE_COMPLETE = " TrangThai <> 3";
     public static final String SERVER = "http://gis.capnuoccholon.com.vn";
     public static final String SERVER_FOR_API = SERVER + "/cholon";
     //    public static final String SERVER_FOR_API = "http://sawagis.vn";
