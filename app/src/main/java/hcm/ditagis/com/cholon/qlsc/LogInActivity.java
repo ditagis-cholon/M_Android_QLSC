@@ -104,7 +104,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(LogInActivity.this, "Phiên bản hiện tại là mới nhất", Toast.LENGTH_LONG).show();
                     }
 
-                    bubbleShowCaseSequence.show();
+//                    bubbleShowCaseSequence.show();
                 }).execute(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
             }
         } catch (PackageManager.NameNotFoundException e) {

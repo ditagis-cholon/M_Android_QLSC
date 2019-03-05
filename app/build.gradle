@@ -3,13 +3,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "hcm.ditagis.com.cholon.qlsc"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 1
-        versionName "sc.1.3.2"
+        versionCode 3
+        versionName "sc.1.3.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

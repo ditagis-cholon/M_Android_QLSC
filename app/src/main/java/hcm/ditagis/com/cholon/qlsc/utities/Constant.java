@@ -19,7 +19,7 @@ public class Constant {
     @SuppressLint("SimpleDateFormat")
     public static final SimpleDateFormat DATE_FORMAT_VIEW = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     public static final String DEFINITION_HIDE_COMPLETE = " TrangThai <> 3";
-    public static final String SERVER = "http://gis.capnuoccholon.com.vn";
+    public static final String SERVER = "https://gis.capnuoccholon.com.vn";
     public static final String SERVER_FOR_API = SERVER + "/cholon";
     //    public static final String SERVER_FOR_API = "http://sawagis.vn";
     public static final String SERVER_API = SERVER_FOR_API + "/api";
@@ -154,7 +154,7 @@ public class Constant {
     }
 
     public class URL_API {
-        public static final String CHECK_VERSION = SERVER_FOR_API + "/versioning/EVN?version=%s";
+        public static final String CHECK_VERSION = SERVER_FOR_API + "/versioning/QLSC?version=%s";
         public static final String ADD_FEATURE = SERVER_API + "/QuanLySuCo/TiepNhanSuCo/%s";
         public static final String LOGIN = SERVER_API + "/Login";
         public static final String PROFILE = SERVER_API + "/Account/Profile";
