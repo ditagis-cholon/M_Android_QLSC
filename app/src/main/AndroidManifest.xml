@@ -21,6 +21,7 @@
     <application
         android:name=".entities.DApplication"
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -53,10 +54,7 @@
             android:screenOrientation="portrait">
 
         </activity>
-        <activity
-            android:name=".DoiMatKhauActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name=".ListTaskActivity"
             android:parentActivityName=".MainActivity"

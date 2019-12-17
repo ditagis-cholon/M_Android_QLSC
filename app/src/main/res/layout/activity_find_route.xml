@@ -159,7 +159,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <android.support.design.widget.CoordinatorLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
@@ -168,7 +168,7 @@
             <include layout="@layout/layout_find_route_bottomsheet" />
 
 
-        </android.support.design.widget.CoordinatorLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <hcm.ditagis.com.cholon.qlsc.entities.CustomLinearLayout
             android:id="@+id/layout_find_route_show_hide"
