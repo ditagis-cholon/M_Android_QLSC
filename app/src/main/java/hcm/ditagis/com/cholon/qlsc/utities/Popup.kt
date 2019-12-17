@@ -69,7 +69,7 @@ class Popup(private val mMainActivity: MainActivity, private val mMapView: MapVi
 
 
         for (field in arcGISFeature.featureTable.fields) {
-            if (outFields.size > 0 && outFields[0] != "*") {
+            if (outFields.isNotEmpty() && outFields[0] != "*") {
                 for (s in outFields)
                     if (s == field.name) {
                         isFoundField = true
@@ -101,7 +101,7 @@ class Popup(private val mMainActivity: MainActivity, private val mMapView: MapVi
                     for (hoSoVatTuSuCo in mListHoSoVatTuSuCo!!) {
                         builder.append(hoSoVatTuSuCo.tenVatTu).append(" ").append(hoSoVatTuSuCo.soLuong).append(" ").append(hoSoVatTuSuCo.donViTinh).append("\n")
                     }
-                    if (builder.length > 0)
+                    if (builder.isNotEmpty())
                         builder.replace(builder.length - 2, builder.length, "")
                     item.value = builder.toString()
                 } else
@@ -110,9 +110,10 @@ class Popup(private val mMainActivity: MainActivity, private val mMapView: MapVi
                         Field.Type.OID, Field.Type.TEXT, Field.Type.SHORT, Field.Type.DOUBLE, Field.Type.INTEGER, Field.Type.FLOAT -> item.value = value.toString()
                     }
                 featureViewInfoAdapter.add(item)
-                featureViewInfoAdapter.notifyDataSetChanged()
+
             }
         }
+        featureViewInfoAdapter.notifyDataSetChanged()
     }
 
     private fun getValueDomain(codedValues: List<CodedValue>, code: String): Any? {

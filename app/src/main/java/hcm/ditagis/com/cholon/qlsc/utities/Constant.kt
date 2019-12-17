@@ -192,7 +192,7 @@ class Constant private constructor() {
         val DEFINITION_HIDE_COMPLETE = " TrangThai <> 3"
         val SERVER = "https://gis.capnuoccholon.com.vn"
         //    public static final String SERVER_FOR_API = SERVER + "/cholon";
-        val SERVER_FOR_API = "http://cholon.sawagis.vn"
+        val SERVER_FOR_API = "http://cholon.sawagis.vn/api"
         val SERVER_API = "$SERVER_FOR_API/api"
         val NULL = ""
 

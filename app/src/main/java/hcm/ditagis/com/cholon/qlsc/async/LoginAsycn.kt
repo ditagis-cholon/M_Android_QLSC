@@ -12,6 +12,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -30,43 +31,47 @@ class LoginAsycn(@field:SuppressLint("StaticFieldLeak")
         this.mDialog!!.setCancelable(false)
         this.mDialog!!.show()
     }
-
     override fun doInBackground(vararg params: String): User? {
         val userName = params[0]
-        val pin = params[1]
-        var user: User? = User()
-        //        String passEncoded = (new EncodeMD5()).encode(pin + "_DITAGIS");
-        // Do some validation here
-        val urlParameters = String.format("Username=%s&Password=%s", userName, pin)
-        val urlWithParam = String.format("%s?%s", Constant.instance.API_LOGIN, urlParameters)
+        val passWord = params[1]
         try {
-            //            + "&apiKey=" + API_KEY
-            val url = URL(urlWithParam)
+            val url = URL(Constant.instance.API_LOGIN)
             val conn = url.openConnection() as HttpURLConnection
-            try {
-                conn.requestMethod = Constant.HTTPRequest.GET_METHOD
-                conn.connect()
-                val bufferedReader = BufferedReader(InputStreamReader(conn.inputStream))
-                val line = bufferedReader.readLine()
-                if (line != null) {
-                    val token = line.replace("\"", "")
-                    bufferedReader.close()
+            conn.doOutput = true
+            conn.instanceFollowRedirects = false
+            conn.requestMethod = Constant.HTTPRequest.POST_METHOD
 
-                    if (checkAccess(token)!!) {
-                        user = getMoreInfo(token)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("Lỗi login", e.toString())
-            } finally {
-                conn.disconnect()
-            }
+            val cred = JSONObject()
+            cred.put("Username", userName)
+            cred.put("Password", passWord)
+
+
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+            conn.setRequestProperty("Accept", "application/json")
+            conn.useCaches = false
+            val wr = OutputStreamWriter(conn.outputStream)
+            wr.write(cred.toString())
+            wr.flush()
+
+            conn.connect()
+
+            val bufferedReader = BufferedReader(InputStreamReader(conn.inputStream))
+            val builder = StringBuilder()
+            val line = bufferedReader.readLine()
+            if (line != null)
+                builder.append(line)
+            val user = User()
+            user.userName = userName
+            user.passWord = passWord
+            user.token = builder.toString().replace("\"", "")
+
+            conn.disconnect()
+            return user
         } catch (e: Exception) {
-            Log.e("ERROR", e.message, e)
+            Log.e("Lỗi đăng nhập", e.toString())
         }
 
-        return user
-
+        return null
     }
 
     override fun onPostExecute(result: User?) {
